@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<Defs>
+
+  <!--
+    Worker's real landing/deployment logic (choosing a template-sized site via GravshipLandingSiteFinder,
+    spawning the ship, registering an EnemyGravshipInstance, deploying pawns from its declared exit cells) is
+    implemented in PawnsArrivalModeWorker_GravshipLanding. Not exposed to any vanilla
+    RaidStrategyDef's <arriveModes> - only GR_GravshipAssault references it.
+  -->
+  <PawnsArrivalModeDef>
+    <defName>GR_GravshipLanding</defName>
+    <workerClass>Gravship_Raids.PawnsArrivalModeWorker_GravshipLanding</workerClass>
+    <selectionWeightCurve>
+      <points>
+        <li>(0, 1)</li>
+      </points>
+    </selectionWeightCurve>
+    <!--
+      No minTechLevel here (deliberately - not just left off by oversight): gravships are advanced-tech
+      vessels, so only sufficiently advanced hostile factions should use this, but that floor is now a
+      configurable setting (GravshipRaidsSettings.minEnemyFactionTechLevel, defaulting to Spacer) enforced in
+      C# - see IncidentWorker_GravshipRaid.FactionCanBeGroupSource and
+      PawnsArrivalModeWorker_GravshipLanding.CanUseWith - rather than fixed here, so a player can raise or
+      lower it without this field silently overriding their choice.
+    -->
+    <textEnemy>A hostile gravship carrying {0} from {1} is landing nearby.</textEnemy>
+    <textFriendly>A gravship carrying friendly {0} from {1} is landing nearby.</textFriendly>
+    <textWillArrive>{0_pawnsPluralDef} will arrive aboard a landing gravship.</textWillArrive>
+    <!-- v1 supports surface maps only. -->
+    <layerWhitelist>
+      <li>Surface</li>
+    </layerWhitelist>
+  </PawnsArrivalModeDef>
+
+</Defs>

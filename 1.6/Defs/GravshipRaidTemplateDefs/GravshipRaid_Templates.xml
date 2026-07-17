@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<Defs>
+
+  <Gravship_Raids.GravshipRaidTemplateDef>
+    <defName>GR_Template_SmallLander</defName>
+    <label>small raider lander</label>
+    <prefab>GR_Prefab_SmallLander</prefab>
+  </Gravship_Raids.GravshipRaidTemplateDef>
+
+  <Gravship_Raids.GravshipRaidTemplateDef>
+    <defName>GR_Template_LargeCraft</defName>
+    <label>large late-game craft</label>
+    <prefab>GR_Prefab_LargeCraft</prefab>
+  </Gravship_Raids.GravshipRaidTemplateDef>
+
+</Defs>

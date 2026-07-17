@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<LanguageData>
+    <GravshipRaids.LoadingLabel>GravshipRaids Loading</GravshipRaids.LoadingLabel>
+
+    <!-- Mod settings window -->
+    <GravshipRaids.Settings.Category>Gravship Raids</GravshipRaids.Settings.Category>
+    <GravshipRaids.Settings.Enable>Enable gravship raids</GravshipRaids.Settings.Enable>
+    <GravshipRaids.Settings.EnableDesc>If disabled, the gravship raid incident will never fire and will not be offered as a raid option.</GravshipRaids.Settings.EnableDesc>
+    <GravshipRaids.Settings.OdysseyMissing>The Odyssey DLC was not detected. Gravship raids require Odyssey and will remain inactive until it is enabled.</GravshipRaids.Settings.OdysseyMissing>
+    <GravshipRaids.Settings.IncidentWeight>Incident frequency factor: {0}x</GravshipRaids.Settings.IncidentWeight>
+    <GravshipRaids.Settings.CasualtyRetreatThreshold>Casualty retreat threshold: {0}</GravshipRaids.Settings.CasualtyRetreatThreshold>
+    <GravshipRaids.Settings.MinThreatPoints>Minimum threat points required</GravshipRaids.Settings.MinThreatPoints>
+    <GravshipRaids.Settings.MaxConcurrentShips>Maximum concurrent gravships per map: {0}</GravshipRaids.Settings.MaxConcurrentShips>
+    <GravshipRaids.Settings.MinColonistCount>Minimum free colonists required on the map</GravshipRaids.Settings.MinColonistCount>
+    <GravshipRaids.Settings.MinEnemyFactionTechLevel>Minimum enemy faction tech level</GravshipRaids.Settings.MinEnemyFactionTechLevel>
+    <GravshipRaids.Settings.EnableRaidshipEffects>Real thruster/dust effects on enemy gravships</GravshipRaids.Settings.EnableRaidshipEffects>
+    <GravshipRaids.Settings.EnableRaidshipEffectsDesc>Enemy gravships show real thruster fire, exhaust, and ground dust while landing and departing, instead of a plain silhouette. Does not take control of the camera or hide the UI. Disable if this new rendering code causes visual issues on your system.</GravshipRaids.Settings.EnableRaidshipEffectsDesc>
+    <GravshipRaids.Settings.EnableMinPlayerTechLevel>Require a minimum colony tech level</GravshipRaids.Settings.EnableMinPlayerTechLevel>
+    <GravshipRaids.Settings.EnableMinPlayerTechLevelDesc>If enabled, gravship raids will not occur until your faction's tech level is at least the level chosen below. Useful to keep gravships away from low-tech starts (e.g. tribal) until your colony has caught up.</GravshipRaids.Settings.EnableMinPlayerTechLevelDesc>
+    <GravshipRaids.Settings.MinPlayerTechLevel>Minimum colony tech level required</GravshipRaids.Settings.MinPlayerTechLevel>
+    <GravshipRaids.Settings.DebugLogging>Enable debug logging</GravshipRaids.Settings.DebugLogging>
+    <GravshipRaids.Settings.DebugLoggingDesc>Logs extra diagnostic messages about gravship raid selection, landing, and lord behavior to the console.</GravshipRaids.Settings.DebugLoggingDesc>
+    <GravshipRaids.Settings.EnableGlobalFactionFilter>Enable global faction filter</GravshipRaids.Settings.EnableGlobalFactionFilter>
+    <GravshipRaids.Settings.EnableGlobalFactionFilterDesc>If enabled, factions excluded below can never be a gravship raid source, regardless of what any individual raid template's own allowed/disallowed faction lists say. Disabled by default.</GravshipRaids.Settings.EnableGlobalFactionFilterDesc>
+    <GravshipRaids.Settings.AddExcludedFaction>Add faction to exclude...</GravshipRaids.Settings.AddExcludedFaction>
+    <GravshipRaids.Settings.NoFactionsAvailable>(no more factions available)</GravshipRaids.Settings.NoFactionsAvailable>
+
+    <!-- Gravship raid templates -->
+    <GravshipRaids.EnemyGravshipCoreInspect>Gravship control core</GravshipRaids.EnemyGravshipCoreInspect>
+
+    <!-- LordJob_GravshipRaid retreat transitions -->
+    <GravshipRaids.MessageRaidersGivenUpRetreating>The {0} of {1} have given up the attack and are falling back to their gravship.</GravshipRaids.MessageRaidersGivenUpRetreating>
+    <GravshipRaids.MessageRaidersSatisfiedRetreating>The {0} of {1} are satisfied with the damage they've done and are falling back to their gravship.</GravshipRaids.MessageRaidersSatisfiedRetreating>
+    <GravshipRaids.MessageRaidersRetreatingCasualties>The {0} of {1} have taken too many casualties and are falling back to their gravship.</GravshipRaids.MessageRaidersRetreatingCasualties>
+    <GravshipRaids.MessageRaidersRetreatingNonHostile>The {0} of {1} are no longer hostile and are falling back to their gravship.</GravshipRaids.MessageRaidersRetreatingNonHostile>
+    <GravshipRaids.MessageRaidersBoarding>Surviving {0} of {1} are boarding their gravship.</GravshipRaids.MessageRaidersBoarding>
+    <GravshipRaids.MessageRaidersStranded>The {0} of {1} have lost their gravship and are fleeing on foot.</GravshipRaids.MessageRaidersStranded>
+
+    <!-- EnemyGravshipRaidUtility departure/destruction -->
+    <GravshipRaids.MessageGravshipCoreDestroyed>The gravship of the {0} of {1} has been destroyed, stranding any survivors.</GravshipRaids.MessageGravshipCoreDestroyed>
+</LanguageData>

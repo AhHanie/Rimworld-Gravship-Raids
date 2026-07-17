@@ -1,0 +1,160 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<Defs>
+
+  <PrefabDef>
+    <defName>GR_Prefab_SmallLander</defName>
+    <size>(13,7)</size>
+    <things>
+      <VacBarrier>
+        <position>(6, 0, 0)</position>
+      </VacBarrier>
+      <GravshipHull>
+        <rects>
+          <li>(3,0,5,0)</li>
+          <li>(7,0,9,0)</li>
+          <li>(2,1,2,1)</li>
+          <li>(10,1,10,1)</li>
+          <li>(11,2,11,2)</li>
+          <li>(0,3,0,3)</li>
+          <li>(12,3,12,3)</li>
+          <li>(11,4,11,4)</li>
+          <li>(2,5,2,5)</li>
+          <li>(10,5,10,5)</li>
+          <li>(3,6,9,6)</li>
+        </rects>
+        <stuff>Steel</stuff>
+      </GravshipHull>
+      <SmallThruster>
+        <positions>
+          <li>(1, 0, 2)</li>
+          <li>(1, 0, 4)</li>
+        </positions>
+        <relativeRotation>Clockwise</relativeRotation>
+      </SmallThruster>
+      <PilotConsole>
+        <position>(4, 0, 4)</position>
+      </PilotConsole>
+      <GR_EnemyGravshipCore>
+        <position>(9, 0, 3)</position>
+      </GR_EnemyGravshipCore>
+      <ChemfuelTank>
+        <position>(6, 0, 4)</position>
+      </ChemfuelTank>
+    </things>
+    <terrain>
+      <Substructure>
+        <rects>
+          <li>(3,0,9,6)</li>
+          <li>(2,1,2,5)</li>
+          <li>(10,1,10,5)</li>
+          <li>(1,2,1,4)</li>
+          <li>(11,2,11,4)</li>
+          <li>(0,3,0,3)</li>
+          <li>(12,3,12,3)</li>
+        </rects>
+      </Substructure>
+    </terrain>
+  </PrefabDef>
+
+  <PrefabDef>
+    <defName>GR_Prefab_LargeCraft</defName>
+    <size>(19,19)</size>
+    <things>
+      <PowerConduit>
+        <rects>
+          <li>(5,4,5,13)</li>
+          <li>(13,4,13,13)</li>
+        </rects>
+      </PowerConduit>
+      <Turret_MiniTurret>
+        <rects>
+          <li>(4,5,4,5)</li>
+          <li>(14,5,14,5)</li>
+          <li>(4,13,4,13)</li>
+          <li>(14,13,14,13)</li>
+        </rects>
+        <stuff>Steel</stuff>
+      </Turret_MiniTurret>
+      <VacBarrier>
+        <rects>
+          <li>(5,9,5,9)</li>
+          <li>(13,9,13,9)</li>
+        </rects>
+        <relativeRotation>Clockwise</relativeRotation>
+      </VacBarrier>
+      <GravshipHull>
+        <rects>
+          <li>(9,0,9,0)</li>
+          <li>(8,1,8,1)</li>
+          <li>(10,1,10,1)</li>
+          <li>(7,2,7,2)</li>
+          <li>(11,2,12,2)</li>
+          <li>(6,3,6,3)</li>
+          <li>(12,3,12,3)</li>
+          <li>(5,4,5,8)</li>
+          <li>(13,4,13,8)</li>
+          <li>(5,10,5,14)</li>
+          <li>(13,10,13,14)</li>
+          <li>(6,15,6,15)</li>
+          <li>(12,15,12,15)</li>
+        </rects>
+        <stuff>Steel</stuff>
+      </GravshipHull>
+      <LargeChemfuelTank>
+        <position>(7, 0, 5)</position>
+      </LargeChemfuelTank>
+      <ChemfuelPoweredGenerator>
+        <positions>
+          <li>(11, 0, 4)</li>
+          <li>(6, 0, 13)</li>
+        </positions>
+      </ChemfuelPoweredGenerator>
+      <SmallThruster>
+        <positions>
+          <li>(7, 0, 16)</li>
+          <li>(11, 0, 16)</li>
+          <li>(8, 0, 17)</li>
+          <li>(10, 0, 17)</li>
+          <li>(9, 0, 18)</li>
+        </positions>
+        <relativeRotation>Opposite</relativeRotation>
+      </SmallThruster>
+      <PilotConsole>
+        <position>(11, 0, 12)</position>
+        <relativeRotation>Clockwise</relativeRotation>
+      </PilotConsole>
+      <GR_EnemyGravshipCore>
+        <position>(9, 0, 9)</position>
+      </GR_EnemyGravshipCore>
+      <Filth_RubbleRock>
+        <position>(9, 0, 1)</position>
+      </Filth_RubbleRock>
+    </things>
+    <terrain>
+      <Substructure>
+        <rects>
+          <li>(9,0,9,18)</li>
+          <li>(8,1,8,17)</li>
+          <li>(10,1,10,17)</li>
+          <li>(7,2,7,16)</li>
+          <li>(11,2,12,15)</li>
+          <li>(6,3,6,15)</li>
+          <li>(5,4,5,14)</li>
+          <li>(13,4,13,14)</li>
+          <li>(4,5,4,13)</li>
+          <li>(14,5,14,13)</li>
+          <li>(3,6,3,12)</li>
+          <li>(15,6,15,12)</li>
+          <li>(2,7,2,11)</li>
+          <li>(16,7,16,11)</li>
+          <li>(1,8,1,10)</li>
+          <li>(17,8,17,10)</li>
+          <li>(0,9,0,9)</li>
+          <li>(18,9,18,9)</li>
+          <li>(11,16,11,16)</li>
+        </rects>
+      </Substructure>
+    </terrain>
+  </PrefabDef>
+
+</Defs>

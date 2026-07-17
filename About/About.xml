@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ModMetaData>
+    <name>Gravship Raids</name>
+    <author>Sk</author>
+    <packageId>sk.gravshipraids</packageId>
+    <supportedVersions>
+        <li>1.6</li>
+    </supportedVersions>
+    <description>Adds gravship raids into the game.</description>
+    <modVersion>1.2.0</modVersion>
+    <url>https://steamcommunity.com/sharedfiles/itemedittext/?id=3767338163</url>
+    <modDependencies>
+        <li>
+            <packageId>Ludeon.RimWorld.Odyssey</packageId>
+            <displayName>Odyssey</displayName>
+            <downloadUrl>https://store.steampowered.com/app/3022790</downloadUrl>
+        </li>
+    </modDependencies>
+    <loadAfter>
+        <li>Ludeon.RimWorld.Odyssey</li>
+    </loadAfter>
+</ModMetaData>

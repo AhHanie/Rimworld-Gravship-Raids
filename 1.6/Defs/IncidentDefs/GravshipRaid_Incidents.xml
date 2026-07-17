@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<Defs>
+
+  <IncidentDef>
+    <defName>GR_GravshipRaid</defName>
+    <label>gravship raid</label>
+    <description>A hostile gravship lands nearby and deploys a raiding party. The ship remains on the map as the raiders' landing site and retreat point.</description>
+    <targetTags>
+      <li>Map_PlayerHome</li>
+    </targetTags>
+    <workerClass>Gravship_Raids.IncidentWorker_GravshipRaid</workerClass>
+    <category>ThreatBig</category>
+    <baseChance>1.5</baseChance>
+    <ignoreRecentSelectionWeighting>true</ignoreRecentSelectionWeighting>
+    <pointsScaleable>true</pointsScaleable>
+    <tale>Raid</tale>
+    <layerWhitelist>
+      <li>Surface</li>
+    </layerWhitelist>
+  </IncidentDef>
+
+</Defs>

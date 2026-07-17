@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<Defs>
+
+  <ThingDef ParentName="SkyfallerBase">
+    <defName>GR_GravshipDepartureSkyfaller</defName>
+    <label>gravship (departing)</label>
+    <thingClass>Gravship_Raids.GravshipDepartureSkyfaller</thingClass>
+    <rotatable>false</rotatable>
+    <size>(1,2)</size>
+    <graphicData>
+      <texPath>Things/Building/SmallThruster/SmallThruster</texPath>
+      <graphicClass>Graphic_Multi</graphicClass>
+      <shaderType>CutoutFlying</shaderType>
+      <drawSize>(1.1,2.2)</drawSize>
+    </graphicData>
+    <skyfaller>
+      <reversed>true</reversed>
+      <movementType>Decelerate</movementType>
+      <ticksToImpactRange>-40~-15</ticksToImpactRange>
+      <shadow>Things/Skyfaller/SkyfallerShadowRectangle</shadow>
+      <shadowSize>(1.5,2.5)</shadowSize>
+      <floatingSound>Gravship_RetroThruster_Loop</floatingSound>
+      <motesPerCell>1</motesPerCell>
+      <moteSpawnTime>0.05</moteSpawnTime>
+    </skyfaller>
+  </ThingDef>
+
+</Defs>

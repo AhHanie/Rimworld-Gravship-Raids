@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<Defs>
+
+  <ThingDef ParentName="BuildingBase">
+    <defName>GR_EnemyGravshipCore</defName>
+    <label>gravship control core</label>
+    <description>The control and boarding core of a hostile gravship. Surviving raiders return here to board and depart when they retreat.</description>
+    <thingClass>Building</thingClass>
+    <graphicData>
+      <texPath>Things/Building/GravEngine/GravEngine</texPath>
+      <graphicClass>Graphic_Single</graphicClass>
+      <drawSize>(1,1)</drawSize>
+    </graphicData>
+    <size>(1,1)</size>
+    <rotatable>false</rotatable>
+    <passability>PassThroughOnly</passability>
+    <pathCost>14</pathCost>
+    <fillPercent>0.4</fillPercent>
+    <canOverlapZones>false</canOverlapZones>
+    <selectable>true</selectable>
+    <terrainAffordanceNeeded>Substructure</terrainAffordanceNeeded>
+    <statBases>
+      <MaxHitPoints>600</MaxHitPoints>
+      <Flammability>0</Flammability>
+      <Beauty>-5</Beauty>
+    </statBases>
+    <comps>
+      <li Class="Gravship_Raids.CompProperties_EnemyGravshipCore" />
+      <li Class="Gravship_Raids.CompProperties_Transporter_Hidden" />
+    </comps>
+  </ThingDef>
+
+</Defs>
