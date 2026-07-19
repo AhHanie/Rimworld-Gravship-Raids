@@ -127,5 +127,60 @@ namespace Gravship_Raids
                 GravshipRaidsSettings.debugLogging = previousDebugLogging;
             }
         }
+
+        [DebugAction("Gravship Raids", "Force enemy gravship departure", false, false, false, false, false, 0, false, allowedGameStates = AllowedGameStates.PlayingOnMap)]
+        private static void ForceEnemyGravshipDeparture()
+        {
+            Map map = Find.CurrentMap;
+            if (map == null)
+            {
+                return;
+            }
+
+            MapComponent_GravshipRaid component = MapComponent_GravshipRaid.GetFor(map);
+            EnemyGravshipInstance instance = component?.Instances.FirstOrDefault(
+                (EnemyGravshipInstance i) => i.state != GravshipRaidState.Departed && i.state != GravshipRaidState.Destroyed);
+
+            if (instance == null)
+            {
+                Report("no active enemy gravship instance exists on this map.");
+                return;
+            }
+
+            if (instance.core == null || !instance.core.Spawned)
+            {
+                Report($"{instance} has no valid spawned core.");
+                return;
+            }
+
+            if (instance.state != GravshipRaidState.Boarding)
+            {
+                Report($"{instance} is not in a departure-capable state (state={instance.state}); it must be Boarding.");
+                return;
+            }
+
+            bool previousDebugLogging = GravshipRaidsSettings.debugLogging;
+            GravshipRaidsSettings.debugLogging = true;
+            try
+            {
+                bool success = EnemyGravshipRaidUtility.BeginDeparture(instance, map);
+                string message = success
+                    ? $"[Gravship Raids] Force enemy gravship departure: {instance} departure sequence started."
+                    : $"[Gravship Raids] Force enemy gravship departure: BeginDeparture failed for {instance}.";
+                Log.Message(message);
+                Messages.Message(message, success ? MessageTypeDefOf.NeutralEvent : MessageTypeDefOf.RejectInput, historical: false);
+            }
+            finally
+            {
+                GravshipRaidsSettings.debugLogging = previousDebugLogging;
+            }
+        }
+
+        private static void Report(string reason)
+        {
+            string message = "[Gravship Raids] Force enemy gravship departure: cannot run - " + reason;
+            Log.Message(message);
+            Messages.Message(message, MessageTypeDefOf.RejectInput, historical: false);
+        }
     }
 }

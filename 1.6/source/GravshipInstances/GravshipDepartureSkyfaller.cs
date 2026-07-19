@@ -147,6 +147,8 @@ namespace Gravship_Raids
 
         protected override void LeaveMap()
         {
+            Map departureMap = Map;
+
             if (innerContainer.Any)
             {
                 List<Thing> contents = new List<Thing>(innerContainer);
@@ -160,16 +162,11 @@ namespace Gravship_Raids
                 innerContainer.ClearAndDestroyContentsOrPassToWorld(DestroyMode.Vanish);
             }
 
-            if (instance != null)
-            {
-                instance.core = null;
-                instance.state = GravshipRaidState.Departed;
-                instance.departingSkyfaller = null;
-                Logger.Message($"GravshipDepartureSkyfaller.LeaveMap: {instance} finished its departure rise; ship fully departed.");
-            }
             effects?.End();
 
             base.LeaveMap();
+
+            EnemyGravshipRaidUtility.FinalizeDeparture(instance, departureMap);
         }
     }
 }

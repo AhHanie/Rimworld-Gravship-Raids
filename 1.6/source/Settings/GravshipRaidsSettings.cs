@@ -26,6 +26,8 @@ namespace Gravship_Raids
 
         public static TechLevel minEnemyFactionTechLevel = TechLevel.Spacer;
 
+        public static bool hardcoreEnemyDepartureDestroysUnguardedMaps = false;
+
         public static bool debugLogging = false;
 
         public static bool globalFactionFilterEnabled = false;
@@ -49,6 +51,10 @@ namespace Gravship_Raids
             Scribe_Values.Look(ref enableMinPlayerTechLevel, "enableMinPlayerTechLevel", false);
             Scribe_Values.Look(ref minPlayerTechLevel, "minPlayerTechLevel", TechLevel.Industrial);
             Scribe_Values.Look(ref minEnemyFactionTechLevel, "minEnemyFactionTechLevel", TechLevel.Spacer);
+            Scribe_Values.Look(
+                ref hardcoreEnemyDepartureDestroysUnguardedMaps,
+                "hardcoreEnemyDepartureDestroysUnguardedMaps",
+                false);
             Scribe_Values.Look(ref debugLogging, "debugLogging", false);
             Scribe_Values.Look(ref globalFactionFilterEnabled, "globalFactionFilterEnabled", false);
             Scribe_Collections.Look(ref globalDisallowedFactionDefNames, "globalDisallowedFactionDefNames", LookMode.Value);

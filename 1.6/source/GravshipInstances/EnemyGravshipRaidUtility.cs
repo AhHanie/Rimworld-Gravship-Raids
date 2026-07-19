@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using RimWorld;
 using RimWorld.Planet;
+using UnityEngine;
 using Verse;
 using Verse.Sound;
 
@@ -9,6 +10,8 @@ namespace Gravship_Raids
 {
     public static class EnemyGravshipRaidUtility
     {
+        private const float TerminalFadeToBlackSeconds = 2f;
+
         public static bool BeginDeparture(EnemyGravshipInstance instance, Map map)
         {
             if (instance == null || map == null)
@@ -69,16 +72,164 @@ namespace Gravship_Raids
                 bool risingAway = TransferDepartingShipToLeavingEffect(boarded, hullPieces, instance, map, launchCell, launchRot);
                 if (!risingAway)
                 {
-                    instance.core = null;
-                    instance.state = GravshipRaidState.Departed;
+                    FinalizeDeparture(instance, map);
                 }
             }
             catch (Exception ex)
             {
                 Logger.Error($"EnemyGravshipRaidUtility.CompleteDeparture: exception while completing departure for {instance}: {ex}");
-                instance.core = null;
-                instance.state = GravshipRaidState.Departed;
+                FinalizeDeparture(instance, map);
             }
+        }
+
+        public static void FinalizeDeparture(EnemyGravshipInstance instance, Map map)
+        {
+            if (instance == null || instance.state == GravshipRaidState.Departed)
+            {
+                return;
+            }
+
+            instance.core = null;
+            instance.state = GravshipRaidState.Departed;
+            instance.departingSkyfaller = null;
+            Logger.Message($"EnemyGravshipRaidUtility.FinalizeDeparture: {instance} finished its departure; ship fully departed.");
+
+            ApplyHardcoreDepartureConsequence(map);
+        }
+
+        private static void ApplyHardcoreDepartureConsequence(Map map)
+        {
+            if (!GravshipRaidsSettings.hardcoreEnemyDepartureDestroysUnguardedMaps)
+            {
+                return;
+            }
+            if (map == null || map.Disposed || map.Parent == null)
+            {
+                return;
+            }
+            if (map.listerThings.AnyThingWithDef(ThingDefOf.GravAnchor))
+            {
+                return;
+            }
+
+            Logger.Message($"EnemyGravshipRaidUtility.ApplyHardcoreDepartureConsequence: map {map} has no grav anchor; abandoning it after a successful enemy gravship departure.");
+            GravshipUtility.AbandonMap(map);
+
+            if (PlayerHasSurvivingColonistsElsewhere())
+            {
+                return;
+            }
+
+            Logger.Message("EnemyGravshipRaidUtility.ApplyHardcoreDepartureConsequence: no surviving player colonists remain anywhere; fading to black before starting the terminal credits sequence.");
+            ScreenFader.StartFade(Color.black, TerminalFadeToBlackSeconds);
+            Delay.AfterNSeconds(TerminalFadeToBlackSeconds, delegate
+            {
+                GameVictoryUtility.ShowCredits(
+                    "GravshipRaids.Ending.UnguardedMapDestroyedIntro".Translate() + "\n\n" +
+                    "GravshipRaids.Ending.UnguardedMapDestroyedEnding".Translate(),
+                    SongDefOf.OdysseyCreditsSong,
+                    exitToMainMenu: true,
+                    songStartDelay: 0f);
+            });
+        }
+
+        private static bool PlayerHasSurvivingColonistsElsewhere()
+        {
+            List<Map> maps = Find.Maps;
+            for (int i = 0; i < maps.Count; i++)
+            {
+                if (maps[i].mapPawns.FreeColonistsSpawnedOrInPlayerEjectablePodsCount >= 1)
+                {
+                    return true;
+                }
+            }
+
+            for (int i = 0; i < maps.Count; i++)
+            {
+                IReadOnlyList<Pawn> allPawnsSpawned = maps[i].mapPawns.AllPawnsSpawned;
+                for (int j = 0; j < allPawnsSpawned.Count; j++)
+                {
+                    Pawn carried = allPawnsSpawned[j].carryTracker?.CarriedThing as Pawn;
+                    if (carried != null && carried.IsFreeColonist)
+                    {
+                        return true;
+                    }
+                }
+            }
+
+            List<Caravan> caravans = Find.WorldObjects.Caravans;
+            for (int i = 0; i < caravans.Count; i++)
+            {
+                if (CaravanHasFreeColonist(caravans[i]))
+                {
+                    return true;
+                }
+            }
+
+            List<TravellingTransporters> travellingTransporters = Find.WorldObjects.TravellingTransporters;
+            for (int i = 0; i < travellingTransporters.Count; i++)
+            {
+                if (travellingTransporters[i].PodsHaveAnyFreeColonist)
+                {
+                    return true;
+                }
+            }
+
+            if (Find.CurrentGravship != null)
+            {
+                foreach (Pawn pawn in Find.CurrentGravship.Pawns)
+                {
+                    if (pawn.IsFreeColonist)
+                    {
+                        return true;
+                    }
+                }
+            }
+
+            if (QuestUtility.TotalBorrowedColonistCount() > 0)
+            {
+                return true;
+            }
+
+            if (ModsConfig.AnomalyActive)
+            {
+                if (DeathRefusalUtility.PlayerHasCorpseWithDeathRefusal())
+                {
+                    return true;
+                }
+                for (int i = 0; i < maps.Count; i++)
+                {
+                    List<Pawn> allPawnsUnspawned = maps[i].mapPawns.AllPawnsUnspawned;
+                    for (int j = 0; j < allPawnsUnspawned.Count; j++)
+                    {
+                        Pawn pawn = allPawnsUnspawned[j];
+                        if (pawn.IsColonist && pawn.HostFaction == null && pawn.ParentHolder is CompDevourer)
+                        {
+                            return true;
+                        }
+                    }
+                }
+            }
+
+            return false;
+        }
+
+        private static bool CaravanHasFreeColonist(Caravan caravan)
+        {
+            if (!caravan.IsPlayerControlled)
+            {
+                return false;
+            }
+            List<Pawn> pawnsListForReading = caravan.PawnsListForReading;
+            for (int i = 0; i < pawnsListForReading.Count; i++)
+            {
+                Pawn pawn = pawnsListForReading[i];
+                if (pawn.IsColonist && pawn.HostFaction == null)
+                {
+                    return true;
+                }
+            }
+            return false;
         }
 
         private static List<Thing> CollectAndDespawnHullPieces(EnemyGravshipInstance instance)

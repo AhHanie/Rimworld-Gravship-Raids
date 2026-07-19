@@ -10,10 +10,23 @@ namespace Gravship_Raids
     {
         private static Vector2 globalFactionScrollPosition = Vector2.zero;
 
+        private static Vector2 settingsScrollPosition = Vector2.zero;
+
+        private static float settingsViewHeight = 1000f;
+
         public static void Draw(Rect inRect)
         {
+            Rect viewRect = new Rect(0f, 0f, inRect.width - 16f, settingsViewHeight);
+            Widgets.BeginScrollView(inRect, ref settingsScrollPosition, viewRect);
+
             Listing_Standard listing = new Listing_Standard();
-            listing.Begin(inRect);
+            listing.Begin(viewRect);
+            // Some sections (e.g. the global faction filter list) are only visible conditionally and can push
+            // total content past the fixed mod-settings window height. Without this, GetRect silently starts a
+            // new column off to the side (effectively off-screen) instead of just growing downward, which made
+            // later checkboxes disappear instead of being pushed down. The scroll view above is what actually
+            // makes the extra height reachable.
+            listing.maxOneColumn = true;
 
             listing.CheckboxLabeled("GravshipRaids.Settings.Enable".Translate(), ref GravshipRaidsSettings.enabled, "GravshipRaids.Settings.EnableDesc".Translate());
 
@@ -58,6 +71,10 @@ namespace Gravship_Raids
 
             listing.GapLine();
             listing.CheckboxLabeled("GravshipRaids.Settings.EnableRaidshipEffects".Translate(), ref GravshipRaidsSettings.enableRaidshipEffects, "GravshipRaids.Settings.EnableRaidshipEffectsDesc".Translate());
+            listing.CheckboxLabeled(
+                "GravshipRaids.Settings.HardcoreEnemyDepartureDestroysUnguardedMaps".Translate(),
+                ref GravshipRaidsSettings.hardcoreEnemyDepartureDestroysUnguardedMaps,
+                "GravshipRaids.Settings.HardcoreEnemyDepartureDestroysUnguardedMapsDesc".Translate());
 
             listing.GapLine();
             listing.CheckboxLabeled("GravshipRaids.Settings.EnableMinPlayerTechLevel".Translate(), ref GravshipRaidsSettings.enableMinPlayerTechLevel, "GravshipRaids.Settings.EnableMinPlayerTechLevelDesc".Translate());
@@ -89,7 +106,12 @@ namespace Gravship_Raids
             listing.GapLine();
             listing.CheckboxLabeled("GravshipRaids.Settings.DebugLogging".Translate(), ref GravshipRaidsSettings.debugLogging, "GravshipRaids.Settings.DebugLoggingDesc".Translate());
 
+            if (Event.current.type == EventType.Layout)
+            {
+                settingsViewHeight = listing.CurHeight + 30f;
+            }
             listing.End();
+            Widgets.EndScrollView();
         }
 
         private static void DrawGlobalFactionFilter(Listing_Standard listing)
