@@ -82,6 +82,7 @@
     <Compile Include="LordJobs\Trigger_FractionPawnsLostWithMinimum.cs" />
     <Compile Include="Debug\DebugActionsGravshipRaidTemplates.cs" />
     <Compile Include="Debug\DebugActionsGravshipRaidPrefabCapture.cs" />
+    <Compile Include="Debug\GravshipRaidDebugApi.cs" />
   </ItemGroup>
   <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

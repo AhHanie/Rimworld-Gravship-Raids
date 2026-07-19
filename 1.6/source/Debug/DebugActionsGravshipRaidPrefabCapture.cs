@@ -15,31 +15,10 @@ namespace Gravship_Raids
         [DebugAction("Gravship Raids", "Capture prefab with terrain...", false, false, false, false, false, 0, false, actionType = DebugActionType.Action, allowedGameStates = AllowedGameStates.PlayingOnMap)]
         private static void CapturePrefabWithTerrain()
         {
-            DebugToolsGeneral.GenericRectTool("Capture", delegate(CellRect rect)
-            {
-                try
-                {
-                    PrefabDef prefab = PrefabUtility.CreatePrefab(rect, copyAllThings: true, copyTerrain: true);
-                    HashSet<IntVec3> substructureCells = prefab.GetTerrain().Where((t) => t.data.def.isFoundation).Select((t) => t.cell).ToHashSet();
-                    List<(PrefabThingData data, IntVec3 cell)> things = prefab.GetThings().Where((t) => substructureCells.Contains(t.cell)).ToList();
-                    List<(PrefabTerrainData data, IntVec3 cell)> terrain = prefab.GetTerrain().Where((t) => t.data.def.isFoundation).ToList();
-
-                    string xml = BuildPrefabXml(rect, things, terrain);
-                    GUIUtility.systemCopyBuffer = xml;
-
-                    string message = $"[Gravship Raids] Captured prefab {rect.Size.x}x{rect.Size.z} ({things.Count} thing cell(s), {terrain.Count} terrain cell(s)). Copied to clipboard - rename NewPrefab before pasting into a defs file.";
-                    Log.Message(message);
-                    Messages.Message(message, MessageTypeDefOf.NeutralEvent, historical: false);
-                }
-                catch (Exception ex)
-                {
-                    Log.Error($"[Gravship Raids] Prefab capture failed for rect {rect}: {ex}");
-                    Messages.Message("[Gravship Raids] Prefab capture failed - see log for details.", MessageTypeDefOf.RejectInput, historical: false);
-                }
-            }, closeOnComplete: true);
+            GravshipRaidDebugApi.StartPrefabCaptureWithTerrain();
         }
 
-        private static string BuildPrefabXml(CellRect rect, List<(PrefabThingData data, IntVec3 cell)> things, List<(PrefabTerrainData data, IntVec3 cell)> terrain)
+        internal static string BuildPrefabXml(CellRect rect, List<(PrefabThingData data, IntVec3 cell)> things, List<(PrefabTerrainData data, IntVec3 cell)> terrain)
         {
             CellRect localRect = new CellRect(0, 0, rect.Size.x, rect.Size.z);
             StringBuilder sb = new StringBuilder();
