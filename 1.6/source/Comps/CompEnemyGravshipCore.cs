@@ -10,9 +10,28 @@ namespace Gravship_Raids
 
         public CompTransporter Transporter => parent.GetComp<CompTransporter>();
 
+        private bool authorResolved;
+
+        private string cachedAuthor;
+
         public override string CompInspectStringExtra()
         {
-            return "GravshipRaids.EnemyGravshipCoreInspect".Translate();
+            string baseText = "GravshipRaids.EnemyGravshipCoreInspect".Translate();
+
+            if (!authorResolved)
+            {
+                EnemyGravshipInstance instance = MapComponent_GravshipRaid.GetFor(parent.Map)?.GetInstanceForCore(parent);
+                string author = instance?.template?.author;
+                cachedAuthor = (author.NullOrEmpty() || author.Trim().Length == 0) ? null : author;
+                authorResolved = true;
+            }
+
+            if (cachedAuthor == null)
+            {
+                return baseText;
+            }
+
+            return baseText + "\n" + "GravshipRaids.EnemyGravshipCoreAuthor".Translate(cachedAuthor);
         }
 
         public override void PostDestroy(DestroyMode mode, Map previousMap)

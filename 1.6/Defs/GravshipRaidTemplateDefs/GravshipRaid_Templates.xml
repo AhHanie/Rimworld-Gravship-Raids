@@ -5,6 +5,7 @@
     <defName>GR_Template_SmallLander</defName>
     <label>small raider lander</label>
     <prefab>GR_Prefab_SmallLander</prefab>
+    <author>Hrušker</author>
   </Gravship_Raids.GravshipRaidTemplateDef>
 
   <Gravship_Raids.GravshipRaidTemplateDef>

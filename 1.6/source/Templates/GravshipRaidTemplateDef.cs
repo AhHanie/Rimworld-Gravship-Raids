@@ -10,6 +10,8 @@ namespace Gravship_Raids
     {
         public PrefabDef prefab;
 
+        public string author;
+
         public float selectionWeight = 1f;
 
         public SimpleCurve selectionWeightPerPointsCurve;

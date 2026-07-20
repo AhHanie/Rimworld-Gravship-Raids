@@ -32,6 +32,7 @@
 
     <!-- Gravship raid templates -->
     <GravshipRaids.EnemyGravshipCoreInspect>Gravship control core</GravshipRaids.EnemyGravshipCoreInspect>
+    <GravshipRaids.EnemyGravshipCoreAuthor>Author: {0}</GravshipRaids.EnemyGravshipCoreAuthor>
 
     <!-- LordJob_GravshipRaid retreat transitions -->
     <GravshipRaids.MessageRaidersGivenUpRetreating>The {0} of {1} have given up the attack and are falling back to their gravship.</GravshipRaids.MessageRaidersGivenUpRetreating>
