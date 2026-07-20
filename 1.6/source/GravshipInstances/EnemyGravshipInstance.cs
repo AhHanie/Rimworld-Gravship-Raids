@@ -32,6 +32,8 @@ namespace Gravship_Raids
 
         public List<Pawn> crew = new List<Pawn>();
 
+        public List<Pawn> guardCrew = new List<Pawn>();
+
         public GravshipRaidState state = GravshipRaidState.Landing;
 
         public int departureTick = -1;
@@ -70,6 +72,7 @@ namespace Gravship_Raids
             Scribe_References.Look(ref core, "core");
             Scribe_Collections.Look(ref spawnedThings, "spawnedThings", LookMode.Reference);
             Scribe_Collections.Look(ref crew, "crew", LookMode.Reference);
+            Scribe_Collections.Look(ref guardCrew, "guardCrew", LookMode.Reference);
             Scribe_Values.Look(ref state, "state", GravshipRaidState.Landing);
             Scribe_Values.Look(ref departureTick, "departureTick", -1);
             Scribe_Collections.Look(ref terrainSnapshot, "terrainSnapshot", LookMode.Deep);
@@ -79,6 +82,7 @@ namespace Gravship_Raids
             {
                 spawnedThings?.RemoveAll((Thing t) => t == null);
                 crew?.RemoveAll((Pawn p) => p == null);
+                guardCrew?.RemoveAll((Pawn p) => p == null || crew == null || !crew.Contains(p));
                 terrainSnapshot?.RemoveAll((GravshipRaidTemplateUtility.TerrainCellSnapshot t) => t == null);
             }
             if (Scribe.mode == LoadSaveMode.LoadingVars)
@@ -91,11 +95,20 @@ namespace Gravship_Raids
                 {
                     crew = new List<Pawn>();
                 }
+                if (guardCrew == null)
+                {
+                    guardCrew = new List<Pawn>();
+                }
                 if (terrainSnapshot == null)
                 {
                     terrainSnapshot = new List<GravshipRaidTemplateUtility.TerrainCellSnapshot>();
                 }
             }
+        }
+
+        public bool IsGuard(Pawn pawn)
+        {
+            return pawn != null && guardCrew != null && guardCrew.Contains(pawn);
         }
 
         public override string ToString()

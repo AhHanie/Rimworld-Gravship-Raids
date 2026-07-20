@@ -38,12 +38,21 @@ namespace Gravship_Raids
         {
             StateGraph stateGraph = new StateGraph();
 
-            LordToil_AssaultColony assaultToil = new LordToil_AssaultColony(attackDownedIfStarving: false, canPickUpOpportunisticWeapons: false);
+            LordToil_GravshipAssault assaultToil = new LordToil_GravshipAssault(instance);
             stateGraph.AddToil(assaultToil);
             stateGraph.StartingToil = assaultToil;
 
             LordToil_BoardEnemyGravship boardToil = new LordToil_BoardEnemyGravship(instance);
             stateGraph.AddToil(boardToil);
+
+            // Shared across every lord split off this raid (see IncidentParmsUtility.SplitIntoGroups):
+            // once any group's LordToil_BoardEnemyGravship.Init marks the instance Boarding, or the core is
+            // destroyed mid-assault, all other groups follow into boarding on their very next tick instead
+            // of continuing to assault independently. Unconditional (not gated on assaulterFaction below) -
+            // this is about the shared instance's state, not this lord's own retreat behavior.
+            Transition evacuatingTransition = new Transition(assaultToil, boardToil);
+            evacuatingTransition.AddTrigger(new Trigger_GravshipInstanceEvacuating(instance));
+            stateGraph.AddTransition(evacuatingTransition);
 
             // Matches vanilla LordJob_AssaultColony: every retreat trigger is gated on a real, humanlike
             // assaulter faction. A null/non-humanlike faction (never expected for this mod's raids, which

@@ -110,8 +110,6 @@ namespace Gravship_Raids
             Thing core = Core;
             SendPhaseMessage(core);
 
-            bool anyPawnStillTryingToBoard = false;
-
             for (int i = 0; i < lord.ownedPawns.Count; i++)
             {
                 Pawn pawn = lord.ownedPawns[i];
@@ -133,23 +131,40 @@ namespace Gravship_Raids
                         pawn.jobs.EndCurrentJob(JobCondition.InterruptForced);
                     }
                 }
-
-                if (expected == DutyDefOf.EnterTransporterAndDefendSelf)
-                {
-                    anyPawnStillTryingToBoard = true;
-                }
             }
 
             // Hand off to the real Boarding -> Launching -> Departed sequence once boarding is
-            // "complete" (no spawned pawn is still trying to reach the ship - everyone left is either already
-            // boarded, already given up, or dead) or the shared boarding-phase deadline has passed (the
-            // downed-pawn case above). EnemyGravshipRaidUtility.BeginDeparture itself no-ops for any state
-            // other than Boarding and for a missing/despawned core, so this is safe to evaluate every tick
-            // without an extra latch here.
-            if (core != null && instance != null && instance.state == GravshipRaidState.Boarding && (!anyPawnStillTryingToBoard || !BoardingWindowOpen))
+            // "complete" across the WHOLE raid instance, not just this lord's own owned pawns - a raid can be
+            // split into several lords (IncidentParmsUtility.SplitIntoGroups), and one lord's group finishing
+            // early must not launch the ship out from under another lord's still-boarding pawns.
+            // EnemyGravshipRaidUtility.BeginDeparture itself no-ops for any state other than Boarding and for
+            // a missing/despawned core, so this is safe to evaluate every tick from every lord without an
+            // extra latch here.
+            if (core != null && instance != null && instance.state == GravshipRaidState.Boarding && !AnyCrewStillTryingToBoard(core))
             {
                 EnemyGravshipRaidUtility.BeginDeparture(instance, lord.Map);
             }
+        }
+
+        private bool AnyCrewStillTryingToBoard(Thing core)
+        {
+            if (!BoardingWindowOpen || instance?.crew == null)
+            {
+                return false;
+            }
+            for (int i = 0; i < instance.crew.Count; i++)
+            {
+                Pawn pawn = instance.crew[i];
+                if (pawn == null || pawn.Dead || !pawn.Spawned)
+                {
+                    continue;
+                }
+                if (pawn.CanReach(core, PathEndMode.Touch, Danger.Deadly))
+                {
+                    return true;
+                }
+            }
+            return false;
         }
 
         private void SendPhaseMessage(Thing core)

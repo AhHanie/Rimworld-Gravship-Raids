@@ -79,7 +79,9 @@
     <Compile Include="GravshipInstances\MapComponent_GravshipRaid.cs" />
     <Compile Include="LordJobs\LordJob_GravshipRaid.cs" />
     <Compile Include="LordJobs\LordToil_BoardEnemyGravship.cs" />
+    <Compile Include="LordJobs\LordToil_GravshipAssault.cs" />
     <Compile Include="LordJobs\Trigger_FractionPawnsLostWithMinimum.cs" />
+    <Compile Include="LordJobs\Trigger_GravshipInstanceEvacuating.cs" />
     <Compile Include="Debug\DebugActionsGravshipRaidTemplates.cs" />
     <Compile Include="Debug\DebugActionsGravshipRaidPrefabCapture.cs" />
     <Compile Include="Debug\GravshipRaidDebugApi.cs" />

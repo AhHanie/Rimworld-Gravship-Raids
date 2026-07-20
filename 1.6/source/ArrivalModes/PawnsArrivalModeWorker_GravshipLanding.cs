@@ -4,6 +4,7 @@ using System.Runtime.CompilerServices;
 using RimWorld;
 using UnityEngine;
 using Verse;
+using Verse.AI.Group;
 
 namespace Gravship_Raids
 {
@@ -247,8 +248,25 @@ namespace Gravship_Raids
             }
 
             DeployPawns(pawns, map, template, root, rotation);
+            RefreshGravshipRaidDuties(instance, map);
 
             Logger.Message($"PawnsArrivalModeWorker_GravshipLanding.FinishLanding: landed '{template.defName}' at {root} (rot {rotation}) for faction '{faction?.Name ?? "null"}'; deployed {pawns.Count} pawn(s).");
+        }
+
+        private static void RefreshGravshipRaidDuties(EnemyGravshipInstance instance, Map map)
+        {
+            if (map == null || map.Disposed)
+            {
+                return;
+            }
+            List<Lord> lords = map.lordManager.lords;
+            for (int i = 0; i < lords.Count; i++)
+            {
+                if (lords[i].LordJob is LordJob_GravshipRaid job && job.Instance == instance)
+                {
+                    lords[i].CurLordToil?.UpdateAllDuties();
+                }
+            }
         }
 
         private static void RandomizeFuelTankLevels(List<Thing> spawned)

@@ -1,11 +1,14 @@
 using System.Collections.Generic;
 using RimWorld;
+using UnityEngine;
 using Verse;
 
 namespace Gravship_Raids
 {
     public class GravshipRaidsSettings : ModSettings
     {
+        public const float MaxGravshipGuardFraction = 0.3f;
+
         public static bool enabled = true;
 
         public static float incidentWeightFactor = 1f;
@@ -27,6 +30,10 @@ namespace Gravship_Raids
         public static TechLevel minEnemyFactionTechLevel = TechLevel.Spacer;
 
         public static bool hardcoreEnemyDepartureDestroysUnguardedMaps = false;
+
+        public static bool enableGravshipGuards = false;
+
+        public static float gravshipGuardFraction = 0.1f;
 
         public static bool debugLogging = false;
 
@@ -55,6 +62,8 @@ namespace Gravship_Raids
                 ref hardcoreEnemyDepartureDestroysUnguardedMaps,
                 "hardcoreEnemyDepartureDestroysUnguardedMaps",
                 false);
+            Scribe_Values.Look(ref enableGravshipGuards, "enableGravshipGuards", false);
+            Scribe_Values.Look(ref gravshipGuardFraction, "gravshipGuardFraction", 0.1f);
             Scribe_Values.Look(ref debugLogging, "debugLogging", false);
             Scribe_Values.Look(ref globalFactionFilterEnabled, "globalFactionFilterEnabled", false);
             Scribe_Collections.Look(ref globalDisallowedFactionDefNames, "globalDisallowedFactionDefNames", LookMode.Value);
@@ -62,6 +71,11 @@ namespace Gravship_Raids
             {
                 globalDisallowedFactionDefNames = new List<string>();
             }
+        }
+
+        public static float ClampedGravshipGuardFraction()
+        {
+            return Mathf.Clamp(gravshipGuardFraction, 0f, MaxGravshipGuardFraction);
         }
 
         public static void PruneInvalidGlobalFactionEntries()

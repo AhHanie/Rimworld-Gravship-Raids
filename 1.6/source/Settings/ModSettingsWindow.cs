@@ -76,6 +76,19 @@ namespace Gravship_Raids
                 ref GravshipRaidsSettings.hardcoreEnemyDepartureDestroysUnguardedMaps,
                 "GravshipRaids.Settings.HardcoreEnemyDepartureDestroysUnguardedMapsDesc".Translate());
 
+            listing.CheckboxLabeled(
+                "GravshipRaids.Settings.EnableGravshipGuards".Translate(),
+                ref GravshipRaidsSettings.enableGravshipGuards,
+                "GravshipRaids.Settings.EnableGravshipGuardsDesc".Translate());
+            if (GravshipRaidsSettings.enableGravshipGuards)
+            {
+                listing.Label("GravshipRaids.Settings.GravshipGuardFraction".Translate(GravshipRaidsSettings.gravshipGuardFraction.ToStringPercent()));
+                GravshipRaidsSettings.gravshipGuardFraction = Mathf.Clamp(
+                    listing.Slider(GravshipRaidsSettings.gravshipGuardFraction, 0f, GravshipRaidsSettings.MaxGravshipGuardFraction),
+                    0f,
+                    GravshipRaidsSettings.MaxGravshipGuardFraction);
+            }
+
             listing.GapLine();
             listing.CheckboxLabeled("GravshipRaids.Settings.EnableMinPlayerTechLevel".Translate(), ref GravshipRaidsSettings.enableMinPlayerTechLevel, "GravshipRaids.Settings.EnableMinPlayerTechLevelDesc".Translate());
             if (GravshipRaidsSettings.enableMinPlayerTechLevel)
