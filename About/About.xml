@@ -7,7 +7,7 @@
         <li>1.6</li>
     </supportedVersions>
     <description>Adds gravship raids into the game.</description>
-    <modVersion>1.4.3</modVersion>
+    <modVersion>1.5.0</modVersion>
     <url>https://steamcommunity.com/sharedfiles/itemedittext/?id=3767338163</url>
     <modDependencies>
         <li>
@@ -18,5 +18,6 @@
     </modDependencies>
     <loadAfter>
         <li>Ludeon.RimWorld.Odyssey</li>
+        <li>vanillaexpanded.gravship</li>
     </loadAfter>
 </ModMetaData>

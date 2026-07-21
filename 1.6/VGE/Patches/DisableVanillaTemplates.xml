@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<Patch>
+
+  <Operation Class="PatchOperationAdd">
+    <xpath>Defs/Gravship_Raids.GravshipRaidTemplateDef[defName="GR_Template_SmallLander"]</xpath>
+    <value>
+      <disabled>true</disabled>
+    </value>
+  </Operation>
+
+  <Operation Class="PatchOperationAdd">
+    <xpath>Defs/Gravship_Raids.GravshipRaidTemplateDef[defName="GR_Template_LargeCraft1"]</xpath>
+    <value>
+      <disabled>true</disabled>
+    </value>
+  </Operation>
+
+  <Operation Class="PatchOperationAdd">
+    <xpath>Defs/Gravship_Raids.GravshipRaidTemplateDef[defName="GR_Template_LargeCraft"]</xpath>
+    <value>
+      <disabled>true</disabled>
+    </value>
+  </Operation>
+
+</Patch>

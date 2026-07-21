@@ -39,6 +39,10 @@ namespace Gravship_Raids
         {
             foreach (GravshipRaidTemplateDef template in DefDatabase<GravshipRaidTemplateDef>.AllDefsListForReading)
             {
+                if (template.disabled)
+                {
+                    continue;
+                }
                 if (!IsValidTemplate(template))
                 {
                     continue;

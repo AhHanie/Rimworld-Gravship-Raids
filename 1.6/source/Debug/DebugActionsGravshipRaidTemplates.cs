@@ -21,7 +21,7 @@ namespace Gravship_Raids
             {
                 GravshipRaidTemplateDef localTemplate = template;
                 bool valid = GravshipRaidTemplateUtility.IsValidTemplate(localTemplate);
-                string label = localTemplate.defName + (valid ? string.Empty : " [INVALID]");
+                string label = localTemplate.defName + (valid ? string.Empty : " [INVALID]") + (localTemplate.disabled ? " [DISABLED]" : string.Empty);
                 list.Add(new DebugActionNode(label, DebugActionType.ToolMap)
                 {
                     action = delegate

@@ -160,15 +160,15 @@ namespace Gravship_Raids
             {
                 try
                 {
-                    PrefabDef prefab = PrefabUtility.CreatePrefab(rect, copyAllThings: true, copyTerrain: true);
-                    HashSet<IntVec3> substructureCells = prefab.GetTerrain().Where((t) => t.data.def.isFoundation).Select((t) => t.cell).ToHashSet();
+                    PrefabDef prefab = PrefabUtility.CreatePrefab(rect, copyAllThings: true, copyTerrain: false);
+                    List<(PrefabTerrainData data, IntVec3 cell)> foundation = CaptureFoundationTerrain(Find.CurrentMap, rect);
+                    HashSet<IntVec3> substructureCells = foundation.Select((t) => t.cell).ToHashSet();
                     List<(PrefabThingData data, IntVec3 cell)> things = prefab.GetThings().Where((t) => substructureCells.Contains(t.cell)).ToList();
-                    List<(PrefabTerrainData data, IntVec3 cell)> terrain = prefab.GetTerrain().Where((t) => t.data.def.isFoundation).ToList();
 
-                    string xml = DebugActionsGravshipRaidPrefabCapture.BuildPrefabXml(rect, things, terrain);
+                    string xml = DebugActionsGravshipRaidPrefabCapture.BuildPrefabXml(rect, things, foundation);
                     GUIUtility.systemCopyBuffer = xml;
 
-                    string message = $"[Gravship Raids] Captured prefab {rect.Size.x}x{rect.Size.z} ({things.Count} thing cell(s), {terrain.Count} terrain cell(s)). Copied to clipboard - rename NewPrefab before pasting into a defs file.";
+                    string message = $"[Gravship Raids] Captured prefab {rect.Size.x}x{rect.Size.z} ({things.Count} thing cell(s), {foundation.Count} foundation terrain cell(s)). Copied to clipboard - rename NewPrefab before pasting into a defs file.";
                     Log.Message(message);
                     Messages.Message(message, MessageTypeDefOf.NeutralEvent, historical: false);
                 }
@@ -178,6 +178,32 @@ namespace Gravship_Raids
                     Messages.Message("[Gravship Raids] Prefab capture failed - see log for details.", MessageTypeDefOf.RejectInput, historical: false);
                 }
             }, closeOnComplete: true);
+        }
+
+        private static List<(PrefabTerrainData data, IntVec3 cell)> CaptureFoundationTerrain(Map map, CellRect rect)
+        {
+            // CreatePrefab's copyTerrain only reads the visible top terrain layer (cell.GetTerrain), so a floor
+            // built over a foundation would be captured as that floor and the foundation beneath silently dropped.
+            // FoundationAt reads the separate foundation layer directly, independent of whatever floor sits above it.
+            List<(PrefabTerrainData data, IntVec3 cell)> result = new List<(PrefabTerrainData, IntVec3)>();
+            TerrainGrid terrainGrid = map.terrainGrid;
+            foreach (IntVec3 cell in rect.Cells)
+            {
+                TerrainDef foundationDef = terrainGrid.FoundationAt(cell);
+                if (foundationDef == null)
+                {
+                    continue;
+                }
+                IntVec3 localCell = cell - rect.Min;
+                PrefabTerrainData data = new PrefabTerrainData
+                {
+                    def = foundationDef,
+                    color = terrainGrid.ColorAt(cell),
+                    rects = new List<CellRect> { new CellRect(localCell.x, localCell.z, 1, 1) }
+                };
+                result.Add((data, localCell));
+            }
+            return result;
         }
 
         private static void Report(string reason)

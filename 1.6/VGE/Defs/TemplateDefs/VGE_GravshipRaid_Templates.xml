@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<Defs>
+
+    <Gravship_Raids.GravshipRaidTemplateDef>
+        <defName>GR_Template_VGE_SmallGravship</defName>
+        <label>small VGE gravship</label>
+        <prefab>GR_Prefab_VGE_SmallGravship</prefab>
+        <arrivalSkyfaller>GR_GravshipArrivalSkyfaller_Large</arrivalSkyfaller>
+        <author>Dmitrij2811by</author>
+    </Gravship_Raids.GravshipRaidTemplateDef>
+
+    <Gravship_Raids.GravshipRaidTemplateDef>
+        <defName>GR_Template_VGE_SmallGravship1</defName>
+        <label>small VGE gravship</label>
+        <prefab>GR_Prefab_VGE_SmallGravship1</prefab>
+        <arrivalSkyfaller>GR_GravshipArrivalSkyfaller_Large</arrivalSkyfaller>
+        <author>Dmitrij2811by</author>
+    </Gravship_Raids.GravshipRaidTemplateDef>
+
+    <Gravship_Raids.GravshipRaidTemplateDef>
+        <defName>GR_Template_VGE_MediumGravship</defName>
+        <label>medium VGE gravship</label>
+        <prefab>GR_Prefab_VGE_MediumGravship</prefab>
+        <arrivalSkyfaller>GR_GravshipArrivalSkyfaller_Large</arrivalSkyfaller>
+        <author>Dmitrij2811by</author>
+    </Gravship_Raids.GravshipRaidTemplateDef>
+
+</Defs>

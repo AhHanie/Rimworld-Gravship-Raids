@@ -10,6 +10,8 @@ namespace Gravship_Raids
     {
         public PrefabDef prefab;
 
+        public bool disabled = false;
+
         public string author;
 
         public float selectionWeight = 1f;
