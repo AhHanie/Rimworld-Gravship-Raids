@@ -9,6 +9,13 @@
   </Gravship_Raids.GravshipRaidTemplateDef>
 
   <Gravship_Raids.GravshipRaidTemplateDef>
+    <defName>GR_Template_LargeCraft1</defName>
+    <label>large late-game craft</label>
+    <prefab>GR_Prefab_LargeCraft1</prefab>
+    <author>Taylor MH</author>
+  </Gravship_Raids.GravshipRaidTemplateDef>
+
+  <Gravship_Raids.GravshipRaidTemplateDef>
     <defName>GR_Template_LargeCraft</defName>
     <label>large late-game craft</label>
     <prefab>GR_Prefab_LargeCraft</prefab>

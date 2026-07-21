@@ -88,6 +88,212 @@
   </PrefabDef>
 
   <PrefabDef>
+    <defName>GR_Prefab_LargeCraft1</defName>
+    <size>(15,15)</size>
+    <things>
+      <HiddenConduit>
+        <rects>
+          <li>(7,5,10,5)</li>
+          <li>(10,6,10,9)</li>
+        </rects>
+      </HiddenConduit>
+      <WallLamp>
+        <position>(3, 0, 6)</position>
+        <relativeRotation>Counterclockwise</relativeRotation>
+      </WallLamp>
+      <WallLamp>
+        <position>(11, 0, 6)</position>
+        <relativeRotation>Clockwise</relativeRotation>
+      </WallLamp>
+      <OxygenPump>
+        <position>(7, 0, 1)</position>
+        <relativeRotation>Opposite</relativeRotation>
+      </OxygenPump>
+      <MealNutrientPaste>
+        <position>(11, 0, 4)</position>
+        <stackCountRange>3~3</stackCountRange>
+      </MealNutrientPaste>
+      <Plant_Rose>
+        <position>(9, 0, 2)</position>
+      </Plant_Rose>
+      <Beer>
+        <position>(11, 0, 4)</position>
+        <stackCountRange>5~5</stackCountRange>
+      </Beer>
+      <Silver>
+        <position>(11, 0, 4)</position>
+        <stackCountRange>150~150</stackCountRange>
+      </Silver>
+      <Yayo>
+        <position>(11, 0, 5)</position>
+      </Yayo>
+      <Table1x2c>
+        <position>(3, 0, 5)</position>
+        <stuff>Steel</stuff>
+        <quality>Normal</quality>
+        <colorDef>Structure_GreyDark</colorDef>
+      </Table1x2c>
+      <PlantPot>
+        <position>(9, 0, 2)</position>
+        <stuff>Steel</stuff>
+        <quality>Normal</quality>
+      </PlantPot>
+      <Turret_MiniTurret>
+        <rects>
+          <li>(1,5,1,6)</li>
+          <li>(13,5,13,6)</li>
+        </rects>
+        <stuff>Steel</stuff>
+      </Turret_MiniTurret>
+      <Armchair>
+        <position>(7, 0, 3)</position>
+        <relativeRotation>Opposite</relativeRotation>
+        <stuff>Cloth</stuff>
+        <quality>Normal</quality>
+      </Armchair>
+      <VacBarrier>
+        <position>(7, 0, 9)</position>
+      </VacBarrier>
+      <HunterDroneTrap>
+        <position>(5, 0, 2)</position>
+      </HunterDroneTrap>
+      <Building_OutfitStand>
+        <rects>
+          <li>(4,9,4,9)</li>
+          <li>(10,9,10,9)</li>
+        </rects>
+        <relativeRotation>Opposite</relativeRotation>
+        <stuff>Steel</stuff>
+      </Building_OutfitStand>
+      <GravshipHull>
+        <rects>
+          <li>(6,0,8,0)</li>
+          <li>(5,1,5,1)</li>
+          <li>(9,1,9,1)</li>
+          <li>(4,2,4,2)</li>
+          <li>(10,2,10,2)</li>
+          <li>(3,3,3,3)</li>
+          <li>(11,3,11,3)</li>
+          <li>(2,4,2,8)</li>
+          <li>(12,4,12,8)</li>
+          <li>(1,9,1,11)</li>
+          <li>(5,9,6,9)</li>
+          <li>(8,9,9,9)</li>
+          <li>(13,9,13,11)</li>
+          <li>(4,10,4,10)</li>
+          <li>(10,10,10,10)</li>
+          <li>(3,11,3,11)</li>
+          <li>(11,11,11,11)</li>
+        </rects>
+        <stuff>Steel</stuff>
+        <colorDef>Structure_Black</colorDef>
+      </GravshipHull>
+      <DiningChair>
+        <position>(3, 0, 4)</position>
+        <stuff>Obsidian</stuff>
+        <quality>Normal</quality>
+        <colorDef>Structure_Marble</colorDef>
+      </DiningChair>
+      <DiningChair>
+        <position>(4, 0, 5)</position>
+        <relativeRotation>Counterclockwise</relativeRotation>
+        <stuff>Obsidian</stuff>
+        <quality>Normal</quality>
+        <colorDef>Structure_Marble</colorDef>
+      </DiningChair>
+      <DiningChair>
+        <position>(10, 0, 7)</position>
+        <relativeRotation>Clockwise</relativeRotation>
+        <stuff>Obsidian</stuff>
+        <quality>Normal</quality>
+        <colorDef>Structure_White</colorDef>
+      </DiningChair>
+      <ChemfuelPoweredGenerator>
+        <position>(11, 0, 9)</position>
+      </ChemfuelPoweredGenerator>
+      <SmallThruster>
+        <positions>
+          <li>(2, 0, 12)</li>
+          <li>(12, 0, 12)</li>
+          <li>(1, 0, 13)</li>
+          <li>(13, 0, 13)</li>
+        </positions>
+        <relativeRotation>Opposite</relativeRotation>
+      </SmallThruster>
+      <PilotConsole>
+        <position>(7, 0, 2)</position>
+        <relativeRotation>Opposite</relativeRotation>
+      </PilotConsole>
+      <GR_EnemyGravshipCore>
+        <position>(7, 0, 6)</position>
+      </GR_EnemyGravshipCore>
+      <DrugLab>
+        <position>(11, 0, 7)</position>
+        <relativeRotation>Clockwise</relativeRotation>
+        <stuff>Steel</stuff>
+      </DrugLab>
+      <TubeTelevision>
+        <position>(3, 0, 7)</position>
+        <relativeRotation>Opposite</relativeRotation>
+      </TubeTelevision>
+      <ChemfuelTank>
+        <position>(2, 0, 9)</position>
+      </ChemfuelTank>
+      <Shelf>
+        <position>(11, 0, 4)</position>
+        <relativeRotation>Counterclockwise</relativeRotation>
+        <stuff>Steel</stuff>
+        <colorDef>Structure_GrayLight</colorDef>
+      </Shelf>
+    </things>
+    <terrain>
+      <Substructure>
+        <rects>
+          <li>(6,0,8,0)</li>
+          <li>(5,1,5,1)</li>
+          <li>(9,1,9,1)</li>
+          <li>(4,2,4,2)</li>
+          <li>(10,2,10,2)</li>
+          <li>(3,3,3,3)</li>
+          <li>(11,3,11,3)</li>
+          <li>(2,4,2,8)</li>
+          <li>(12,4,12,8)</li>
+          <li>(1,9,1,13)</li>
+          <li>(5,9,9,9)</li>
+          <li>(13,9,13,13)</li>
+          <li>(4,10,4,10)</li>
+          <li>(10,10,10,10)</li>
+          <li>(2,11,3,11)</li>
+          <li>(11,11,12,11)</li>
+          <li>(2,12,2,12)</li>
+          <li>(12,12,12,12)</li>
+        </rects>
+      </Substructure>
+      <Substructure>
+        <color>Structure_White</color>
+        <rects>
+          <li>(6,1,8,8)</li>
+          <li>(5,2,5,8)</li>
+          <li>(9,2,9,8)</li>
+          <li>(4,3,4,9)</li>
+          <li>(10,3,10,9)</li>
+          <li>(3,4,3,10)</li>
+          <li>(11,4,11,10)</li>
+          <li>(2,9,2,10)</li>
+          <li>(12,9,12,10)</li>
+        </rects>
+      </Substructure>
+      <Substructure>
+        <color>Structure_Black</color>
+        <rects>
+          <li>(1,5,1,6)</li>
+          <li>(13,5,13,6)</li>
+        </rects>
+      </Substructure>
+    </terrain>
+  </PrefabDef>
+
+  <PrefabDef>
     <defName>GR_Prefab_LargeCraft</defName>
     <size>(19,19)</size>
     <things>
