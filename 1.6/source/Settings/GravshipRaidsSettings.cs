@@ -35,6 +35,8 @@ namespace Gravship_Raids
 
         public static float gravshipGuardFraction = 0.1f;
 
+        public static bool allowEnemyGravcoreDrops = false;
+
         public static bool debugLogging = false;
 
         public static bool globalFactionFilterEnabled = false;
@@ -64,6 +66,7 @@ namespace Gravship_Raids
                 false);
             Scribe_Values.Look(ref enableGravshipGuards, "enableGravshipGuards", false);
             Scribe_Values.Look(ref gravshipGuardFraction, "gravshipGuardFraction", 0.1f);
+            Scribe_Values.Look(ref allowEnemyGravcoreDrops, "allowEnemyGravcoreDrops", false);
             Scribe_Values.Look(ref debugLogging, "debugLogging", false);
             Scribe_Values.Look(ref globalFactionFilterEnabled, "globalFactionFilterEnabled", false);
             Scribe_Collections.Look(ref globalDisallowedFactionDefNames, "globalDisallowedFactionDefNames", LookMode.Value);

@@ -72,6 +72,10 @@ namespace Gravship_Raids
             listing.GapLine();
             listing.CheckboxLabeled("GravshipRaids.Settings.EnableRaidshipEffects".Translate(), ref GravshipRaidsSettings.enableRaidshipEffects, "GravshipRaids.Settings.EnableRaidshipEffectsDesc".Translate());
             listing.CheckboxLabeled(
+                "GravshipRaids.Settings.AllowEnemyGravcoreDrops".Translate(),
+                ref GravshipRaidsSettings.allowEnemyGravcoreDrops,
+                "GravshipRaids.Settings.AllowEnemyGravcoreDropsDesc".Translate());
+            listing.CheckboxLabeled(
                 "GravshipRaids.Settings.HardcoreEnemyDepartureDestroysUnguardedMaps".Translate(),
                 ref GravshipRaidsSettings.hardcoreEnemyDepartureDestroysUnguardedMaps,
                 "GravshipRaids.Settings.HardcoreEnemyDepartureDestroysUnguardedMapsDesc".Translate());

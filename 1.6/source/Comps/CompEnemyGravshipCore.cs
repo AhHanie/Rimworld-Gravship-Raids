@@ -34,9 +34,25 @@ namespace Gravship_Raids
             return baseText + "\n" + "GravshipRaids.EnemyGravshipCoreAuthor".Translate(cachedAuthor);
         }
 
+        public override IEnumerable<ThingDefCountClass> GetAdditionalLeavings(Map map, DestroyMode mode)
+        {
+            if (GravshipRaidsSettings.allowEnemyGravcoreDrops && mode == DestroyMode.KillFinalize)
+            {
+                yield return new ThingDefCountClass(ThingDefOf.Gravcore, 1);
+            }
+        }
+
         public override void PostDestroy(DestroyMode mode, Map previousMap)
         {
+            IntVec3 corePosition = parent.Position;
             base.PostDestroy(mode, previousMap);
+
+            if (GravshipRaidsSettings.allowEnemyGravcoreDrops && mode == DestroyMode.Deconstruct && previousMap != null)
+            {
+                Thing gravcore = ThingMaker.MakeThing(ThingDefOf.Gravcore);
+                GenPlace.TryPlaceThing(gravcore, corePosition, previousMap, ThingPlaceMode.Near);
+            }
+
             if (previousMap == null)
             {
                 return;
