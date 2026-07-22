@@ -19,6 +19,28 @@
     <defName>GR_Template_LargeCraft</defName>
     <label>large late-game craft</label>
     <prefab>GR_Prefab_LargeCraft</prefab>
+    <disabled>true</disabled>
+  </Gravship_Raids.GravshipRaidTemplateDef>
+
+  <Gravship_Raids.GravshipRaidTemplateDef>
+    <defName>GR_Template_LargeCraft2</defName>
+    <label>large late-game craft</label>
+    <prefab>GR_Prefab_LargeCraft2</prefab>
+    <author>Taylor MH</author>
+  </Gravship_Raids.GravshipRaidTemplateDef>
+
+  <Gravship_Raids.GravshipRaidTemplateDef>
+    <defName>GR_Template_LargeCraft3</defName>
+    <label>large late-game craft</label>
+    <prefab>GR_Prefab_LargeCraft3</prefab>
+    <author>Taylor MH</author>
+  </Gravship_Raids.GravshipRaidTemplateDef>
+
+  <Gravship_Raids.GravshipRaidTemplateDef>
+    <defName>GR_Template_LargeCraft4</defName>
+    <label>large late-game craft</label>
+    <prefab>GR_Prefab_LargeCraft4</prefab>
+    <author>Taylor MH</author>
   </Gravship_Raids.GravshipRaidTemplateDef>
 
 </Defs>
