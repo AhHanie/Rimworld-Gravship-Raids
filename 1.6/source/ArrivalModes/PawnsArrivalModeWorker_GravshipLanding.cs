@@ -12,11 +12,26 @@ namespace Gravship_Raids
     {
         private static readonly ConditionalWeakTable<IncidentParms, LandingPlan> LandingPlans = new ConditionalWeakTable<IncidentParms, LandingPlan>();
 
-        internal static IntVec3? DebugForcedRoot;
-
-        internal static Rot4 DebugForcedRotation = Rot4.North;
+        internal static ForcedLandingRequest? DebugForcedRequest;
 
         private IncidentParms currentCanUseWithParms;
+
+        internal readonly struct ForcedLandingRequest
+        {
+            public readonly IntVec3 Root;
+            public readonly Rot4 Rotation;
+
+            // Non-null for "Force gravship raid with template..."; null for the generic forced-root cheat,
+            // which still picks the first eligible template for the clicked cell.
+            public readonly GravshipRaidTemplateDef SelectedTemplate;
+
+            public ForcedLandingRequest(IntVec3 root, Rot4 rotation, GravshipRaidTemplateDef selectedTemplate)
+            {
+                Root = root;
+                Rotation = rotation;
+                SelectedTemplate = selectedTemplate;
+            }
+        }
 
         public override bool CanUseOnMap(Map map)
         {
@@ -74,6 +89,16 @@ namespace Gravship_Raids
                 return false;
             }
 
+            if (DebugForcedRequest.HasValue && DebugForcedRequest.Value.SelectedTemplate != null)
+            {
+                ForcedLandingRequest request = DebugForcedRequest.Value;
+                if (!GravshipRaidTemplateUtility.IsEligibleTemplate(request.SelectedTemplate, parms.faction?.def, parms.points, map))
+                {
+                    return false;
+                }
+                return GravshipRaidTemplateUtility.CanSpawnPrefab(request.SelectedTemplate, map, request.Root, request.Rotation, canWipeEdifices: false);
+            }
+
             if (!GravshipRaidTemplateUtility.HasEligibleTemplate(parms.faction?.def, parms.points, map))
             {
                 return false;
@@ -91,22 +116,37 @@ namespace Gravship_Raids
         {
             Map map = (Map)parms.target;
 
-            if (DebugForcedRoot.HasValue)
+            if (DebugForcedRequest.HasValue)
             {
-                IntVec3 forcedRoot = DebugForcedRoot.Value;
-                Rot4 forcedRotation = DebugForcedRotation;
-                DebugForcedRoot = null;
+                ForcedLandingRequest request = DebugForcedRequest.Value;
+                DebugForcedRequest = null;
 
-                if (!TryFindTemplateForForcedCell(map, parms.faction?.def, parms.points, forcedRoot, forcedRotation, out GravshipRaidTemplateDef forcedTemplate))
+                if (request.SelectedTemplate != null)
                 {
-                    Logger.Warning($"PawnsArrivalModeWorker_GravshipLanding.TryResolveRaidSpawnCenter: no eligible template for faction '{parms.faction?.def?.defName ?? "null"}' at {parms.points} points can be spawned at the debug-forced cell {forcedRoot} (rot {forcedRotation}); declining this arrival mode so the incident fails cleanly before any pawns are generated.");
+                    if (!GravshipRaidTemplateUtility.IsEligibleTemplate(request.SelectedTemplate, parms.faction?.def, parms.points, map) ||
+                        !GravshipRaidTemplateUtility.CanSpawnPrefab(request.SelectedTemplate, map, request.Root, request.Rotation, canWipeEdifices: false))
+                    {
+                        Logger.Warning($"PawnsArrivalModeWorker_GravshipLanding.TryResolveRaidSpawnCenter: selected template '{request.SelectedTemplate.defName}' is not eligible/placeable for faction '{parms.faction?.def?.defName ?? "null"}' at {parms.points} points at the debug-forced cell {request.Root} (rot {request.Rotation}); declining this arrival mode so the incident fails cleanly before any pawns are generated.");
+                        return false;
+                    }
+
+                    parms.spawnCenter = request.Root;
+                    parms.spawnRotation = request.Rotation;
+                    LandingPlans.Remove(parms);
+                    LandingPlans.Add(parms, new LandingPlan(request.SelectedTemplate, request.Root, request.Rotation));
+                    return true;
+                }
+
+                if (!TryFindTemplateForForcedCell(map, parms.faction?.def, parms.points, request.Root, request.Rotation, out GravshipRaidTemplateDef forcedTemplate))
+                {
+                    Logger.Warning($"PawnsArrivalModeWorker_GravshipLanding.TryResolveRaidSpawnCenter: no eligible template for faction '{parms.faction?.def?.defName ?? "null"}' at {parms.points} points can be spawned at the debug-forced cell {request.Root} (rot {request.Rotation}); declining this arrival mode so the incident fails cleanly before any pawns are generated.");
                     return false;
                 }
 
-                parms.spawnCenter = forcedRoot;
-                parms.spawnRotation = forcedRotation;
+                parms.spawnCenter = request.Root;
+                parms.spawnRotation = request.Rotation;
                 LandingPlans.Remove(parms);
-                LandingPlans.Add(parms, new LandingPlan(forcedTemplate, forcedRoot, forcedRotation));
+                LandingPlans.Add(parms, new LandingPlan(forcedTemplate, request.Root, request.Rotation));
                 return true;
             }
 
@@ -216,7 +256,10 @@ namespace Gravship_Raids
             List<GravshipRaidTemplateUtility.TerrainCellSnapshot> terrainSnapshot = GravshipRaidTemplateUtility.SnapshotTerrain(template, map, root, rotation);
 
             List<Thing> spawned = new List<Thing>();
-            PrefabUtility.SpawnPrefab(template.prefab, map, root, rotation, faction, spawned);
+            using (HAROutfitStandCompatibility.BeginRaidPrefabSpawn())
+            {
+                PrefabUtility.SpawnPrefab(template.prefab, map, root, rotation, faction, spawned);
+            }
 
             RandomizeFuelTankLevels(spawned);
 

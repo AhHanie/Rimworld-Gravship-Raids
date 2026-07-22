@@ -35,42 +35,50 @@ namespace Gravship_Raids
             return template?.prefab != null && !template.ConfigErrors().Any();
         }
 
+        public static bool IsEligibleTemplate(GravshipRaidTemplateDef template, FactionDef factionDef, float points, Map map)
+        {
+            if (template.disabled)
+            {
+                return false;
+            }
+            if (!IsValidTemplate(template))
+            {
+                return false;
+            }
+            if (!template.PointsInRange(points))
+            {
+                return false;
+            }
+            if (!template.AllowsFaction(factionDef))
+            {
+                return false;
+            }
+            if (!GravshipRaidsSettings.AllowsFactionGlobally(factionDef))
+            {
+                return false;
+            }
+            if (map != null)
+            {
+                if (!template.AllowsBiome(map.Biome))
+                {
+                    return false;
+                }
+                if (map.Tile.Valid && !template.AllowsLayer(map.Tile.LayerDef))
+                {
+                    return false;
+                }
+            }
+            return true;
+        }
+
         public static IEnumerable<GravshipRaidTemplateDef> GetEligibleTemplates(FactionDef factionDef, float points, Map map)
         {
             foreach (GravshipRaidTemplateDef template in DefDatabase<GravshipRaidTemplateDef>.AllDefsListForReading)
             {
-                if (template.disabled)
+                if (IsEligibleTemplate(template, factionDef, points, map))
                 {
-                    continue;
+                    yield return template;
                 }
-                if (!IsValidTemplate(template))
-                {
-                    continue;
-                }
-                if (!template.PointsInRange(points))
-                {
-                    continue;
-                }
-                if (!template.AllowsFaction(factionDef))
-                {
-                    continue;
-                }
-                if (!GravshipRaidsSettings.AllowsFactionGlobally(factionDef))
-                {
-                    continue;
-                }
-                if (map != null)
-                {
-                    if (!template.AllowsBiome(map.Biome))
-                    {
-                        continue;
-                    }
-                    if (map.Tile.Valid && !template.AllowsLayer(map.Tile.LayerDef))
-                    {
-                        continue;
-                    }
-                }
-                yield return template;
             }
         }
         public static bool HasEligibleTemplate(FactionDef factionDef, float points, Map map)

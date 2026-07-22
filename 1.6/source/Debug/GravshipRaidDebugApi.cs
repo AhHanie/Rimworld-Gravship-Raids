@@ -50,7 +50,10 @@ namespace Gravship_Raids
             bool canSpawn = GravshipRaidTemplateUtility.CanSpawnPrefab(template, map, cell, rotation);
             Log.Message($"[Gravship Raids] Spawning template '{template.defName}' at {cell}, rotation {rotation}. Bounds: {bounds}. CanSpawnPrefab: {canSpawn}.");
 
-            PrefabUtility.SpawnPrefab(template.prefab, map, cell, rotation);
+            using (HAROutfitStandCompatibility.BeginRaidPrefabSpawn())
+            {
+                PrefabUtility.SpawnPrefab(template.prefab, map, cell, rotation);
+            }
 
             IntVec3 coreCell = GravshipRaidTemplateUtility.GetCoreCell(template, cell, rotation);
             Log.Message($"[Gravship Raids] Core cell: {coreCell}.");
@@ -76,6 +79,32 @@ namespace Gravship_Raids
 
         public static void ForceGravshipRaidAt(Map map, IntVec3 cell)
         {
+            ForceGravshipRaidAtInternal(null, map, cell);
+        }
+
+        public static void ForceGravshipRaidAt(GravshipRaidTemplateDef selectedTemplate, Map map, IntVec3 cell)
+        {
+            if (selectedTemplate == null)
+            {
+                Log.Error("[Gravship Raids] Force gravship raid with template: no template was supplied.");
+                return;
+            }
+            if (!GravshipRaidTemplateUtility.IsValidTemplate(selectedTemplate))
+            {
+                string message = $"[Gravship Raids] Force gravship raid with template: '{selectedTemplate.defName}' is invalid (missing prefab or has config errors) - see log for details.";
+                Log.Error(message);
+                foreach (string error in selectedTemplate.ConfigErrors())
+                {
+                    Log.Error($"[Gravship Raids] Template '{selectedTemplate.defName}' config error: {error}");
+                }
+                Messages.Message(message, MessageTypeDefOf.RejectInput, historical: false);
+                return;
+            }
+            ForceGravshipRaidAtInternal(selectedTemplate, map, cell);
+        }
+
+        private static void ForceGravshipRaidAtInternal(GravshipRaidTemplateDef selectedTemplate, Map map, IntVec3 cell)
+        {
             if (map == null || !cell.InBounds(map))
             {
                 return;
@@ -83,8 +112,8 @@ namespace Gravship_Raids
 
             bool previousDebugLogging = GravshipRaidsSettings.debugLogging;
             GravshipRaidsSettings.debugLogging = true;
-            PawnsArrivalModeWorker_GravshipLanding.DebugForcedRoot = cell;
-            PawnsArrivalModeWorker_GravshipLanding.DebugForcedRotation = rotation;
+            PawnsArrivalModeWorker_GravshipLanding.DebugForcedRequest =
+                new PawnsArrivalModeWorker_GravshipLanding.ForcedLandingRequest(cell, rotation, selectedTemplate);
             try
             {
                 IncidentParms parms = StorytellerUtility.DefaultParmsNow(GravshipRaidsDefOf.GR_GravshipRaid.category, map);
@@ -97,13 +126,14 @@ namespace Gravship_Raids
                 }
 
                 bool success = GravshipRaidsDefOf.GR_GravshipRaid.Worker.TryExecute(parms);
-                string message = "[Gravship Raids] Forced gravship raid at " + cell + " " + (success ? "succeeded." : "failed - see log for the declining faction/landing-search reason.");
+                string templateDesc = (selectedTemplate != null) ? $" with template '{selectedTemplate.defName}'" : string.Empty;
+                string message = $"[Gravship Raids] Forced gravship raid{templateDesc} at {cell} (rot {rotation}) " + (success ? "succeeded." : "failed - see log for the declining faction/landing-search reason.");
                 Log.Message(message);
                 Messages.Message(message, success ? MessageTypeDefOf.NeutralEvent : MessageTypeDefOf.RejectInput, historical: false);
             }
             finally
             {
-                PawnsArrivalModeWorker_GravshipLanding.DebugForcedRoot = null;
+                PawnsArrivalModeWorker_GravshipLanding.DebugForcedRequest = null;
                 GravshipRaidsSettings.debugLogging = previousDebugLogging;
             }
         }

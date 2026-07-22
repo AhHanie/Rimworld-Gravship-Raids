@@ -45,6 +45,26 @@ namespace Gravship_Raids
             GravshipRaidDebugApi.ForceGravshipRaidAt(Find.CurrentMap, UI.MouseCell());
         }
 
+        [DebugAction("Gravship Raids", "Force gravship raid with template...", false, false, false, false, false, 0, false, allowedGameStates = AllowedGameStates.PlayingOnMap)]
+        private static List<DebugActionNode> ForceGravshipRaidWithTemplate()
+        {
+            List<DebugActionNode> list = new List<DebugActionNode>();
+            foreach (GravshipRaidTemplateDef template in GravshipRaidDebugApi.GetTemplates())
+            {
+                GravshipRaidTemplateDef localTemplate = template;
+                bool valid = GravshipRaidTemplateUtility.IsValidTemplate(localTemplate);
+                string label = localTemplate.defName + (valid ? string.Empty : " [INVALID]") + (localTemplate.disabled ? " [DISABLED]" : string.Empty);
+                list.Add(new DebugActionNode(label, DebugActionType.ToolMap)
+                {
+                    action = delegate
+                    {
+                        GravshipRaidDebugApi.ForceGravshipRaidAt(localTemplate, Find.CurrentMap, UI.MouseCell());
+                    }
+                });
+            }
+            return list;
+        }
+
         [DebugAction("Gravship Raids", "Force enemy gravship departure", false, false, false, false, false, 0, false, allowedGameStates = AllowedGameStates.PlayingOnMap)]
         private static void ForceEnemyGravshipDeparture()
         {

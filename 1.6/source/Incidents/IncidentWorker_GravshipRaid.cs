@@ -92,7 +92,16 @@ namespace Gravship_Raids
                 return false;
             }
 
-            if (!GravshipRaidTemplateUtility.HasEligibleTemplate(f.def, parms.points, map))
+            GravshipRaidTemplateDef selectedTemplate = PawnsArrivalModeWorker_GravshipLanding.DebugForcedRequest?.SelectedTemplate;
+            if (selectedTemplate != null)
+            {
+                if (!GravshipRaidTemplateUtility.IsEligibleTemplate(selectedTemplate, f.def, parms.points, map))
+                {
+                    Logger.Message($"IncidentWorker_GravshipRaid.FactionCanBeGroupSource: excluding faction '{f.def.defName}' - debug-selected template '{selectedTemplate.defName}' is not eligible for it at {parms.points} points.");
+                    return false;
+                }
+            }
+            else if (!GravshipRaidTemplateUtility.HasEligibleTemplate(f.def, parms.points, map))
             {
                 Logger.Message($"IncidentWorker_GravshipRaid.FactionCanBeGroupSource: excluding faction '{f.def.defName}' - no GravshipRaidTemplateDef is eligible for it at {parms.points} points.");
                 return false;
