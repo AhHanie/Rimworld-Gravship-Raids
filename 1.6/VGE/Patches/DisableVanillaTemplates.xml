@@ -22,4 +22,25 @@
     </value>
   </Operation>
 
+  <Operation Class="PatchOperationAdd">
+    <xpath>Defs/Gravship_Raids.GravshipRaidTemplateDef[defName="GR_Template_LargeCraft2"]</xpath>
+    <value>
+      <disabled>true</disabled>
+    </value>
+  </Operation>
+
+  <Operation Class="PatchOperationAdd">
+    <xpath>Defs/Gravship_Raids.GravshipRaidTemplateDef[defName="GR_Template_LargeCraft3"]</xpath>
+    <value>
+      <disabled>true</disabled>
+    </value>
+  </Operation>
+
+  <Operation Class="PatchOperationAdd">
+    <xpath>Defs/Gravship_Raids.GravshipRaidTemplateDef[defName="GR_Template_LargeCraft4"]</xpath>
+    <value>
+      <disabled>true</disabled>
+    </value>
+  </Operation>
+
 </Patch>
