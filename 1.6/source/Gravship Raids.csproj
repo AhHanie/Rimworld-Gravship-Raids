@@ -90,6 +90,10 @@
     <Compile Include="Debug\DebugActionsGravshipRaidPrefabCapture.cs" />
     <Compile Include="Debug\GravshipRaidDebugApi.cs" />
     <Compile Include="Compatibility\HAROutfitStandCompatibility.cs" />
+    <Compile Include="Scenarios\ScenPart_CrashlandedGravshipStart.cs" />
+    <Compile Include="Scenarios\CrashlandedGravshipArrivalSkyfaller.cs" />
+    <Compile Include="Scenarios\MapComponent_CrashlandedGravshipStart.cs" />
+    <Compile Include="Scenarios\CrashlandedGravshipStartUtility.cs" />
   </ItemGroup>
   <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

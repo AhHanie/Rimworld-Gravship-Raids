@@ -43,4 +43,11 @@
     <author>Taylor MH</author>
   </Gravship_Raids.GravshipRaidTemplateDef>
 
+  <Gravship_Raids.GravshipRaidTemplateDef>
+    <defName>GR_Template_LargeCraft5</defName>
+    <label>large late-game craft</label>
+    <prefab>GR_Prefab_LargeCraft5</prefab>
+    <author>Taylor MH</author>
+  </Gravship_Raids.GravshipRaidTemplateDef>
+
 </Defs>

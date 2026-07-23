@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<LanguageData>
+    <GravshipRaids.CrashlandedGravship.GameStartDialogText>Sirens. Tearing metal. The smell of scorched wiring.\n\nYour gravship's gravlite core failed somewhere over this rimworld, and the hull came apart on the way down. The crash sealed your three cryptosleep caskets shut before the ship stopped moving, which is the only reason you're still breathing.\n\nThe wreck outside will never fly again. There is no engine left to salvage, no console left to pilot. Whatever you can strip from its hull is all you have left.\n\nYour caskets are about to open.</GravshipRaids.CrashlandedGravship.GameStartDialogText>
+
+    <!-- MapComponent_CrashlandedGravshipStart ejection -->
+    <GravshipRaids.CrashlandedGravship.MessageColonistsWoke>The cryptosleep caskets have opened. Your colonists are waking up, dazed from the crash.</GravshipRaids.CrashlandedGravship.MessageColonistsWoke>
+</LanguageData>

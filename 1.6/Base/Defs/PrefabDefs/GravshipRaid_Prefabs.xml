@@ -1227,5 +1227,195 @@
     </terrain>
   </PrefabDef>
 
+  <PrefabDef>
+    <defName>GR_Prefab_LargeCraft5</defName>
+    <size>(15,15)</size>
+    <things>
+      <WallLamp>
+        <rects>
+          <li>(8,3,8,3)</li>
+          <li>(9,7,9,7)</li>
+          <li>(8,11,8,11)</li>
+        </rects>
+        <relativeRotation>Clockwise</relativeRotation>
+      </WallLamp>
+      <WallLamp>
+        <rects>
+          <li>(6,3,6,3)</li>
+          <li>(5,7,5,7)</li>
+          <li>(6,11,6,11)</li>
+        </rects>
+        <relativeRotation>Counterclockwise</relativeRotation>
+      </WallLamp>
+      <OxygenPump>
+        <rects>
+          <li>(6,6,6,6)</li>
+          <li>(8,6,8,6)</li>
+        </rects>
+        <relativeRotation>Opposite</relativeRotation>
+      </OxygenPump>
+      <OxygenPump>
+        <rects>
+          <li>(6,8,6,8)</li>
+          <li>(8,8,8,8)</li>
+        </rects>
+      </OxygenPump>
+      <Filth_Dirt>
+        <position>(2, 0, 6)</position>
+      </Filth_Dirt>
+      <Battery>
+        <positions>
+          <li>(2, 0, 7)</li>
+          <li>(13, 0, 7)</li>
+        </positions>
+        <relativeRotation>Counterclockwise</relativeRotation>
+      </Battery>
+      <TableMachining>
+        <position>(9, 0, 7)</position>
+        <relativeRotation>Clockwise</relativeRotation>
+      </TableMachining>
+      <Turret_MiniTurret>
+        <rects>
+          <li>(6,4,6,4)</li>
+          <li>(8,4,8,4)</li>
+          <li>(0,7,0,7)</li>
+          <li>(14,7,14,7)</li>
+        </rects>
+        <stuff>Plasteel</stuff>
+      </Turret_MiniTurret>
+      <Armchair>
+        <position>(8, 0, 7)</position>
+        <relativeRotation>Clockwise</relativeRotation>
+        <stuff>Synthread</stuff>
+        <quality>Normal</quality>
+      </Armchair>
+      <VacBarrier>
+        <position>(7, 0, 0)</position>
+      </VacBarrier>
+      <AncientSealedCrate>
+        <rects>
+          <li>(6,11,6,12)</li>
+        </rects>
+      </AncientSealedCrate>
+      <HunterDroneTrap>
+        <rects>
+          <li>(6,2,6,2)</li>
+          <li>(8,2,8,2)</li>
+        </rects>
+      </HunterDroneTrap>
+      <Autodoor>
+        <position>(7, 0, 1)</position>
+        <stuff>Steel</stuff>
+        <colorDef>Structure_GrayLight</colorDef>
+      </Autodoor>
+      <Autodoor>
+        <rects>
+          <li>(7,5,7,5)</li>
+          <li>(7,9,7,9)</li>
+        </rects>
+        <stuff>Steel</stuff>
+        <colorDef>Structure_BlueIce</colorDef>
+      </Autodoor>
+      <GravshipHull>
+        <rects>
+          <li>(6,0,6,1)</li>
+          <li>(8,0,8,1)</li>
+          <li>(5,1,5,5)</li>
+          <li>(9,1,9,5)</li>
+          <li>(6,5,6,5)</li>
+          <li>(8,5,8,5)</li>
+          <li>(4,6,4,8)</li>
+          <li>(10,6,10,8)</li>
+          <li>(5,9,6,9)</li>
+          <li>(8,9,9,9)</li>
+          <li>(5,10,5,13)</li>
+          <li>(9,10,9,13)</li>
+          <li>(6,13,6,14)</li>
+          <li>(8,13,8,14)</li>
+        </rects>
+        <stuff>Plasteel</stuff>
+        <colorDef>Structure_White</colorDef>
+      </GravshipHull>
+      <PowerSwitch>
+        <rects>
+          <li>(3,7,3,7)</li>
+          <li>(11,7,11,7)</li>
+        </rects>
+      </PowerSwitch>
+      <SmallThruster>
+        <position>(7, 0, 14)</position>
+        <relativeRotation>Opposite</relativeRotation>
+      </SmallThruster>
+      <AncientChemfuelCanister>
+        <rects>
+          <li>(6,10,6,10)</li>
+          <li>(8,10,8,10)</li>
+        </rects>
+      </AncientChemfuelCanister>
+      <PilotConsole>
+        <position>(6, 0, 7)</position>
+        <relativeRotation>Counterclockwise</relativeRotation>
+      </PilotConsole>
+      <GR_EnemyGravshipCore>
+        <position>(7, 0, 10)</position>
+      </GR_EnemyGravshipCore>
+      <ChemfuelTank>
+        <position>(7, 0, 11)</position>
+      </ChemfuelTank>
+      <Sandbags>
+        <rects>
+          <li>(6,3,6,3)</li>
+          <li>(8,3,8,3)</li>
+        </rects>
+        <stuff>Hyperweave</stuff>
+      </Sandbags>
+      <SolarGenerator>
+        <positions>
+          <li>(1, 0, 4)</li>
+          <li>(12, 0, 4)</li>
+          <li>(1, 0, 9)</li>
+          <li>(12, 0, 9)</li>
+        </positions>
+      </SolarGenerator>
+    </things>
+    <terrain>
+      <Substructure>
+        <rects>
+          <li>(6,0,6,1)</li>
+          <li>(8,0,8,1)</li>
+          <li>(5,1,5,13)</li>
+          <li>(9,1,9,13)</li>
+          <li>(6,5,6,5)</li>
+          <li>(8,5,8,5)</li>
+          <li>(6,9,6,9)</li>
+          <li>(8,9,8,9)</li>
+          <li>(6,13,6,14)</li>
+          <li>(8,13,8,14)</li>
+        </rects>
+      </Substructure>
+      <Substructure>
+        <color>Structure_White</color>
+        <rects>
+          <li>(7,0,7,14)</li>
+          <li>(6,2,6,4)</li>
+          <li>(8,2,8,4)</li>
+          <li>(6,6,6,8)</li>
+          <li>(8,6,8,8)</li>
+          <li>(6,10,6,12)</li>
+          <li>(8,10,8,12)</li>
+        </rects>
+      </Substructure>
+      <Substructure>
+        <color>Structure_Blue</color>
+        <rects>
+          <li>(0,3,3,11)</li>
+          <li>(11,3,14,11)</li>
+          <li>(4,6,4,8)</li>
+          <li>(10,6,10,8)</li>
+        </rects>
+      </Substructure>
+    </terrain>
+  </PrefabDef>
+
 
 </Defs>

@@ -22,6 +22,10 @@ namespace Gravship_Raids
 
         public static ThingDef GR_GravshipArrivalSkyfaller_Large;
 
+        public static ThingDef GR_CrashlandedGravshipSkyfaller;
+
+        public static PrefabDef GR_Prefab_CrashlandedGravship;
+
         static GravshipRaidsDefOf()
         {
             DefOfHelper.EnsureInitializedInCtor(typeof(GravshipRaidsDefOf));

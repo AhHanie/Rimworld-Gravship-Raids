@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<Defs>
+
+  <!--
+    Fixed (non-removable, non-addable) so an edited copy of the Crashlanded Gravship scenario can never
+    lose its crash-start behavior and silently fall back to a normal ScenPart_PlayerPawnsArriveMethod arrival.
+  -->
+  <ScenPartDef>
+    <defName>GR_CrashlandedGravshipStart</defName>
+    <label>crashlanded gravship start</label>
+    <category>Fixed</category>
+    <scenPartClass>Gravship_Raids.ScenPart_CrashlandedGravshipStart</scenPartClass>
+    <canBeRandomlyAdded>false</canBeRandomlyAdded>
+    <canBePlayerAddedRemoved>false</canBePlayerAddedRemoved>
+    <summaryPriority>470</summaryPriority>
+  </ScenPartDef>
+
+</Defs>

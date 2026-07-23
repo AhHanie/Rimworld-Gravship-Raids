@@ -119,17 +119,27 @@ namespace Gravship_Raids
             return SelectTemplate(factionDef, points, map, MakeSelectionSeed(factionDef, points, map));
         }
 
+        public static CellRect GetRotatedBounds(PrefabDef prefab, IntVec3 pos, Rot4 rot)
+        {
+            Rot4 validatedRot = PrefabUtility.ValidateRotation(prefab, rot);
+            return GenAdj.OccupiedRect(pos, validatedRot, prefab.size);
+        }
+
         public static CellRect GetRotatedBounds(GravshipRaidTemplateDef template, IntVec3 pos, Rot4 rot)
         {
-            Rot4 validatedRot = PrefabUtility.ValidateRotation(template.prefab, rot);
-            return GenAdj.OccupiedRect(pos, validatedRot, template.prefab.size);
+            return GetRotatedBounds(template.prefab, pos, rot);
+        }
+
+        public static IntVec3 TransformCell(PrefabDef prefab, IntVec3 relativeCell, IntVec3 pos, Rot4 rot)
+        {
+            Rot4 validatedRot = PrefabUtility.ValidateRotation(prefab, rot);
+            IntVec3 root = PrefabUtility.GetRoot(prefab, pos, validatedRot);
+            return root + PrefabUtility.GetAdjustedLocalPosition(relativeCell, validatedRot);
         }
 
         public static IntVec3 TransformCell(GravshipRaidTemplateDef template, IntVec3 relativeCell, IntVec3 pos, Rot4 rot)
         {
-            Rot4 validatedRot = PrefabUtility.ValidateRotation(template.prefab, rot);
-            IntVec3 root = PrefabUtility.GetRoot(template.prefab, pos, validatedRot);
-            return root + PrefabUtility.GetAdjustedLocalPosition(relativeCell, validatedRot);
+            return TransformCell(template.prefab, relativeCell, pos, rot);
         }
         public static IntVec3 GetCoreCell(GravshipRaidTemplateDef template, IntVec3 pos, Rot4 rot)
         {
@@ -145,13 +155,13 @@ namespace Gravship_Raids
             return TransformCell(template, localCoreCell, pos, rot);
         }
 
-        public static IEnumerable<IntVec3> GetOpenInteriorCells(GravshipRaidTemplateDef template, Map map, IntVec3 pos, Rot4 rot)
+        public static IEnumerable<IntVec3> GetOpenInteriorCells(PrefabDef prefab, Map map, IntVec3 pos, Rot4 rot)
         {
-            if (template?.prefab == null || map == null)
+            if (prefab == null || map == null)
             {
                 yield break;
             }
-            CellRect footprint = GetRotatedBounds(template, pos, rot);
+            CellRect footprint = GetRotatedBounds(prefab, pos, rot);
             foreach (IntVec3 cell in footprint.Cells)
             {
                 if (!cell.InBounds(map) || !cell.Standable(map) || cell.GetFirstBuilding(map) != null)
@@ -161,23 +171,45 @@ namespace Gravship_Raids
                 yield return cell;
             }
         }
-        public static List<(TerrainDef def, IntVec3 cell)> GetFloorCellsForDraw(GravshipRaidTemplateDef template, IntVec3 root, Rot4 rotation)
+
+        public static IEnumerable<IntVec3> GetOpenInteriorCells(GravshipRaidTemplateDef template, Map map, IntVec3 pos, Rot4 rot)
+        {
+            if (template?.prefab == null || map == null)
+            {
+                yield break;
+            }
+            foreach (IntVec3 cell in GetOpenInteriorCells(template.prefab, map, pos, rot))
+            {
+                yield return cell;
+            }
+        }
+
+        public static List<(TerrainDef def, IntVec3 cell)> GetFloorCellsForDraw(PrefabDef prefab, IntVec3 root, Rot4 rotation)
         {
             List<(TerrainDef def, IntVec3 cell)> result = new List<(TerrainDef, IntVec3)>();
-            if (template?.prefab == null)
+            if (prefab == null)
             {
                 return result;
             }
-            foreach (var (data, cell) in template.prefab.GetTerrain())
+            foreach (var (data, cell) in prefab.GetTerrain())
             {
                 if (data?.def == null)
                 {
                     continue;
                 }
-                IntVec3 absolute = TransformCell(template, cell, root, rotation);
+                IntVec3 absolute = TransformCell(prefab, cell, root, rotation);
                 result.Add((data.def, absolute));
             }
             return result;
+        }
+
+        public static List<(TerrainDef def, IntVec3 cell)> GetFloorCellsForDraw(GravshipRaidTemplateDef template, IntVec3 root, Rot4 rotation)
+        {
+            if (template?.prefab == null)
+            {
+                return new List<(TerrainDef, IntVec3)>();
+            }
+            return GetFloorCellsForDraw(template.prefab, root, rotation);
         }
 
         public static bool CanSpawnPrefab(GravshipRaidTemplateDef template, Map map, IntVec3 pos, Rot4 rot, bool canWipeEdifices = false)

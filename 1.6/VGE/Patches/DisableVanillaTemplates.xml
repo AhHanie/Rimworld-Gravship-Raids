@@ -43,4 +43,11 @@
     </value>
   </Operation>
 
+  <Operation Class="PatchOperationAdd">
+    <xpath>Defs/Gravship_Raids.GravshipRaidTemplateDef[defName="GR_Template_LargeCraft5"]</xpath>
+    <value>
+      <disabled>true</disabled>
+    </value>
+  </Operation>
+
 </Patch>

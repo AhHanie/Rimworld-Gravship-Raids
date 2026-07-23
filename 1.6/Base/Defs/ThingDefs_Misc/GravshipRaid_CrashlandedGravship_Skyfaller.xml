@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<Defs>
+
+  <!-- Matches GR_Prefab_CrashlandedGravship's 9x9 footprint (GravshipRaid_CrashlandedGravship_Prefab.xml). -->
+  <ThingDef ParentName="GR_GravshipArrivalSkyfallerBase">
+    <defName>GR_CrashlandedGravshipSkyfaller</defName>
+    <label>gravship (crashing)</label>
+    <thingClass>Gravship_Raids.CrashlandedGravshipArrivalSkyfaller</thingClass>
+    <size>(9,9)</size>
+    <graphicData>
+      <drawSize>(9.5,9.5)</drawSize>
+    </graphicData>
+    <skyfaller>
+      <shadowSize>(9,9)</shadowSize>
+      <ticksToImpactRange>240~280</ticksToImpactRange>
+      <cameraShake>3</cameraShake>
+    </skyfaller>
+  </ThingDef>
+
+</Defs>
