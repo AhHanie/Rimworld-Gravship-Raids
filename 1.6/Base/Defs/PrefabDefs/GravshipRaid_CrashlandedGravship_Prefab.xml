@@ -74,4 +74,87 @@
     </terrain>
   </PrefabDef>
 
+  <PrefabDef>
+    <defName>GR_Prefab_LostTribeGravship</defName>
+    <size>(12,13)</size>
+    <things>
+      <Door>
+        <position>(0, 0, 6)</position>
+        <relativeRotation>Clockwise</relativeRotation>
+        <stuff>Steel</stuff>
+      </Door>
+      <GravshipHull>
+        <rects>
+          <li>(3,0,6,0)</li>
+          <li>(2,1,2,1)</li>
+          <li>(6,1,6,1)</li>
+          <li>(5,2,5,3)</li>
+          <li>(1,3,1,3)</li>
+          <li>(0,4,0,5)</li>
+          <li>(6,4,7,4)</li>
+          <li>(8,5,10,5)</li>
+          <li>(11,6,11,6)</li>
+          <li>(0,7,0,8)</li>
+          <li>(8,7,10,7)</li>
+          <li>(6,8,7,8)</li>
+          <li>(1,9,1,9)</li>
+          <li>(5,9,5,10)</li>
+          <li>(2,11,2,11)</li>
+          <li>(6,11,6,12)</li>
+          <li>(3,12,5,12)</li>
+        </rects>
+        <stuff>Steel</stuff>
+      </GravshipHull>
+      <SmallThruster>
+        <positions>
+          <li>(1, 0, 2)</li>
+          <li>(1, 0, 10)</li>
+        </positions>
+        <relativeRotation>Clockwise</relativeRotation>
+      </SmallThruster>
+      <PilotConsole>
+        <position>(6, 0, 6)</position>
+        <relativeRotation>Clockwise</relativeRotation>
+      </PilotConsole>
+      <Ship_CryptosleepCasket>
+        <positions>
+          <li>(4, 0, 3)</li>
+          <li>(4, 0, 6)</li>
+        </positions>
+        <relativeRotation>Counterclockwise</relativeRotation>
+      </Ship_CryptosleepCasket>
+      <Ship_CryptosleepCasket>
+        <positions>
+          <li>(1, 0, 4)</li>
+          <li>(1, 0, 7)</li>
+        </positions>
+      </Ship_CryptosleepCasket>
+      <Ship_CryptosleepCasket>
+        <position>(3, 0, 9)</position>
+        <relativeRotation>Clockwise</relativeRotation>
+      </Ship_CryptosleepCasket>
+      <ChemfuelTank>
+        <positions>
+          <li>(3, 0, 1)</li>
+          <li>(3, 0, 10)</li>
+        </positions>
+      </ChemfuelTank>
+    </things>
+    <terrain>
+      <Substructure>
+        <rects>
+          <li>(3,0,6,1)</li>
+          <li>(2,1,2,11)</li>
+          <li>(1,2,1,10)</li>
+          <li>(3,2,5,12)</li>
+          <li>(0,4,0,8)</li>
+          <li>(6,4,7,8)</li>
+          <li>(8,5,10,7)</li>
+          <li>(11,6,11,6)</li>
+          <li>(6,11,6,12)</li>
+        </rects>
+      </Substructure>
+    </terrain>
+  </PrefabDef>
+
 </Defs>

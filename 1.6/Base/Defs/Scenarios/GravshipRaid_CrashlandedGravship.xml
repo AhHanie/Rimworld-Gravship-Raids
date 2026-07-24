@@ -26,6 +26,7 @@
         <li Class="Gravship_Raids.ScenPart_CrashlandedGravshipStart">
           <def>GR_CrashlandedGravshipStart</def>
           <visible>false</visible>
+          <prefab>GR_Prefab_CrashlandedGravship</prefab>
         </li>
 
         <!-- Player starting things (identical to the classic Crashlanded scenario) -->

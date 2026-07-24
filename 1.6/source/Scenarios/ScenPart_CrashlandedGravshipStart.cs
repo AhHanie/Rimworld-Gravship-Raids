@@ -6,6 +6,14 @@ namespace Gravship_Raids
 {
     public class ScenPart_CrashlandedGravshipStart : ScenPart
     {
+        public PrefabDef prefab;
+
+        public override void ExposeData()
+        {
+            base.ExposeData();
+            Scribe_Defs.Look(ref prefab, "prefab");
+        }
+
         public override void GenerateIntoMap(Map map)
         {
             if (Find.GameInitData == null || !ModsConfig.OdysseyActive)
@@ -13,7 +21,6 @@ namespace Gravship_Raids
                 return;
             }
 
-            PrefabDef prefab = GravshipRaidsDefOf.GR_Prefab_CrashlandedGravship;
             ThingDef skyfallerDef = GravshipRaidsDefOf.GR_CrashlandedGravshipSkyfaller;
 
             List<Pawn> colonists = new List<Pawn>(Find.GameInitData.startingAndOptionalPawns);
@@ -57,7 +64,7 @@ namespace Gravship_Raids
 
             if (prefab == null || skyfallerDef == null)
             {
-                Logger.Error("ScenPart_CrashlandedGravshipStart.GenerateIntoMap: GR_Prefab_CrashlandedGravship or GR_CrashlandedGravshipSkyfaller failed to resolve; falling back to a safe drop-pod-style start with no wreck.");
+                Logger.Error($"ScenPart_CrashlandedGravshipStart.GenerateIntoMap: configured wreck prefab '{prefab?.defName ?? "null"}' or GR_CrashlandedGravshipSkyfaller failed to resolve; falling back to a safe drop-pod-style start with no wreck.");
                 CrashlandedGravshipStartUtility.FallbackArrive(colonists, pets, items, map, searchStart);
                 return;
             }

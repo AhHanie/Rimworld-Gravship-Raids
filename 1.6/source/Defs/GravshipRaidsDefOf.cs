@@ -26,6 +26,8 @@ namespace Gravship_Raids
 
         public static PrefabDef GR_Prefab_CrashlandedGravship;
 
+        public static PrefabDef GR_Prefab_LostTribeGravship;
+
         static GravshipRaidsDefOf()
         {
             DefOfHelper.EnsureInitializedInCtor(typeof(GravshipRaidsDefOf));

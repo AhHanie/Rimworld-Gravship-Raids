@@ -8,6 +8,15 @@ namespace Gravship_Raids
 {
     public class RaidStrategyWorker_GravshipAssault : RaidStrategyWorker
     {
+        public override bool CanUsePawnGenOption(float pointsTotal, PawnGenOption option, List<PawnGenOptionWithXenotype> chosenGroups, Faction faction = null)
+        {
+            if (!base.CanUsePawnGenOption(pointsTotal, option, chosenGroups, faction))
+            {
+                return false;
+            }
+            return !option.kind.RaceProps.Animal;
+        }
+
         public override void MakeLords(IncidentParms parms, List<Pawn> pawns)
         {
             EnemyGravshipInstance instance = FindInstance((Map)parms.target, pawns);
