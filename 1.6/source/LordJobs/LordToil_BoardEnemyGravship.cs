@@ -133,16 +133,18 @@ namespace Gravship_Raids
                 }
             }
 
-            // Hand off to the real Boarding -> Launching -> Departed sequence once boarding is
-            // "complete" across the WHOLE raid instance, not just this lord's own owned pawns - a raid can be
-            // split into several lords (IncidentParmsUtility.SplitIntoGroups), and one lord's group finishing
-            // early must not launch the ship out from under another lord's still-boarding pawns.
-            // EnemyGravshipRaidUtility.BeginDeparture itself no-ops for any state other than Boarding and for
-            // a missing/despawned core, so this is safe to evaluate every tick from every lord without an
-            // extra latch here.
             if (core != null && instance != null && instance.state == GravshipRaidState.Boarding && !AnyCrewStillTryingToBoard(core))
             {
-                EnemyGravshipRaidUtility.BeginDeparture(instance, lord.Map);
+                if (EnemyGravshipRaidUtility.HasLivingCrewBoarded(instance, core))
+                {
+                    Logger.Message($"LordToil_BoardEnemyGravship.EnsureCorrectDuties: {instance} finished boarding with living crew aboard; beginning departure.");
+                    EnemyGravshipRaidUtility.BeginDeparture(instance, lord.Map);
+                }
+                else
+                {
+                    Logger.Message($"LordToil_BoardEnemyGravship.EnsureCorrectDuties: {instance} finished boarding with no living crew aboard; abandoning ship instead of departing.");
+                    EnemyGravshipRaidUtility.AbandonShip(instance, "no living crew boarded before the boarding window closed");
+                }
             }
         }
 

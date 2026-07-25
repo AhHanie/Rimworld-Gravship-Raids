@@ -187,8 +187,7 @@ namespace Gravship_Raids
 
                 if ((instance.state == GravshipRaidState.Landing || instance.state == GravshipRaidState.Landed || instance.state == GravshipRaidState.Boarding) && !AnyCrewStillLordOwned(instance))
                 {
-                    instance.state = GravshipRaidState.Destroyed;
-                    Logger.Message($"MapComponent_GravshipRaid.SweepFinishedInstances: {instance} has no crew left owned by any Lord; marking it abandoned/Destroyed so it stops occupying a landing slot.");
+                    EnemyGravshipRaidUtility.AbandonShip(instance, "no crew left owned by any Lord (periodic sweep)");
                 }
 
                 if ((instance.state == GravshipRaidState.Departed || instance.state == GravshipRaidState.Destroyed) && !StillReferencedByLiveLord(instance))

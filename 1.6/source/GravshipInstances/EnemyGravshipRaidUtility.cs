@@ -27,10 +27,50 @@ namespace Gravship_Raids
                 return false;
             }
 
+            if (!HasLivingCrewBoarded(instance, instance.core))
+            {
+                Logger.Message($"EnemyGravshipRaidUtility.BeginDeparture: {instance} has no living crew aboard its core transporter; abandoning instead of departing.");
+                AbandonShip(instance, "no living crew boarded");
+                return false;
+            }
+
             instance.state = GravshipRaidState.Launching;
             Logger.Message($"EnemyGravshipRaidUtility.BeginDeparture: {instance} beginning departure sequence.");
             CompleteDeparture(instance, map);
             return true;
+        }
+
+        public static bool HasLivingCrewBoarded(EnemyGravshipInstance instance, Thing core)
+        {
+            if (instance?.crew == null || core == null)
+            {
+                return false;
+            }
+            CompTransporter transporter = core.TryGetComp<CompTransporter>();
+            if (transporter?.innerContainer == null)
+            {
+                return false;
+            }
+            foreach (Thing t in transporter.innerContainer)
+            {
+                if (t is Pawn pawn && !pawn.Dead && instance.crew.Contains(pawn))
+                {
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        public static void AbandonShip(EnemyGravshipInstance instance, string reason)
+        {
+            if (instance == null || instance.state == GravshipRaidState.Destroyed || instance.state == GravshipRaidState.Departed)
+            {
+                return;
+            }
+
+            instance.state = GravshipRaidState.Destroyed;
+            instance.departureTick = -1;
+            Logger.Message($"EnemyGravshipRaidUtility.AbandonShip: {instance} abandoned ({reason}); core and hull remain on the map as a wreck.");
         }
 
         public static void CompleteDeparture(EnemyGravshipInstance instance, Map map)
