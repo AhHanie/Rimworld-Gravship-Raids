@@ -157,7 +157,7 @@ namespace Gravship_Raids
             for (int i = 0; i < instance.crew.Count; i++)
             {
                 Pawn pawn = instance.crew[i];
-                if (pawn == null || pawn.Dead || !pawn.Spawned)
+                if (pawn == null || pawn.Dead || pawn.Downed || !pawn.Spawned)
                 {
                     continue;
                 }
