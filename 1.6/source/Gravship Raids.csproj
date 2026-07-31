@@ -94,6 +94,20 @@
     <Compile Include="Scenarios\CrashlandedGravshipArrivalSkyfaller.cs" />
     <Compile Include="Scenarios\MapComponent_CrashlandedGravshipStart.cs" />
     <Compile Include="Scenarios\CrashlandedGravshipStartUtility.cs" />
+    <Compile Include="Templates\ShuttleRaidTemplateDef.cs" />
+    <Compile Include="Templates\ShuttleRaidTemplateUtility.cs" />
+    <Compile Include="Incidents\IncidentWorker_ShuttleRaid.cs" />
+    <Compile Include="RaidStrategies\RaidStrategyWorker_ShuttleAssault.cs" />
+    <Compile Include="ArrivalModes\PawnsArrivalModeWorker_ShuttleLanding.cs" />
+    <Compile Include="ShuttleInstances\EnemyShuttleRaidInstance.cs" />
+    <Compile Include="ShuttleInstances\EnemyShuttleRaidUtility.cs" />
+    <Compile Include="ShuttleInstances\MapComponent_ShuttleRaid.cs" />
+    <Compile Include="Patches\CompShuttleHostileCrewPatch.cs" />
+    <Compile Include="LordJobs\LordJob_ShuttleRaid.cs" />
+    <Compile Include="LordJobs\LordToil_ShuttleAssault.cs" />
+    <Compile Include="LordJobs\LordToil_BoardEnemyShuttle.cs" />
+    <Compile Include="LordJobs\Trigger_ShuttleRaidBoarding.cs" />
+    <Compile Include="Debug\DebugActionsShuttleRaidTemplates.cs" />
   </ItemGroup>
   <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

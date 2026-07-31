@@ -47,6 +47,32 @@ namespace Gravship_Raids
 
         public static string minColonistCountBuffer;
 
+        public static bool enableShuttleRaids = true;
+
+        public static float shuttleIncidentWeightFactor = 1f;
+
+        public static float shuttleMinThreatPoints = 300f;
+
+        public static int shuttleMaxConcurrentPerMap = 1;
+
+        public static float shuttleCasualtyRetreatThreshold = 0.5f;
+
+        public static int shuttleMinColonistCount = 1;
+
+        public static bool shuttleEnableMinPlayerTechLevel = false;
+
+        public static TechLevel shuttleMinPlayerTechLevel = TechLevel.Industrial;
+
+        public static TechLevel shuttleMinEnemyFactionTechLevel = TechLevel.Industrial;
+
+        public static bool shuttleGlobalFactionFilterEnabled = false;
+
+        public static List<string> shuttleDisallowedFactionDefNames = new List<string>();
+
+        public static string shuttleMinThreatPointsBuffer;
+
+        public static string shuttleMinColonistCountBuffer;
+
         public override void ExposeData()
         {
             base.ExposeData();
@@ -74,6 +100,22 @@ namespace Gravship_Raids
             {
                 globalDisallowedFactionDefNames = new List<string>();
             }
+
+            Scribe_Values.Look(ref enableShuttleRaids, "enableShuttleRaids", true);
+            Scribe_Values.Look(ref shuttleIncidentWeightFactor, "shuttleIncidentWeightFactor", 1f);
+            Scribe_Values.Look(ref shuttleMinThreatPoints, "shuttleMinThreatPoints", 300f);
+            Scribe_Values.Look(ref shuttleMaxConcurrentPerMap, "shuttleMaxConcurrentPerMap", 1);
+            Scribe_Values.Look(ref shuttleCasualtyRetreatThreshold, "shuttleCasualtyRetreatThreshold", 0.5f);
+            Scribe_Values.Look(ref shuttleMinColonistCount, "shuttleMinColonistCount", 1);
+            Scribe_Values.Look(ref shuttleEnableMinPlayerTechLevel, "shuttleEnableMinPlayerTechLevel", false);
+            Scribe_Values.Look(ref shuttleMinPlayerTechLevel, "shuttleMinPlayerTechLevel", TechLevel.Industrial);
+            Scribe_Values.Look(ref shuttleMinEnemyFactionTechLevel, "shuttleMinEnemyFactionTechLevel", TechLevel.Industrial);
+            Scribe_Values.Look(ref shuttleGlobalFactionFilterEnabled, "shuttleGlobalFactionFilterEnabled", false);
+            Scribe_Collections.Look(ref shuttleDisallowedFactionDefNames, "shuttleDisallowedFactionDefNames", LookMode.Value);
+            if (shuttleDisallowedFactionDefNames == null)
+            {
+                shuttleDisallowedFactionDefNames = new List<string>();
+            }
         }
 
         public static float ClampedGravshipGuardFraction()
@@ -97,6 +139,24 @@ namespace Gravship_Raids
                 return true;
             }
             return !globalDisallowedFactionDefNames.Contains(factionDef.defName);
+        }
+
+        public static void PruneInvalidShuttleFactionEntries()
+        {
+            int removed = shuttleDisallowedFactionDefNames.RemoveAll(defName => DefDatabase<FactionDef>.GetNamedSilentFail(defName) == null);
+            if (removed > 0)
+            {
+                Logger.Message($"GravshipRaidsSettings.PruneInvalidShuttleFactionEntries: removed {removed} stale entry(ies) from shuttleDisallowedFactionDefNames (no matching FactionDef found).");
+            }
+        }
+
+        public static bool AllowsShuttleFactionGlobally(FactionDef factionDef)
+        {
+            if (!shuttleGlobalFactionFilterEnabled || factionDef == null)
+            {
+                return true;
+            }
+            return !shuttleDisallowedFactionDefNames.Contains(factionDef.defName);
         }
     }
 }

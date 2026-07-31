@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<Defs>
+
+  <ThingDef ParentName="BuildingBase">
+    <defName>GR_CombatShuttle</defName>
+    <label>combat shuttle</label>
+    <description>A hardened shuttle variant outfitted for rapid tactical insertion and extraction of armed personnel, rather than civilian transit.</description>
+    <altitudeLayer>Building</altitudeLayer>
+    <preventDroppingThingsOn>true</preventDroppingThingsOn>
+    <pathCost>50</pathCost>
+    <blockWind>true</blockWind>
+    <passability>Impassable</passability>
+    <fillPercent>1.0</fillPercent>
+    <size>(5,3)</size>
+    <drawHighlight>true</drawHighlight>
+    <highlightColor>(0.56, 0.62, 0.9)</highlightColor>
+    <graphicData>
+      <texPath>Things/Building/Misc/Shuttle</texPath>
+      <graphicClass>Graphic_Single</graphicClass>
+      <drawSize>(6,3)</drawSize>
+      <color>(162,164,149)</color>
+      <shadowData>
+        <volume>(4.1, 1.0, 1.8)</volume>
+        <offset>(0, 0, -0.1)</offset>
+      </shadowData>
+    </graphicData>
+    <statBases>
+      <MaxHitPoints>1000</MaxHitPoints>
+      <Flammability>1</Flammability>
+      <Comfort>0.65</Comfort>
+    </statBases>
+    <tickerType>Normal</tickerType>
+    <canOverlapZones>true</canOverlapZones>
+    <killedLeavings>
+      <Plasteel>50</Plasteel>
+      <Uranium>50</Uranium>
+      <ChunkSlagSteel>4</ChunkSlagSteel>
+      <ComponentIndustrial>4</ComponentIndustrial>
+      <ShuttleEngine MayRequire="Ludeon.RimWorld.Odyssey">1</ShuttleEngine>
+    </killedLeavings>
+    <rotatable>false</rotatable>
+    <bringAlongOnGravship>false</bringAlongOnGravship>
+    <hasInteractionCell>true</hasInteractionCell>
+    <interactionCellOffset>(0, 0, -2)</interactionCellOffset>
+    <selectable>true</selectable>
+    <terrainAffordanceNeeded>Light</terrainAffordanceNeeded>
+    <soundImpactDefault>BulletImpact_Metal</soundImpactDefault>
+    <preventSkyfallersLandingOn>true</preventSkyfallersLandingOn>
+    <drawerType>RealtimeOnly</drawerType>
+    <repairEffect>ConstructMetal</repairEffect>
+    <uiIconScale>1.4</uiIconScale>
+    <building>
+      <claimable>false</claimable>
+      <destroySound>BuildingDestroyed_Metal_Big</destroySound>
+    </building>
+    <inspectorTabs>
+      <li>ITab_ContentsTransporter</li>
+    </inspectorTabs>
+    <comps>
+      <li Class="CompProperties_Shuttle" />
+      <li Class="CompProperties_Transporter">
+        <massCapacity>2000</massCapacity>
+        <max1PerGroup>true</max1PerGroup>
+        <canChangeAssignedThingsAfterStarting>true</canChangeAssignedThingsAfterStarting>
+        <showOverallStats>false</showOverallStats>
+        <pawnLoadedSound>Shuttle_PawnLoaded</pawnLoadedSound>
+        <pawnExitSound>Shuttle_PawnExit</pawnExitSound>
+      </li>
+      <li Class="CompProperties_AmbientSound">
+        <sound>ShuttleIdle_Ambience</sound>
+      </li>
+    </comps>
+  </ThingDef>
+
+</Defs>

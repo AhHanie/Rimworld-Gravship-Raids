@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<Defs>
+
+  <TransportShipDef>
+    <defName>GR_TransportShip_CombatShuttle</defName>
+    <label>combat shuttle</label>
+    <shipThing>GR_CombatShuttle</shipThing>
+    <arrivingSkyfaller>ShuttleIncoming</arrivingSkyfaller>
+    <leavingSkyfaller>ShuttleLeaving</leavingSkyfaller>
+    <worldObject>TravelingShuttle</worldObject>
+    <maxLaunchDistance>70</maxLaunchDistance>
+  </TransportShipDef>
+
+</Defs>

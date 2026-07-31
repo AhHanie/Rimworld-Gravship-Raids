@@ -28,6 +28,15 @@ namespace Gravship_Raids
 
         public static PrefabDef GR_Prefab_LostTribeGravship;
 
+        [MayRequireRoyalty]
+        public static IncidentDef GR_ShuttleRaid;
+
+        [MayRequireRoyalty]
+        public static RaidStrategyDef GR_ShuttleAssault;
+
+        [MayRequireRoyalty]
+        public static PawnsArrivalModeDef GR_ShuttleLanding;
+
         static GravshipRaidsDefOf()
         {
             DefOfHelper.EnsureInitializedInCtor(typeof(GravshipRaidsDefOf));

@@ -10,6 +10,8 @@ namespace Gravship_Raids
     {
         private static Vector2 globalFactionScrollPosition = Vector2.zero;
 
+        private static Vector2 shuttleFactionScrollPosition = Vector2.zero;
+
         private static Vector2 settingsScrollPosition = Vector2.zero;
 
         private static float settingsViewHeight = 1000f;
@@ -123,12 +125,139 @@ namespace Gravship_Raids
             listing.GapLine();
             listing.CheckboxLabeled("GravshipRaids.Settings.DebugLogging".Translate(), ref GravshipRaidsSettings.debugLogging, "GravshipRaids.Settings.DebugLoggingDesc".Translate());
 
+            listing.GapLine();
+            DrawShuttleRaidSection(listing);
+
             if (Event.current.type == EventType.Layout)
             {
                 settingsViewHeight = listing.CurHeight + 30f;
             }
             listing.End();
             Widgets.EndScrollView();
+        }
+
+        private static void DrawShuttleRaidSection(Listing_Standard listing)
+        {
+            listing.Label("GravshipRaids.Settings.ShuttleSectionHeader".Translate());
+
+            if (!ModsConfig.RoyaltyActive)
+            {
+                GUI.color = Color.red;
+                listing.Label("GravshipRaids.Settings.RoyaltyMissing".Translate());
+                GUI.color = Color.white;
+                return;
+            }
+
+            listing.CheckboxLabeled("GravshipRaids.Settings.EnableShuttleRaids".Translate(), ref GravshipRaidsSettings.enableShuttleRaids, "GravshipRaids.Settings.EnableShuttleRaidsDesc".Translate());
+
+            if (!GravshipRaidsSettings.enableShuttleRaids)
+            {
+                return;
+            }
+
+            listing.Label("GravshipRaids.Settings.ShuttleIncidentWeight".Translate(GravshipRaidsSettings.shuttleIncidentWeightFactor.ToString("0.00")));
+            GravshipRaidsSettings.shuttleIncidentWeightFactor = listing.Slider(GravshipRaidsSettings.shuttleIncidentWeightFactor, 0f, 3f);
+
+            listing.Label("GravshipRaids.Settings.ShuttleCasualtyRetreatThreshold".Translate(GravshipRaidsSettings.shuttleCasualtyRetreatThreshold.ToStringPercent()));
+            GravshipRaidsSettings.shuttleCasualtyRetreatThreshold = listing.Slider(GravshipRaidsSettings.shuttleCasualtyRetreatThreshold, 0.05f, 1f);
+
+            TextFieldNumericLabeledLeft(listing, "GravshipRaids.Settings.ShuttleMinThreatPoints".Translate(), ref GravshipRaidsSettings.shuttleMinThreatPoints, ref GravshipRaidsSettings.shuttleMinThreatPointsBuffer, 0f, 100000f);
+
+            float maxConcurrentFloat = GravshipRaidsSettings.shuttleMaxConcurrentPerMap;
+            listing.Label("GravshipRaids.Settings.ShuttleMaxConcurrentPerMap".Translate(GravshipRaidsSettings.shuttleMaxConcurrentPerMap.ToString()));
+            maxConcurrentFloat = listing.Slider(maxConcurrentFloat, 1f, 5f);
+            GravshipRaidsSettings.shuttleMaxConcurrentPerMap = Mathf.RoundToInt(maxConcurrentFloat);
+
+            TextFieldNumericLabeledLeft(listing, "GravshipRaids.Settings.ShuttleMinColonistCount".Translate(), ref GravshipRaidsSettings.shuttleMinColonistCount, ref GravshipRaidsSettings.shuttleMinColonistCountBuffer, 0, 20);
+
+            if (listing.ButtonTextLabeled("GravshipRaids.Settings.ShuttleMinEnemyFactionTechLevel".Translate(), GravshipRaidsSettings.shuttleMinEnemyFactionTechLevel.ToStringHuman().CapitalizeFirst()))
+            {
+                List<FloatMenuOption> options = new List<FloatMenuOption>();
+                foreach (TechLevel level in Enum.GetValues(typeof(TechLevel)))
+                {
+                    if (level == TechLevel.Undefined)
+                    {
+                        continue;
+                    }
+                    TechLevel capturedLevel = level;
+                    options.Add(new FloatMenuOption(level.ToStringHuman().CapitalizeFirst(), () => GravshipRaidsSettings.shuttleMinEnemyFactionTechLevel = capturedLevel));
+                }
+                Find.WindowStack.Add(new FloatMenu(options));
+            }
+
+            listing.CheckboxLabeled("GravshipRaids.Settings.ShuttleEnableMinPlayerTechLevel".Translate(), ref GravshipRaidsSettings.shuttleEnableMinPlayerTechLevel, "GravshipRaids.Settings.ShuttleEnableMinPlayerTechLevelDesc".Translate());
+            if (GravshipRaidsSettings.shuttleEnableMinPlayerTechLevel)
+            {
+                if (listing.ButtonTextLabeled("GravshipRaids.Settings.ShuttleMinPlayerTechLevel".Translate(), GravshipRaidsSettings.shuttleMinPlayerTechLevel.ToStringHuman().CapitalizeFirst()))
+                {
+                    List<FloatMenuOption> options = new List<FloatMenuOption>();
+                    foreach (TechLevel level in Enum.GetValues(typeof(TechLevel)))
+                    {
+                        if (level == TechLevel.Undefined)
+                        {
+                            continue;
+                        }
+                        TechLevel capturedLevel = level;
+                        options.Add(new FloatMenuOption(level.ToStringHuman().CapitalizeFirst(), () => GravshipRaidsSettings.shuttleMinPlayerTechLevel = capturedLevel));
+                    }
+                    Find.WindowStack.Add(new FloatMenu(options));
+                }
+            }
+
+            listing.CheckboxLabeled("GravshipRaids.Settings.ShuttleEnableGlobalFactionFilter".Translate(), ref GravshipRaidsSettings.shuttleGlobalFactionFilterEnabled, "GravshipRaids.Settings.ShuttleEnableGlobalFactionFilterDesc".Translate());
+            if (GravshipRaidsSettings.shuttleGlobalFactionFilterEnabled)
+            {
+                DrawShuttleFactionFilter(listing);
+            }
+        }
+
+        private static void DrawShuttleFactionFilter(Listing_Standard listing)
+        {
+            if (listing.ButtonText("GravshipRaids.Settings.AddExcludedFaction".Translate()))
+            {
+                List<FloatMenuOption> options = new List<FloatMenuOption>();
+                foreach (FactionDef factionDef in DefDatabase<FactionDef>.AllDefsListForReading)
+                {
+                    if (!factionDef.humanlikeFaction || GravshipRaidsSettings.shuttleDisallowedFactionDefNames.Contains(factionDef.defName))
+                    {
+                        continue;
+                    }
+                    FactionDef captured = factionDef;
+                    options.Add(new FloatMenuOption(captured.LabelCap, () => GravshipRaidsSettings.shuttleDisallowedFactionDefNames.Add(captured.defName)));
+                }
+                if (options.Count == 0)
+                {
+                    options.Add(new FloatMenuOption("GravshipRaids.Settings.NoFactionsAvailable".Translate(), null));
+                }
+                Find.WindowStack.Add(new FloatMenu(options));
+            }
+
+            const float rowHeight = 26f;
+            Rect outerRect = listing.GetRect(150f);
+            Widgets.DrawBoxSolid(outerRect, new Color(0f, 0f, 0f, 0.1f));
+            Rect viewRect = new Rect(0f, 0f, outerRect.width - 16f, Mathf.Max(GravshipRaidsSettings.shuttleDisallowedFactionDefNames.Count * rowHeight, outerRect.height));
+            Widgets.BeginScrollView(outerRect, ref shuttleFactionScrollPosition, viewRect);
+            string toRemove = null;
+            float y = 0f;
+            foreach (string defName in GravshipRaidsSettings.shuttleDisallowedFactionDefNames)
+            {
+                FactionDef factionDef = DefDatabase<FactionDef>.GetNamedSilentFail(defName);
+                string label = factionDef != null ? factionDef.LabelCap.Resolve() : defName;
+                Rect rowRect = new Rect(0f, y, viewRect.width, rowHeight);
+                Rect removeRect = new Rect(rowRect.xMax - rowHeight, rowRect.y + 1f, rowHeight - 2f, rowHeight - 2f);
+                Widgets.Label(new Rect(rowRect.x + 4f, rowRect.y, rowRect.width - rowHeight - 4f, rowRect.height), label);
+                if (Widgets.ButtonText(removeRect, "X"))
+                {
+                    toRemove = defName;
+                }
+                y += rowHeight;
+            }
+            Widgets.EndScrollView();
+            if (toRemove != null)
+            {
+                GravshipRaidsSettings.shuttleDisallowedFactionDefNames.Remove(toRemove);
+            }
+            listing.Gap(listing.verticalSpacing);
         }
 
         private static void DrawGlobalFactionFilter(Listing_Standard listing)

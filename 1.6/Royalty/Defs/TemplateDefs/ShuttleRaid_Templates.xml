@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<Defs>
+
+  <Gravship_Raids.ShuttleRaidTemplateDef>
+    <defName>GR_ShuttleTemplate_CombatShuttle</defName>
+    <label>combat shuttle</label>
+    <shuttle>GR_CombatShuttle</shuttle>
+    <shipDef>GR_TransportShip_CombatShuttle</shipDef>
+    <minPoints>300</minPoints>
+  </Gravship_Raids.ShuttleRaidTemplateDef>
+
+</Defs>

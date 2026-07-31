@@ -21,11 +21,11 @@ namespace Gravship_Raids
             {
                 return false;
             }
-            if (lord.numPawnsLostViolently < minimumCasualties)
-            {
-                return false;
-            }
-            return (float)lord.numPawnsLostViolently >= (float)lord.numPawnsEverGained * fraction;
+            bool meetsMinimum = lord.numPawnsLostViolently >= minimumCasualties;
+            bool meetsFraction = (float)lord.numPawnsLostViolently >= (float)lord.numPawnsEverGained * fraction;
+            bool result = meetsMinimum && meetsFraction;
+            Logger.Message($"Trigger_FractionPawnsLostWithMinimum.ActivateOn: lord={lord} numPawnsLostViolently={lord.numPawnsLostViolently} numPawnsEverGained={lord.numPawnsEverGained} fraction={fraction} minimumCasualties={minimumCasualties} meetsMinimum={meetsMinimum} meetsFraction={meetsFraction} result={result}.");
+            return result;
         }
     }
 }

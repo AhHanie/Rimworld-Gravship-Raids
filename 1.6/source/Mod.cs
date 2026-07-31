@@ -23,6 +23,7 @@ namespace Gravship_Raids
             GetSettings<GravshipRaidsSettings>();
             GravshipRaidTemplateUtility.PopulateCoreCellCache();
             GravshipRaidsSettings.PruneInvalidGlobalFactionEntries();
+            GravshipRaidsSettings.PruneInvalidShuttleFactionEntries();
 
             if (!ModsConfig.OdysseyActive)
             {
@@ -31,6 +32,15 @@ namespace Gravship_Raids
             else
             {
                 Logger.Message("Initialized. Odyssey detected; gravship raid content is available.");
+            }
+
+            if (!ModsConfig.RoyaltyActive)
+            {
+                Log.Warning("[Gravship Raids] The Royalty DLC was not detected. Shuttle raids are an optional feature that requires Royalty (for CompShuttle/TransportShipDef) and will remain unavailable until Royalty is enabled. Gravship raids are unaffected.");
+            }
+            else
+            {
+                Logger.Message("Royalty detected; shuttle raid content is available.");
             }
         }
 

@@ -12,6 +12,8 @@ namespace Gravship_Raids
     {
         private static Rot4 rotation = Rot4.North;
 
+        private static Rot4 shuttleRotation = Rot4.North;
+
         public static void RotateTemplateSpawn()
         {
             rotation.Rotate(RotationDirection.Clockwise);
@@ -175,6 +177,181 @@ namespace Gravship_Raids
                 string message = success
                     ? $"[Gravship Raids] Force enemy gravship departure: {instance} departure sequence started."
                     : $"[Gravship Raids] Force enemy gravship departure: BeginDeparture failed for {instance}.";
+                Log.Message(message);
+                Messages.Message(message, success ? MessageTypeDefOf.NeutralEvent : MessageTypeDefOf.RejectInput, historical: false);
+            }
+            finally
+            {
+                GravshipRaidsSettings.debugLogging = previousDebugLogging;
+            }
+        }
+
+        public static void RotateShuttleTemplateSpawn()
+        {
+            shuttleRotation.Rotate(RotationDirection.Clockwise);
+            Messages.Message("Shuttle template spawn rotation: " + shuttleRotation.ToStringHuman(), MessageTypeDefOf.NeutralEvent, historical: false);
+        }
+
+        public static List<ShuttleRaidTemplateDef> GetShuttleTemplates()
+        {
+            return DefDatabase<ShuttleRaidTemplateDef>.AllDefsListForReading
+                .OrderBy((ShuttleRaidTemplateDef t) => t.defName)
+                .ToList();
+        }
+
+        public static void SpawnShuttleTemplateAt(ShuttleRaidTemplateDef template, Map map, IntVec3 cell)
+        {
+            if (map == null || !cell.InBounds(map))
+            {
+                return;
+            }
+            if (template.shuttle == null)
+            {
+                Log.Error($"[Gravship Raids] Cannot spawn shuttle template '{template.defName}': shuttle is not assigned.");
+                return;
+            }
+
+            IEnumerable<string> errors = template.ConfigErrors().ToList();
+            if (errors.Any())
+            {
+                foreach (string error in errors)
+                {
+                    Log.Error($"[Gravship Raids] Shuttle template '{template.defName}' is invalid: {error}");
+                }
+            }
+
+            AcceptanceReport report = RoyalTitlePermitWorker_CallShuttle.ShuttleCanLandHere(cell, map, template.shuttle, shuttleRotation);
+            Log.Message($"[Gravship Raids] Shuttle template '{template.defName}' at {cell}, rotation {shuttleRotation}. ShuttleCanLandHere: {report.Accepted}" + (report.Accepted ? string.Empty : $" ({report.Reason})") + ".");
+
+            if (!report.Accepted)
+            {
+                Messages.Message($"[Gravship Raids] Cannot land here: {report.Reason}", MessageTypeDefOf.RejectInput, historical: false);
+                return;
+            }
+
+            Thing shuttleThing = ThingMaker.MakeThing(template.shuttle);
+            shuttleThing.Rotation = shuttleRotation;
+            GenSpawn.Spawn(shuttleThing, cell, map, shuttleRotation);
+        }
+
+        public static void ForceShuttleRaidAt(Map map, IntVec3 cell)
+        {
+            ForceShuttleRaidAtInternal(null, map, cell);
+        }
+
+        public static void ForceShuttleRaidAt(ShuttleRaidTemplateDef selectedTemplate, Map map, IntVec3 cell)
+        {
+            if (selectedTemplate == null)
+            {
+                Log.Error("[Gravship Raids] Force shuttle raid with template: no template was supplied.");
+                return;
+            }
+            if (!ShuttleRaidTemplateUtility.IsValidTemplate(selectedTemplate))
+            {
+                string message = $"[Gravship Raids] Force shuttle raid with template: '{selectedTemplate.defName}' is invalid - see log for details.";
+                Log.Error(message);
+                foreach (string error in selectedTemplate.ConfigErrors())
+                {
+                    Log.Error($"[Gravship Raids] Shuttle template '{selectedTemplate.defName}' config error: {error}");
+                }
+                Messages.Message(message, MessageTypeDefOf.RejectInput, historical: false);
+                return;
+            }
+            ForceShuttleRaidAtInternal(selectedTemplate, map, cell);
+        }
+
+        private static void ForceShuttleRaidAtInternal(ShuttleRaidTemplateDef selectedTemplate, Map map, IntVec3 cell)
+        {
+            if (map == null || !cell.InBounds(map))
+            {
+                return;
+            }
+
+            if (!ModsConfig.RoyaltyActive || GravshipRaidsDefOf.GR_ShuttleRaid == null)
+            {
+                string royaltyMessage = "[Gravship Raids] Force shuttle raid: the Royalty DLC is not active; shuttle raids are unavailable.";
+                Log.Warning(royaltyMessage);
+                Messages.Message(royaltyMessage, MessageTypeDefOf.RejectInput, historical: false);
+                return;
+            }
+
+            if (selectedTemplate != null)
+            {
+                AcceptanceReport report = RoyalTitlePermitWorker_CallShuttle.ShuttleCanLandHere(cell, map, selectedTemplate.shuttle, shuttleRotation);
+                if (!report.Accepted)
+                {
+                    string rejectMessage = $"[Gravship Raids] Force shuttle raid with template '{selectedTemplate.defName}': cannot land at {cell} (rot {shuttleRotation}) - {report.Reason}.";
+                    Log.Warning(rejectMessage);
+                    Messages.Message(rejectMessage, MessageTypeDefOf.RejectInput, historical: false);
+                    return;
+                }
+            }
+
+            bool previousDebugLogging = GravshipRaidsSettings.debugLogging;
+            GravshipRaidsSettings.debugLogging = true;
+            PawnsArrivalModeWorker_ShuttleLanding.DebugForcedRequest =
+                new PawnsArrivalModeWorker_ShuttleLanding.ForcedLandingRequest(cell, shuttleRotation, selectedTemplate);
+            try
+            {
+                IncidentParms parms = StorytellerUtility.DefaultParmsNow(GravshipRaidsDefOf.GR_ShuttleRaid.category, map);
+                parms.forced = true;
+
+                if (parms.points < GravshipRaidsSettings.shuttleMinThreatPoints)
+                {
+                    Log.Message($"[Gravship Raids] Forced shuttle raid: raising parms.points from {parms.points} to settings.shuttleMinThreatPoints {GravshipRaidsSettings.shuttleMinThreatPoints} so faction selection isn't blocked by colony wealth during debug testing.");
+                    parms.points = GravshipRaidsSettings.shuttleMinThreatPoints;
+                }
+
+                bool success = GravshipRaidsDefOf.GR_ShuttleRaid.Worker.TryExecute(parms);
+                string templateDesc = (selectedTemplate != null) ? $" with template '{selectedTemplate.defName}'" : string.Empty;
+                string message = $"[Gravship Raids] Forced shuttle raid{templateDesc} at {cell} (rot {shuttleRotation}) " + (success ? "succeeded." : "failed - see log for the declining faction/landing-search reason.");
+                Log.Message(message);
+                Messages.Message(message, success ? MessageTypeDefOf.NeutralEvent : MessageTypeDefOf.RejectInput, historical: false);
+            }
+            finally
+            {
+                PawnsArrivalModeWorker_ShuttleLanding.DebugForcedRequest = null;
+                GravshipRaidsSettings.debugLogging = previousDebugLogging;
+            }
+        }
+
+        public static void ForceEnemyShuttleDeparture(Map map)
+        {
+            if (map == null)
+            {
+                return;
+            }
+
+            MapComponent_ShuttleRaid component = MapComponent_ShuttleRaid.GetFor(map);
+            EnemyShuttleRaidInstance instance = component?.Instances.FirstOrDefault(
+                (EnemyShuttleRaidInstance i) => i.state != ShuttleRaidState.Departed && i.state != ShuttleRaidState.Lost);
+
+            if (instance == null)
+            {
+                Report("no active enemy shuttle raid instance exists on this map.");
+                return;
+            }
+
+            if (!instance.ShuttleAvailable)
+            {
+                Report($"{instance} has no valid spawned shuttle.");
+                return;
+            }
+
+            if (instance.state != ShuttleRaidState.Boarding)
+            {
+                Report($"{instance} is not in a departure-capable state (state={instance.state}); it must be Boarding.");
+                return;
+            }
+
+            bool previousDebugLogging = GravshipRaidsSettings.debugLogging;
+            GravshipRaidsSettings.debugLogging = true;
+            try
+            {
+                bool success = EnemyShuttleRaidUtility.TryDepart(instance);
+                string message = success
+                    ? $"[Gravship Raids] Force enemy shuttle departure: {instance} departure sequence started."
+                    : $"[Gravship Raids] Force enemy shuttle departure: TryDepart failed for {instance}.";
                 Log.Message(message);
                 Messages.Message(message, success ? MessageTypeDefOf.NeutralEvent : MessageTypeDefOf.RejectInput, historical: false);
             }

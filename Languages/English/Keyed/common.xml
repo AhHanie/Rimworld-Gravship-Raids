@@ -50,4 +50,29 @@
     <!-- Hardcore enemy departure ending -->
     <GravshipRaids.Ending.UnguardedMapDestroyedIntro>Your colony had no grav anchor to hold its ground against a departing enemy gravship.</GravshipRaids.Ending.UnguardedMapDestroyedIntro>
     <GravshipRaids.Ending.UnguardedMapDestroyedEnding>As the raiders' gravship tore away, it took the map, and everyone left on it, with it. No colonists remain to carry on.</GravshipRaids.Ending.UnguardedMapDestroyedEnding>
+
+    <!-- Shuttle raids settings -->
+    <GravshipRaids.Settings.ShuttleSectionHeader>Shuttle raids</GravshipRaids.Settings.ShuttleSectionHeader>
+    <GravshipRaids.Settings.EnableShuttleRaids>Enable shuttle raids</GravshipRaids.Settings.EnableShuttleRaids>
+    <GravshipRaids.Settings.EnableShuttleRaidsDesc>If disabled, the shuttle raid incident will never fire and will not be offered as a raid option. Requires the Royalty DLC; stays inactive without it regardless of this setting.</GravshipRaids.Settings.EnableShuttleRaidsDesc>
+    <GravshipRaids.Settings.RoyaltyMissing>The Royalty DLC was not detected. Shuttle raids require Royalty and will remain inactive until it is enabled.</GravshipRaids.Settings.RoyaltyMissing>
+    <GravshipRaids.Settings.ShuttleIncidentWeight>Incident frequency factor: {0}x</GravshipRaids.Settings.ShuttleIncidentWeight>
+    <GravshipRaids.Settings.ShuttleCasualtyRetreatThreshold>Casualty retreat threshold: {0}</GravshipRaids.Settings.ShuttleCasualtyRetreatThreshold>
+    <GravshipRaids.Settings.ShuttleMinThreatPoints>Minimum threat points required</GravshipRaids.Settings.ShuttleMinThreatPoints>
+    <GravshipRaids.Settings.ShuttleMaxConcurrentPerMap>Maximum concurrent shuttles per map: {0}</GravshipRaids.Settings.ShuttleMaxConcurrentPerMap>
+    <GravshipRaids.Settings.ShuttleMinColonistCount>Minimum free colonists required on the map</GravshipRaids.Settings.ShuttleMinColonistCount>
+    <GravshipRaids.Settings.ShuttleMinEnemyFactionTechLevel>Minimum enemy faction tech level</GravshipRaids.Settings.ShuttleMinEnemyFactionTechLevel>
+    <GravshipRaids.Settings.ShuttleEnableMinPlayerTechLevel>Require a minimum colony tech level</GravshipRaids.Settings.ShuttleEnableMinPlayerTechLevel>
+    <GravshipRaids.Settings.ShuttleEnableMinPlayerTechLevelDesc>If enabled, shuttle raids will not occur until your faction's tech level is at least the level chosen below.</GravshipRaids.Settings.ShuttleEnableMinPlayerTechLevelDesc>
+    <GravshipRaids.Settings.ShuttleMinPlayerTechLevel>Minimum colony tech level required</GravshipRaids.Settings.ShuttleMinPlayerTechLevel>
+    <GravshipRaids.Settings.ShuttleEnableGlobalFactionFilter>Enable global faction filter</GravshipRaids.Settings.ShuttleEnableGlobalFactionFilter>
+    <GravshipRaids.Settings.ShuttleEnableGlobalFactionFilterDesc>If enabled, factions excluded below can never be a shuttle raid source, regardless of what any individual shuttle template's own allowed/disallowed faction lists say. Disabled by default.</GravshipRaids.Settings.ShuttleEnableGlobalFactionFilterDesc>
+
+    <!-- Shuttle raid strategy/incident letters -->
+    <GravshipRaids.MessageShuttleRaidersGivenUpRetreating>The {0} of {1} have given up the attack and are falling back to their shuttle.</GravshipRaids.MessageShuttleRaidersGivenUpRetreating>
+    <GravshipRaids.MessageShuttleRaidersSatisfiedRetreating>The {0} of {1} are satisfied with the damage they've done and are falling back to their shuttle.</GravshipRaids.MessageShuttleRaidersSatisfiedRetreating>
+    <GravshipRaids.MessageShuttleRaidersRetreatingCasualties>The {0} of {1} have taken too many casualties and are falling back to their shuttle.</GravshipRaids.MessageShuttleRaidersRetreatingCasualties>
+    <GravshipRaids.MessageShuttleRaidersRetreatingNonHostile>The {0} of {1} are no longer hostile and are falling back to their shuttle.</GravshipRaids.MessageShuttleRaidersRetreatingNonHostile>
+    <GravshipRaids.MessageShuttleRaidersBoarding>Surviving {0} of {1} are boarding their shuttle.</GravshipRaids.MessageShuttleRaidersBoarding>
+    <GravshipRaids.MessageShuttleRaidersStranded>The {0} of {1} have lost their shuttle and are fleeing on foot.</GravshipRaids.MessageShuttleRaidersStranded>
 </LanguageData>
