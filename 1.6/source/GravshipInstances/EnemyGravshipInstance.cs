@@ -38,6 +38,8 @@ namespace Gravship_Raids
 
         public int departureTick = -1;
 
+        public bool flightDisabled;
+
         public List<GravshipRaidTemplateUtility.TerrainCellSnapshot> terrainSnapshot = new List<GravshipRaidTemplateUtility.TerrainCellSnapshot>();
 
         public Thing departingSkyfaller;
@@ -75,6 +77,7 @@ namespace Gravship_Raids
             Scribe_Collections.Look(ref guardCrew, "guardCrew", LookMode.Reference);
             Scribe_Values.Look(ref state, "state", GravshipRaidState.Landing);
             Scribe_Values.Look(ref departureTick, "departureTick", -1);
+            Scribe_Values.Look(ref flightDisabled, "flightDisabled", false);
             Scribe_Collections.Look(ref terrainSnapshot, "terrainSnapshot", LookMode.Deep);
             Scribe_References.Look(ref departingSkyfaller, "departingSkyfaller");
 
@@ -113,7 +116,7 @@ namespace Gravship_Raids
 
         public override string ToString()
         {
-            return $"EnemyGravshipInstance(template={template?.defName}, root={root}, state={state}, crew={crew?.Count ?? 0})";
+            return $"EnemyGravshipInstance(template={template?.defName}, root={root}, state={state}, flightDisabled={flightDisabled}, crew={crew?.Count ?? 0})";
         }
     }
 }

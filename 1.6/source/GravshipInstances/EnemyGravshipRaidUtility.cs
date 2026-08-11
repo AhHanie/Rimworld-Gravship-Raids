@@ -22,7 +22,7 @@ namespace Gravship_Raids
             {
                 return false;
             }
-            if (instance.core == null || !instance.core.Spawned)
+            if (instance.core == null || !instance.core.Spawned || instance.flightDisabled)
             {
                 return false;
             }
@@ -370,7 +370,7 @@ namespace Gravship_Raids
             FleckMaker.ThrowHeatGlow(cell, map, 4f);
         }
 
-        public static void HandleCoreDestroyed(EnemyGravshipInstance instance)
+        public static void HandleFlightCriticalBuildingDestroyed(EnemyGravshipInstance instance, Thing destroyedBuilding)
         {
             if (instance == null)
             {
@@ -378,20 +378,34 @@ namespace Gravship_Raids
             }
             if (instance.state != GravshipRaidState.Landed && instance.state != GravshipRaidState.Boarding)
             {
-                // Already mid/post departure (Launching/Departed) or already handled (Destroyed) - this is our
-                // own departure cleanup destroying the core, or a duplicate notification, not real combat loss.
+                // Already mid/post departure (Launching/Departed) or already abandoned (Destroyed) - this is our
+                // own departure cleanup destroying hull/core pieces, or a duplicate notification, not real
+                // combat loss.
                 return;
             }
 
-            instance.state = GravshipRaidState.Destroyed;
-            instance.core = null;
-            instance.departureTick = -1;
+            bool wasAlreadyDisabled = instance.flightDisabled;
+            instance.flightDisabled = true;
+            if (instance.core != null && instance.core == destroyedBuilding)
+            {
+                instance.core = null;
+            }
+
+            if (wasAlreadyDisabled)
+            {
+                return;
+            }
 
             if (instance.faction?.def != null)
             {
                 Messages.Message("GravshipRaids.MessageGravshipCoreDestroyed".Translate(instance.faction.def.pawnsPlural.CapitalizeFirst(), instance.faction.Name), MessageTypeDefOf.PositiveEvent);
             }
-            Logger.Message($"EnemyGravshipRaidUtility.HandleCoreDestroyed: {instance}'s core was destroyed; retreat canceled, hull left as ruin, surviving crew fall back to map-edge escape.");
+            Logger.Message($"EnemyGravshipRaidUtility.HandleFlightCriticalBuildingDestroyed: {instance}'s flight-critical building '{destroyedBuilding?.def?.defName ?? "null"}' was destroyed; the ship can no longer fly, but the raid continues normally until it otherwise retreats, at which point it will fall back on foot.");
+        }
+
+        public static void HandleCoreDestroyed(EnemyGravshipInstance instance)
+        {
+            HandleFlightCriticalBuildingDestroyed(instance, instance?.core);
         }
     }
 }

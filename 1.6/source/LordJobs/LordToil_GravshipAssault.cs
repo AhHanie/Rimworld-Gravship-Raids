@@ -63,12 +63,7 @@ namespace Gravship_Raids
                 point = instance.core.Position;
                 return true;
             }
-            // The ship has not landed yet - fall back to the planned root so guards get a sensible
-            // temporary duty immediately on Lord creation. Once the core is set (or lost after being
-            // spawned - i.e. destroyed mid-assault), only the live core position is a valid defend point;
-            // the shared boarding/destroyed-state transition takes every pawn, guard or not, off this
-            // toil instead.
-            if (instance.state == GravshipRaidState.Landing)
+            if (instance.state == GravshipRaidState.Landing || instance.state == GravshipRaidState.Landed || instance.state == GravshipRaidState.Boarding)
             {
                 point = instance.root;
                 return true;

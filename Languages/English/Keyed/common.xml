@@ -45,7 +45,7 @@
     <GravshipRaids.MessageRaidersStranded>The {0} of {1} have lost their gravship and are fleeing on foot.</GravshipRaids.MessageRaidersStranded>
 
     <!-- EnemyGravshipRaidUtility departure/destruction -->
-    <GravshipRaids.MessageGravshipCoreDestroyed>The gravship of the {0} of {1} has been destroyed, stranding any survivors.</GravshipRaids.MessageGravshipCoreDestroyed>
+    <GravshipRaids.MessageGravshipCoreDestroyed>The gravship of the {0} of {1} has been disabled and will be unable to depart.</GravshipRaids.MessageGravshipCoreDestroyed>
 
     <!-- Hardcore enemy departure ending -->
     <GravshipRaids.Ending.UnguardedMapDestroyedIntro>Your colony had no grav anchor to hold its ground against a departing enemy gravship.</GravshipRaids.Ending.UnguardedMapDestroyedIntro>

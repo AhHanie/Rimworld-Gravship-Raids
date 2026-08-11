@@ -163,6 +163,12 @@ namespace Gravship_Raids
                 return;
             }
 
+            if (instance.flightDisabled)
+            {
+                Report($"{instance} is flight-disabled and cannot depart.");
+                return;
+            }
+
             if (instance.state != GravshipRaidState.Boarding)
             {
                 Report($"{instance} is not in a departure-capable state (state={instance.state}); it must be Boarding.");

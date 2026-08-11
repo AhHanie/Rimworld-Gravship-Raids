@@ -101,6 +101,35 @@ namespace Gravship_Raids
             }
         }
 
+        public void NotifyShipBuildingDestroyed(Thing destroyedThing, Map previousMap)
+        {
+            if (destroyedThing?.def == null)
+            {
+                return;
+            }
+            foreach (EnemyGravshipInstance instance in instances)
+            {
+                if (instance == null)
+                {
+                    continue;
+                }
+                if (instance.state != GravshipRaidState.Landed && instance.state != GravshipRaidState.Boarding)
+                {
+                    continue;
+                }
+                if (instance.spawnedThings == null || !instance.spawnedThings.Contains(destroyedThing))
+                {
+                    continue;
+                }
+                if (instance.template?.flightCriticalBuildings == null || !instance.template.flightCriticalBuildings.Contains(destroyedThing.def))
+                {
+                    continue;
+                }
+                EnemyGravshipRaidUtility.HandleFlightCriticalBuildingDestroyed(instance, destroyedThing);
+                return;
+            }
+        }
+
         public EnemyGravshipInstance GetInstanceForCore(Thing core)
         {
             if (core == null)
@@ -134,7 +163,7 @@ namespace Gravship_Raids
             }
             if (Scribe.mode == LoadSaveMode.PostLoadInit)
             {
-                int removedCount = instances.RemoveAll((EnemyGravshipInstance i) => i == null || (i.core == null && i.state != GravshipRaidState.Landing && i.state != GravshipRaidState.Departed && i.state != GravshipRaidState.Destroyed));
+                int removedCount = instances.RemoveAll((EnemyGravshipInstance i) => i == null || (i.core == null && !i.flightDisabled && i.state != GravshipRaidState.Landing && i.state != GravshipRaidState.Departed && i.state != GravshipRaidState.Destroyed));
                 if (removedCount > 0)
                 {
                     Logger.Warning($"MapComponent_GravshipRaid.ExposeData: pruned {removedCount} instance(s) with an unexpectedly null core reference on map {map} during PostLoadInit.");

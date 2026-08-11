@@ -39,7 +39,7 @@ namespace Gravship_Raids
             data = new LordToilData_BoardEnemyGravship();
         }
 
-        private Thing Core => (instance?.core != null && instance.core.Spawned) ? instance.core : null;
+        private Thing Core => (instance?.core != null && instance.core.Spawned && !instance.flightDisabled) ? instance.core : null;
 
         private bool BoardingWindowOpen => instance == null || instance.departureTick < 0 || Find.TickManager.TicksGame < instance.departureTick;
 

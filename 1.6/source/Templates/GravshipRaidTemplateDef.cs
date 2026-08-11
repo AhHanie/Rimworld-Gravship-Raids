@@ -38,6 +38,8 @@ namespace Gravship_Raids
 
         public ThingDef arrivalSkyfaller;
 
+        public List<ThingDef> flightCriticalBuildings;
+
         public override IEnumerable<string> ConfigErrors()
         {
             foreach (string error in base.ConfigErrors())
@@ -61,6 +63,26 @@ namespace Gravship_Raids
             else if (coreThings.Count > 1)
             {
                 yield return $"prefab '{prefab.defName}' contains {coreThings.Count} CompEnemyGravshipCore-bearing buildings; every template needs exactly one.";
+            }
+
+            if (!flightCriticalBuildings.NullOrEmpty())
+            {
+                // Entries that don't occur in this template's prefab are intentionally allowed (not an error):
+                // they simply never match a spawned thing, so the same flightCriticalBuildings list can be
+                // copy-pasted across every template regardless of which buildings each prefab actually has.
+                HashSet<ThingDef> seenFlightCritical = new HashSet<ThingDef>();
+                foreach (ThingDef flightCriticalDef in flightCriticalBuildings)
+                {
+                    if (flightCriticalDef == null)
+                    {
+                        yield return "flightCriticalBuildings contains a null entry.";
+                        continue;
+                    }
+                    if (!seenFlightCritical.Add(flightCriticalDef))
+                    {
+                        yield return $"flightCriticalBuildings contains duplicate entry '{flightCriticalDef.defName}'.";
+                    }
+                }
             }
 
             HashSet<IntVec3> occupiedCells = new HashSet<IntVec3>();
