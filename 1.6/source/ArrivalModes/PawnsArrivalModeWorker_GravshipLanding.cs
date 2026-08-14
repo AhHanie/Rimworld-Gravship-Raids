@@ -317,11 +317,12 @@ namespace Gravship_Raids
             foreach (Thing thing in spawned)
             {
                 CompRefuelable fuelComp = thing.TryGetComp<CompRefuelable>();
-                if (fuelComp == null)
+                if (fuelComp != null)
                 {
+                    fuelComp.Refuel(Rand.Range(0.2f, 1f) * fuelComp.Props.fuelCapacity);
                     continue;
                 }
-                fuelComp.Refuel(Rand.Range(0.2f, 1f) * fuelComp.Props.fuelCapacity);
+                VGEAstrofuelTankCompatibility.TryRandomizeFuelLevel(thing);
             }
         }
 

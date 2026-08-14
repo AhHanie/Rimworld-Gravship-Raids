@@ -32,9 +32,25 @@ namespace Gravship_Raids
             {
                 return;
             }
+
+            string cleanupOutcome = "no spawned shuttle to clean up";
+            string wreckOutcome = "no wreck component";
+            if (instance.ShuttleAvailable)
+            {
+                CompTransporter transporter = instance.shuttle.TryGetComp<CompTransporter>();
+                cleanupOutcome = (transporter != null && transporter.CancelLoad()) ? "cancelled active loading" : "no active loading to cancel";
+
+                CompEnemyShuttleWreck wreck = instance.shuttle.TryGetComp<CompEnemyShuttleWreck>();
+                if (wreck != null)
+                {
+                    wreck.MarkAbandoned();
+                    wreckOutcome = "marked abandoned";
+                }
+            }
+
             instance.state = ShuttleRaidState.Lost;
             instance.departureTick = -1;
-            Logger.Message($"EnemyShuttleRaidUtility.AbandonInstance: {instance} abandoned ({reason}).");
+            Logger.Message($"EnemyShuttleRaidUtility.AbandonInstance: {instance} abandoned ({reason}); shuttle cleanup: {cleanupOutcome}; wreck: {wreckOutcome}.");
         }
 
         public static bool TryDepart(EnemyShuttleRaidInstance instance)

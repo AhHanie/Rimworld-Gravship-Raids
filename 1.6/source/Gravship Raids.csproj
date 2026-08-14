@@ -90,6 +90,7 @@
     <Compile Include="Debug\DebugActionsGravshipRaidPrefabCapture.cs" />
     <Compile Include="Debug\GravshipRaidDebugApi.cs" />
     <Compile Include="Compatibility\HAROutfitStandCompatibility.cs" />
+    <Compile Include="Compatibility\VGEAstrofuelTankCompatibility.cs" />
     <Compile Include="Scenarios\ScenPart_CrashlandedGravshipStart.cs" />
     <Compile Include="Scenarios\CrashlandedGravshipArrivalSkyfaller.cs" />
     <Compile Include="Scenarios\MapComponent_CrashlandedGravshipStart.cs" />
@@ -109,6 +110,7 @@
     <Compile Include="LordJobs\LordToil_BoardEnemyShuttle.cs" />
     <Compile Include="LordJobs\Trigger_ShuttleRaidBoarding.cs" />
     <Compile Include="Debug\DebugActionsShuttleRaidTemplates.cs" />
+    <Compile Include="Comps\CompEnemyShuttleWreck.cs" />
   </ItemGroup>
   <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
