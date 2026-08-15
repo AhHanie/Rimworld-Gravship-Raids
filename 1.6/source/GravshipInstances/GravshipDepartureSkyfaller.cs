@@ -151,14 +151,6 @@ namespace Gravship_Raids
 
             if (innerContainer.Any)
             {
-                List<Thing> contents = new List<Thing>(innerContainer);
-                foreach (Thing t in contents)
-                {
-                    if (t is Pawn pawn && !pawn.Destroyed && !pawn.IsWorldPawn())
-                    {
-                        pawn.ExitMap(allowedToJoinOrCreateCaravan: false, Rot4.Invalid);
-                    }
-                }
                 innerContainer.ClearAndDestroyContentsOrPassToWorld(DestroyMode.Vanish);
             }
 
