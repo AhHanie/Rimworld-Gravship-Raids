@@ -72,7 +72,7 @@ namespace Gravship_Raids
 
         public int ActiveInstanceCount => instances.Count((EnemyGravshipInstance i) =>
             i.state != GravshipRaidState.Departed && i.state != GravshipRaidState.Destroyed &&
-            (i.state == GravshipRaidState.Landing || i.core != null));
+            (i.state == GravshipRaidState.Landing || i.state == GravshipRaidState.Launching || i.core != null));
 
         public static MapComponent_GravshipRaid GetFor(Map map)
         {
@@ -163,7 +163,7 @@ namespace Gravship_Raids
             }
             if (Scribe.mode == LoadSaveMode.PostLoadInit)
             {
-                int removedCount = instances.RemoveAll((EnemyGravshipInstance i) => i == null || (i.core == null && !i.flightDisabled && i.state != GravshipRaidState.Landing && i.state != GravshipRaidState.Departed && i.state != GravshipRaidState.Destroyed));
+                int removedCount = instances.RemoveAll((EnemyGravshipInstance i) => i == null || (i.core == null && !i.flightDisabled && i.state != GravshipRaidState.Landing && i.state != GravshipRaidState.Launching && i.state != GravshipRaidState.Departed && i.state != GravshipRaidState.Destroyed));
                 if (removedCount > 0)
                 {
                     Logger.Warning($"MapComponent_GravshipRaid.ExposeData: pruned {removedCount} instance(s) with an unexpectedly null core reference on map {map} during PostLoadInit.");
