@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Linq;
 using RimWorld;
 using Verse;
 
@@ -23,7 +24,7 @@ namespace Gravship_Raids
 
             ThingDef skyfallerDef = GravshipRaidsDefOf.GR_CrashlandedGravshipSkyfaller;
 
-            List<Pawn> colonists = new List<Pawn>(Find.GameInitData.startingAndOptionalPawns);
+            List<Pawn> colonists = new List<Pawn>(Find.GameInitData.startingAndOptionalPawns.Take(Find.GameInitData.startingPawnCount));
 
             List<Pawn> pets = new List<Pawn>();
             List<Thing> items = new List<Thing>();
