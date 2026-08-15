@@ -309,14 +309,7 @@ namespace Gravship_Raids
                 Logger.Error("EnemyGravshipRaidUtility.TransferDepartingShipToLeavingEffect: GR_GravshipDepartureSkyfaller is null; falling back to direct pawn removal/hull destruction with no leaving effect.");
                 foreach (Thing t in boarded)
                 {
-                    if (t is Pawn pawn && !pawn.Destroyed && !pawn.IsWorldPawn())
-                    {
-                        pawn.ExitMap(allowedToJoinOrCreateCaravan: false, Rot4.Invalid);
-                    }
-                    else if (!(t is Pawn))
-                    {
-                        t.DestroyOrPassToWorld(DestroyMode.Vanish);
-                    }
+                    t.DestroyOrPassToWorld(DestroyMode.Vanish);
                 }
                 foreach (Thing t in hullPieces)
                 {
