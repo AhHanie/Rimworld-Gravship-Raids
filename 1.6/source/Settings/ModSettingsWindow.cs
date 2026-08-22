@@ -126,6 +126,9 @@ namespace Gravship_Raids
             listing.CheckboxLabeled("GravshipRaids.Settings.DebugLogging".Translate(), ref GravshipRaidsSettings.debugLogging, "GravshipRaids.Settings.DebugLoggingDesc".Translate());
 
             listing.GapLine();
+            DrawWinstonWavesCompatibilitySection(listing);
+
+            listing.GapLine();
             DrawShuttleRaidSection(listing);
 
             if (Event.current.type == EventType.Layout)
@@ -134,6 +137,26 @@ namespace Gravship_Raids
             }
             listing.End();
             Widgets.EndScrollView();
+        }
+
+        private static void DrawWinstonWavesCompatibilitySection(Listing_Standard listing)
+        {
+            if (!ModsConfig.IsActive("VanillaStorytellersExpanded.WinstonWave"))
+            {
+                return;
+            }
+
+            listing.Label("GravshipRaids.Settings.WinstonSectionHeader".Translate());
+            listing.CheckboxLabeled(
+                "GravshipRaids.Settings.EnableWinstonWavesCompatibility".Translate(),
+                ref GravshipRaidsSettings.enableWinstonWavesCompatibility,
+                "GravshipRaids.Settings.EnableWinstonWavesCompatibilityDesc".Translate());
+
+            if (GravshipRaidsSettings.enableWinstonWavesCompatibility)
+            {
+                listing.Label("GravshipRaids.Settings.WinstonWavesGravshipChance".Translate(GravshipRaidsSettings.winstonWavesGravshipChance.ToStringPercent()));
+                GravshipRaidsSettings.winstonWavesGravshipChance = Mathf.Clamp01(listing.Slider(GravshipRaidsSettings.winstonWavesGravshipChance, 0f, 1f));
+            }
         }
 
         private static void DrawShuttleRaidSection(Listing_Standard listing)

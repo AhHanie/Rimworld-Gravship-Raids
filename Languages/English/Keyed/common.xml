@@ -51,6 +51,12 @@
     <GravshipRaids.Ending.UnguardedMapDestroyedIntro>Your colony had no grav anchor to hold its ground against a departing enemy gravship.</GravshipRaids.Ending.UnguardedMapDestroyedIntro>
     <GravshipRaids.Ending.UnguardedMapDestroyedEnding>As the raiders' gravship tore away, it took the map, and everyone left on it, with it. No colonists remain to carry on.</GravshipRaids.Ending.UnguardedMapDestroyedEnding>
 
+    <!-- Winston Waves compatibility settings -->
+    <GravshipRaids.Settings.WinstonSectionHeader>Winston Waves compatibility</GravshipRaids.Settings.WinstonSectionHeader>
+    <GravshipRaids.Settings.EnableWinstonWavesCompatibility>Allow Winston Waves to select gravship raids</GravshipRaids.Settings.EnableWinstonWavesCompatibility>
+    <GravshipRaids.Settings.EnableWinstonWavesCompatibilityDesc>If enabled, an otherwise-eligible scheduled Winston Wave enemy wave has a chance (below) to become a gravship raid using this mod's existing templates, landing, crew, and departure systems. This chance is evaluated only for a wave that is already eligible under this mod's own gravship raid settings above; it does not change ordinary storyteller gravship incidence.</GravshipRaids.Settings.EnableWinstonWavesCompatibilityDesc>
+    <GravshipRaids.Settings.WinstonWavesGravshipChance>Chance per eligible wave: {0}</GravshipRaids.Settings.WinstonWavesGravshipChance>
+
     <!-- Shuttle raids settings -->
     <GravshipRaids.Settings.ShuttleSectionHeader>Shuttle raids</GravshipRaids.Settings.ShuttleSectionHeader>
     <GravshipRaids.Settings.EnableShuttleRaids>Enable shuttle raids</GravshipRaids.Settings.EnableShuttleRaids>

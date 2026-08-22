@@ -7,37 +7,10 @@ namespace Gravship_Raids
     {
         protected override bool CanFireNowSub(IncidentParms parms)
         {
-            if (!ModsConfig.OdysseyActive)
+            if (!GravshipRaidEligibility.CanUseGravshipRaidOnMap(parms.target as Map, out string reason, parms))
             {
+                Logger.Message($"IncidentWorker_GravshipRaid.CanFireNowSub: declining - {reason}.");
                 return false;
-            }
-
-            if (!GravshipRaidsSettings.enabled)
-            {
-                return false;
-            }
-
-            if (GravshipRaidsSettings.enableMinPlayerTechLevel && (int)Faction.OfPlayer.def.techLevel < (int)GravshipRaidsSettings.minPlayerTechLevel)
-            {
-                Logger.Message($"IncidentWorker_GravshipRaid.CanFireNowSub: declining - player faction techLevel {Faction.OfPlayer.def.techLevel} is below settings.minPlayerTechLevel {GravshipRaidsSettings.minPlayerTechLevel}.");
-                return false;
-            }
-
-            Map map = parms.target as Map;
-            if (map != null)
-            {
-                MapComponent_GravshipRaid component = MapComponent_GravshipRaid.GetFor(map);
-                int maxConcurrent = GravshipRaidsSettings.maxConcurrentShipsPerMap;
-                if (component != null && component.ActiveInstanceCount >= maxConcurrent)
-                {
-                    return false;
-                }
-
-                if (!MapSuitabilityUtility.IsMapSuitable(map, parms, out string unsuitableReason))
-                {
-                    Logger.Message($"IncidentWorker_GravshipRaid.CanFireNowSub: declining on map '{map}' - {unsuitableReason}.");
-                    return false;
-                }
             }
 
             return base.CanFireNowSub(parms);
@@ -64,52 +37,10 @@ namespace Gravship_Raids
                 return false;
             }
 
-            if (!f.def.humanlikeFaction)
-            {
-                return false;
-            }
-
-            if ((int)f.def.techLevel < (int)GravshipRaidsSettings.minEnemyFactionTechLevel)
-            {
-                Logger.Message($"IncidentWorker_GravshipRaid.FactionCanBeGroupSource: excluding faction '{f.def.defName}' - techLevel {f.def.techLevel} is below settings.minEnemyFactionTechLevel {GravshipRaidsSettings.minEnemyFactionTechLevel}.");
-                return false;
-            }
-
-            if (!GravshipRaidsSettings.enabled)
-            {
-                return false;
-            }
-            if (parms.points < GravshipRaidsSettings.minThreatPoints)
-            {
-                Logger.Message($"IncidentWorker_GravshipRaid.FactionCanBeGroupSource: excluding faction '{f.def.defName}' - parms.points {parms.points} is below settings.minThreatPoints {GravshipRaidsSettings.minThreatPoints}.");
-                return false;
-            }
-
             Map map = parms.target as Map;
-            if (map != null && map.Tile.Valid && map.Tile.LayerDef != PlanetLayerDefOf.Surface)
+            if (!GravshipRaidEligibility.CanUseGravshipRaidForFaction(f, map, parms.points, out string reason))
             {
-                Logger.Message($"IncidentWorker_GravshipRaid.FactionCanBeGroupSource: excluding faction '{f.def.defName}' - map '{map}' is not a Surface-layer tile (layer '{map.Tile.LayerDef}').");
-                return false;
-            }
-
-            GravshipRaidTemplateDef selectedTemplate = PawnsArrivalModeWorker_GravshipLanding.DebugForcedRequest?.SelectedTemplate;
-            if (selectedTemplate != null)
-            {
-                if (!GravshipRaidTemplateUtility.IsEligibleTemplate(selectedTemplate, f.def, parms.points, map))
-                {
-                    Logger.Message($"IncidentWorker_GravshipRaid.FactionCanBeGroupSource: excluding faction '{f.def.defName}' - debug-selected template '{selectedTemplate.defName}' is not eligible for it at {parms.points} points.");
-                    return false;
-                }
-            }
-            else if (!GravshipRaidTemplateUtility.HasEligibleTemplate(f.def, parms.points, map))
-            {
-                Logger.Message($"IncidentWorker_GravshipRaid.FactionCanBeGroupSource: excluding faction '{f.def.defName}' - no GravshipRaidTemplateDef is eligible for it at {parms.points} points.");
-                return false;
-            }
-
-            if (map != null && !GravshipLandingSiteFinder.HasViableLandingArea(map, f.def, parms.points))
-            {
-                Logger.Message($"IncidentWorker_GravshipRaid.FactionCanBeGroupSource: excluding faction '{f.def.defName}' - GravshipLandingSiteFinder found no viable landing area on map '{map}' (roofed/home-area/foundation/building/reachability pre-screen found nothing in the cheap search).");
+                Logger.Message($"IncidentWorker_GravshipRaid.FactionCanBeGroupSource: excluding faction '{f.def.defName}' - {reason}.");
                 return false;
             }
 

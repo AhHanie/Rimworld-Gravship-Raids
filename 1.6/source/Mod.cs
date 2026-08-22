@@ -18,12 +18,18 @@ namespace Gravship_Raids
 
         private void Init()
         {
-            new Harmony("sk.gravshipraids").PatchAll();
+            Harmony harmony = new Harmony("sk.gravshipraids");
+            harmony.PatchAll();
 
             GetSettings<GravshipRaidsSettings>();
             GravshipRaidTemplateUtility.PopulateCoreCellCache();
             GravshipRaidsSettings.PruneInvalidGlobalFactionEntries();
             GravshipRaidsSettings.PruneInvalidShuttleFactionEntries();
+
+            if (ModsConfig.IsActive("VanillaStorytellersExpanded.WinstonWave"))
+            {
+                WinstonWavesCompatibility.TryInstall(harmony);
+            }
 
             if (!ModsConfig.OdysseyActive)
             {
