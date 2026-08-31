@@ -107,6 +107,7 @@
     <Compile Include="ShuttleInstances\MapComponent_ShuttleRaid.cs" />
     <Compile Include="Patches\CompShuttleHostileCrewPatch.cs" />
     <Compile Include="Patches\FlightCriticalBuildingDestroyedPatch.cs" />
+    <Compile Include="Patches\EnemyGravshipRainShortCircuitPatch.cs" />
     <Compile Include="LordJobs\LordJob_ShuttleRaid.cs" />
     <Compile Include="LordJobs\LordToil_ShuttleAssault.cs" />
     <Compile Include="LordJobs\LordToil_BoardEnemyShuttle.cs" />

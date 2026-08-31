@@ -153,6 +153,39 @@ namespace Gravship_Raids
             return instances.FirstOrDefault((EnemyGravshipInstance i) => i.template != null && GravshipRaidTemplateUtility.GetRotatedBounds(i.template, i.root, i.rotation).Contains(cell));
         }
 
+        public bool IsActiveEnemyGravshipPart(Thing thing)
+        {
+            if (thing == null || !thing.Spawned || thing.Map != map || thing.Destroyed)
+            {
+                return false;
+            }
+            if (thing.Faction == null || thing.Faction == Faction.OfPlayer)
+            {
+                return false;
+            }
+            foreach (EnemyGravshipInstance instance in instances)
+            {
+                if (instance == null || instance.faction == null || instance.faction == Faction.OfPlayer)
+                {
+                    continue;
+                }
+                if (instance.state != GravshipRaidState.Landed && instance.state != GravshipRaidState.Boarding && instance.state != GravshipRaidState.Launching)
+                {
+                    continue;
+                }
+                if (instance.spawnedThings == null || !instance.spawnedThings.Contains(thing))
+                {
+                    continue;
+                }
+                if (thing.Faction != instance.faction)
+                {
+                    continue;
+                }
+                return true;
+            }
+            return false;
+        }
+
         public override void ExposeData()
         {
             base.ExposeData();
