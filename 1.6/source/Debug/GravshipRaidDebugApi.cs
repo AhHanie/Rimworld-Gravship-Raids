@@ -57,6 +57,8 @@ namespace Gravship_Raids
                 PrefabUtility.SpawnPrefab(template.prefab, map, cell, rotation);
             }
 
+            GravshipRaidTemplateUtility.ApplyPrefabInteriorRoofs(template.prefab, map, cell, rotation);
+
             IntVec3 coreCell = GravshipRaidTemplateUtility.GetCoreCell(template, cell, rotation);
             Log.Message($"[Gravship Raids] Core cell: {coreCell}.");
 

@@ -261,12 +261,15 @@ namespace Gravship_Raids
                 PrefabUtility.SpawnPrefab(template.prefab, map, root, rotation, faction, spawned);
             }
 
+            List<GravshipRaidTemplateUtility.RoofCellSnapshot> roofSnapshot = GravshipRaidTemplateUtility.ApplyPrefabInteriorRoofs(template.prefab, map, root, rotation);
+
             RandomizeFuelTankLevels(spawned);
 
             Thing core = spawned.Find((Thing t) => t.TryGetComp<CompEnemyGravshipCore>() != null);
             if (core == null)
             {
                 Logger.Error($"PawnsArrivalModeWorker_GravshipLanding.FinishLanding: template '{template.defName}' produced no CompEnemyGravshipCore-bearing thing among {spawned.Count} spawned things; the raid will proceed without a registered ship instance.");
+                GravshipRaidTemplateUtility.RestoreRoofs(roofSnapshot, map);
                 instance.state = GravshipRaidState.Destroyed;
             }
             else
@@ -274,6 +277,7 @@ namespace Gravship_Raids
                 instance.core = core;
                 instance.spawnedThings = spawned;
                 instance.terrainSnapshot = terrainSnapshot;
+                instance.roofSnapshot = roofSnapshot;
                 instance.state = GravshipRaidState.Landed;
             }
 

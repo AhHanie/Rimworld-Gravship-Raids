@@ -415,6 +415,154 @@ namespace Gravship_Raids
             return false;
         }
 
+        public class RoofCellSnapshot : IExposable
+        {
+            public IntVec3 cell;
+            public RoofDef originalRoof;
+            public RoofDef appliedRoof;
+
+            public RoofCellSnapshot()
+            {
+            }
+
+            public RoofCellSnapshot(IntVec3 cell, RoofDef originalRoof, RoofDef appliedRoof)
+            {
+                this.cell = cell;
+                this.originalRoof = originalRoof;
+                this.appliedRoof = appliedRoof;
+            }
+
+            public void ExposeData()
+            {
+                Scribe_Values.Look(ref cell, "cell");
+                Scribe_Defs.Look(ref originalRoof, "originalRoof");
+                Scribe_Defs.Look(ref appliedRoof, "appliedRoof");
+            }
+        }
+
+        // Finds prefab-interior cells sealed off by a continuous perimeter of holdsRoof things: flood-fills
+        // outward from a one-cell-expanded ring around the footprint, through non-barrier cells, so any cell
+        // the fill can't reach (and that isn't itself a hull/wall/thruster cell) is enclosed. A breach in the
+        // hull simply gives the fill a path in, correctly leaving that compartment unroofed.
+        private static List<IntVec3> GetEnclosedInteriorCells(PrefabDef prefab, Map map, IntVec3 pos, Rot4 rot)
+        {
+            List<IntVec3> result = new List<IntVec3>();
+            if (prefab == null || map == null)
+            {
+                return result;
+            }
+
+            Rot4 validatedRot = PrefabUtility.ValidateRotation(prefab, rot);
+            CellRect bounds = GetRotatedBounds(prefab, pos, validatedRot);
+
+            HashSet<IntVec3> barrierCells = new HashSet<IntVec3>();
+            foreach (var (data, cell, itemRot) in PrefabUtility.GetThings(prefab, pos, validatedRot))
+            {
+                if (data?.def == null || !data.def.holdsRoof)
+                {
+                    continue;
+                }
+                foreach (IntVec3 occupied in GenAdj.OccupiedRect(cell, itemRot, data.def.Size))
+                {
+                    barrierCells.Add(occupied);
+                }
+            }
+
+            CellRect searchBounds = bounds.ExpandedBy(1);
+            HashSet<IntVec3> visited = new HashSet<IntVec3>();
+            Queue<IntVec3> queue = new Queue<IntVec3>();
+
+            foreach (IntVec3 cell in searchBounds.Cells)
+            {
+                bool onEdge = cell.x == searchBounds.minX || cell.x == searchBounds.maxX || cell.z == searchBounds.minZ || cell.z == searchBounds.maxZ;
+                if (!onEdge || !cell.InBounds(map) || barrierCells.Contains(cell) || !visited.Add(cell))
+                {
+                    continue;
+                }
+                queue.Enqueue(cell);
+            }
+
+            while (queue.Count > 0)
+            {
+                IntVec3 current = queue.Dequeue();
+                for (int i = 0; i < GenAdj.CardinalDirections.Length; i++)
+                {
+                    IntVec3 next = current + GenAdj.CardinalDirections[i];
+                    if (!searchBounds.Contains(next) || !next.InBounds(map) || barrierCells.Contains(next) || !visited.Add(next))
+                    {
+                        continue;
+                    }
+                    queue.Enqueue(next);
+                }
+            }
+
+            foreach (IntVec3 cell in bounds.Cells)
+            {
+                if (barrierCells.Contains(cell) || visited.Contains(cell))
+                {
+                    continue;
+                }
+                result.Add(cell);
+            }
+
+            return result;
+        }
+
+        public static List<RoofCellSnapshot> ApplyPrefabInteriorRoofs(PrefabDef prefab, Map map, IntVec3 pos, Rot4 rot)
+        {
+            List<RoofCellSnapshot> result = new List<RoofCellSnapshot>();
+            if (prefab == null || map == null)
+            {
+                return result;
+            }
+
+            List<IntVec3> candidates = GetEnclosedInteriorCells(prefab, map, pos, rot);
+            int skippedCount = 0;
+            foreach (IntVec3 cell in candidates)
+            {
+                if (map.roofGrid.RoofAt(cell) != null || map.areaManager.NoRoof[cell])
+                {
+                    skippedCount++;
+                    continue;
+                }
+                if (!RoofCollapseUtility.WithinRangeOfRoofHolder(cell, map, assumeNonNoRoofCellsAreRoofed: true))
+                {
+                    skippedCount++;
+                    continue;
+                }
+                map.roofGrid.SetRoof(cell, RoofDefOf.RoofConstructed);
+                result.Add(new RoofCellSnapshot(cell, null, RoofDefOf.RoofConstructed));
+            }
+
+            Logger.Message($"GravshipRaidTemplateUtility.ApplyPrefabInteriorRoofs: prefab '{prefab.defName}' at {pos} (rot {rot}) - {candidates.Count} candidate(s), {result.Count} applied, {skippedCount} skipped.");
+            return result;
+        }
+
+        public static void RestoreRoofs(List<RoofCellSnapshot> snapshots, Map map)
+        {
+            if (snapshots == null || map == null)
+            {
+                return;
+            }
+            for (int i = snapshots.Count - 1; i >= 0; i--)
+            {
+                RoofCellSnapshot entry = snapshots[i];
+                if (entry == null || !entry.cell.InBounds(map))
+                {
+                    continue;
+                }
+                if (map.roofGrid.RoofAt(entry.cell) != entry.appliedRoof)
+                {
+                    continue;
+                }
+                if (map.areaManager.NoRoof[entry.cell] || map.areaManager.BuildRoof[entry.cell] || CellShowsPlayerInteraction(entry.cell, map))
+                {
+                    continue;
+                }
+                map.roofGrid.SetRoof(entry.cell, entry.originalRoof);
+            }
+        }
+
         public static Dictionary<IntVec3, LinkFlags> BuildCellLinkFlags(IEnumerable<(IntVec3 cell, Rot4 rot, IntVec2 size, LinkFlags flags)> pieces)
         {
             Dictionary<IntVec3, LinkFlags> result = new Dictionary<IntVec3, LinkFlags>();

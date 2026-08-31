@@ -99,6 +99,9 @@ namespace Gravship_Raids
 
                 PlayLaunchEffect(map, launchCell);
 
+                GravshipRaidTemplateUtility.RestoreRoofs(instance.roofSnapshot, map);
+                instance.roofSnapshot?.Clear();
+
                 GravshipRaidTemplateUtility.RestoreTerrain(instance.terrainSnapshot, map);
                 instance.terrainSnapshot?.Clear();
 

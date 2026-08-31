@@ -120,6 +120,8 @@ namespace Gravship_Raids
             List<Thing> spawned = new List<Thing>();
             PrefabUtility.SpawnPrefab(prefab, map, root, rotation, Faction.OfPlayer, spawned);
 
+            GravshipRaidTemplateUtility.ApplyPrefabInteriorRoofs(prefab, map, root, rotation);
+
             ApplyCrashDamage(spawned);
 
             List<Building_CryptosleepCasket> caskets = spawned.OfType<Building_CryptosleepCasket>().ToList();

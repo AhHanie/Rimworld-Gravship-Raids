@@ -42,6 +42,8 @@ namespace Gravship_Raids
 
         public List<GravshipRaidTemplateUtility.TerrainCellSnapshot> terrainSnapshot = new List<GravshipRaidTemplateUtility.TerrainCellSnapshot>();
 
+        public List<GravshipRaidTemplateUtility.RoofCellSnapshot> roofSnapshot = new List<GravshipRaidTemplateUtility.RoofCellSnapshot>();
+
         public Thing departingSkyfaller;
 
         public EnemyGravshipInstance()
@@ -79,6 +81,7 @@ namespace Gravship_Raids
             Scribe_Values.Look(ref departureTick, "departureTick", -1);
             Scribe_Values.Look(ref flightDisabled, "flightDisabled", false);
             Scribe_Collections.Look(ref terrainSnapshot, "terrainSnapshot", LookMode.Deep);
+            Scribe_Collections.Look(ref roofSnapshot, "roofSnapshot", LookMode.Deep);
             Scribe_References.Look(ref departingSkyfaller, "departingSkyfaller");
 
             if (Scribe.mode == LoadSaveMode.PostLoadInit)
@@ -87,6 +90,7 @@ namespace Gravship_Raids
                 crew?.RemoveAll((Pawn p) => p == null);
                 guardCrew?.RemoveAll((Pawn p) => p == null || crew == null || !crew.Contains(p));
                 terrainSnapshot?.RemoveAll((GravshipRaidTemplateUtility.TerrainCellSnapshot t) => t == null);
+                roofSnapshot?.RemoveAll((GravshipRaidTemplateUtility.RoofCellSnapshot r) => r == null);
             }
             if (Scribe.mode == LoadSaveMode.LoadingVars)
             {
@@ -105,6 +109,10 @@ namespace Gravship_Raids
                 if (terrainSnapshot == null)
                 {
                     terrainSnapshot = new List<GravshipRaidTemplateUtility.TerrainCellSnapshot>();
+                }
+                if (roofSnapshot == null)
+                {
+                    roofSnapshot = new List<GravshipRaidTemplateUtility.RoofCellSnapshot>();
                 }
             }
         }
