@@ -68,9 +68,13 @@ namespace Gravship_Raids
                 return;
             }
 
+            Thing core = instance.core;
+            CompTransporter transporter = (core != null && !core.Destroyed && core.Spawned) ? core.TryGetComp<CompTransporter>() : null;
+            bool cancelledLoad = transporter != null && transporter.CancelLoad();
+
             instance.state = GravshipRaidState.Destroyed;
             instance.departureTick = -1;
-            Logger.Message($"EnemyGravshipRaidUtility.AbandonShip: {instance} abandoned ({reason}); core and hull remain on the map as a wreck.");
+            Logger.Message($"EnemyGravshipRaidUtility.AbandonShip: {instance} abandoned ({reason}); core and hull remain on the map as a wreck ({(cancelledLoad ? "cancelled active loading" : "no active loading")}).");
         }
 
         public static void CompleteDeparture(EnemyGravshipInstance instance, Map map)

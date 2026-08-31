@@ -34,6 +34,15 @@ namespace Gravship_Raids
             return baseText + "\n" + "GravshipRaids.EnemyGravshipCoreAuthor".Translate(cachedAuthor);
         }
 
+        public override void PostDeSpawn(Map map, DestroyMode mode = DestroyMode.Vanish)
+        {
+            if (map != null)
+            {
+                Transporter?.CancelLoad(map);
+            }
+            base.PostDeSpawn(map, mode);
+        }
+
         public override IEnumerable<ThingDefCountClass> GetAdditionalLeavings(Map map, DestroyMode mode)
         {
             if (GravshipRaidsSettings.allowEnemyGravcoreDrops && mode == DestroyMode.KillFinalize)
