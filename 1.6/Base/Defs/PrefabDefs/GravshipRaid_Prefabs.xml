@@ -435,10 +435,10 @@
         <quality>Normal</quality>
         <colorDef>Structure_GreyDark</colorDef>
       </Table1x2c>
-      <CommsConsole>
+      <GR_RaidCommsConsole>
         <position>(11, 0, 14)</position>
         <relativeRotation>Opposite</relativeRotation>
-      </CommsConsole>
+      </GR_RaidCommsConsole>
       <Turret_MiniTurret>
         <rects>
           <li>(5,1,5,1)</li>
@@ -1065,9 +1065,9 @@
         <stuff>WoodLog</stuff>
         <colorDef>Structure_GrayLight</colorDef>
       </BookcaseSmall>
-      <CommsConsole>
+      <GR_RaidCommsConsole>
         <position>(2, 0, 1)</position>
-      </CommsConsole>
+      </GR_RaidCommsConsole>
       <Turret_MiniTurret>
         <rects>
           <li>(8,5,8,5)</li>
