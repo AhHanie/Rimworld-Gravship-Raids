@@ -264,6 +264,7 @@ namespace Gravship_Raids
             List<GravshipRaidTemplateUtility.RoofCellSnapshot> roofSnapshot = GravshipRaidTemplateUtility.ApplyPrefabInteriorRoofs(template.prefab, map, root, rotation);
 
             RandomizeFuelTankLevels(spawned);
+            int chargedBatteries = ChargeSpawnedBatteries(spawned);
 
             Thing core = spawned.Find((Thing t) => t.TryGetComp<CompEnemyGravshipCore>() != null);
             if (core == null)
@@ -297,7 +298,7 @@ namespace Gravship_Raids
             DeployPawns(pawns, map, template, root, rotation);
             RefreshGravshipRaidDuties(instance, map);
 
-            Logger.Message($"PawnsArrivalModeWorker_GravshipLanding.FinishLanding: landed '{template.defName}' at {root} (rot {rotation}) for faction '{faction?.Name ?? "null"}'; deployed {pawns.Count} pawn(s).");
+            Logger.Message($"PawnsArrivalModeWorker_GravshipLanding.FinishLanding: landed '{template.defName}' at {root} (rot {rotation}) for faction '{faction?.Name ?? "null"}'; deployed {pawns.Count} pawn(s), charged {chargedBatteries} batter{(chargedBatteries == 1 ? "y" : "ies")}.");
         }
 
         private static void RefreshGravshipRaidDuties(EnemyGravshipInstance instance, Map map)
@@ -328,6 +329,26 @@ namespace Gravship_Raids
                 }
                 VGEAstrofuelTankCompatibility.TryRandomizeFuelLevel(thing);
             }
+        }
+
+        private static int ChargeSpawnedBatteries(List<Thing> spawned)
+        {
+            if (spawned == null)
+            {
+                return 0;
+            }
+
+            int charged = 0;
+            foreach (Thing thing in spawned)
+            {
+                CompPowerBattery batteryComp = thing?.TryGetComp<CompPowerBattery>();
+                if (batteryComp != null)
+                {
+                    batteryComp.SetStoredEnergyPct(1f);
+                    charged++;
+                }
+            }
+            return charged;
         }
 
         private static bool TryTakeLandingPlan(IncidentParms parms, out LandingPlan plan)
