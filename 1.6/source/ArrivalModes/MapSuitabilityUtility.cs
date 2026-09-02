@@ -93,7 +93,7 @@ namespace Gravship_Raids
                 return false;
             }
 
-            if (SampledFractionAtLeast(map, RoofSampleCount, IsRoofedCell, MaxRoofedFraction))
+            if (!GravshipLandingSiteFinder.IsOrbitMap(map) && SampledFractionAtLeast(map, RoofSampleCount, IsRoofedCell, MaxRoofedFraction))
             {
                 reason = $"map is estimated to be at least {MaxRoofedFraction:P0} roofed (enclosed/underground)";
                 return false;

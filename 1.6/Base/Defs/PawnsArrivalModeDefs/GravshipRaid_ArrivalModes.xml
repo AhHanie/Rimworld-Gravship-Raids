@@ -26,9 +26,9 @@
     <textEnemy>A hostile gravship carrying {0} from {1} is landing nearby.</textEnemy>
     <textFriendly>A gravship carrying friendly {0} from {1} is landing nearby.</textFriendly>
     <textWillArrive>{0_pawnsPluralDef} will arrive aboard a landing gravship.</textWillArrive>
-    <!-- v1 supports surface maps only. -->
     <layerWhitelist>
       <li>Surface</li>
+      <li MayRequire="Ludeon.RimWorld.Odyssey">Orbit</li>
     </layerWhitelist>
   </PawnsArrivalModeDef>
 

@@ -110,12 +110,6 @@ namespace Gravship_Raids
                 return false;
             }
 
-            if (map != null && map.Tile.Valid && map.Tile.LayerDef != PlanetLayerDefOf.Surface)
-            {
-                reason = $"map '{map}' is not a Surface-layer tile (layer '{map.Tile.LayerDef}')";
-                return false;
-            }
-
             GravshipRaidTemplateDef selectedTemplate = PawnsArrivalModeWorker_GravshipLanding.DebugForcedRequest?.SelectedTemplate;
             if (selectedTemplate != null)
             {
@@ -131,9 +125,9 @@ namespace Gravship_Raids
                 return false;
             }
 
-            if (map != null && !GravshipLandingSiteFinder.HasViableLandingArea(map, faction.def, points))
+            if (map != null && !GravshipLandingSiteFinder.HasViableLandingArea(map, faction.def, points, out GravshipLandingSiteFinder.LandingSearchDiagnostics diagnostics))
             {
-                reason = $"GravshipLandingSiteFinder found no viable landing area on map '{map}'";
+                reason = $"GravshipLandingSiteFinder found no viable landing area on map '{map}' (layer '{map.Tile.LayerDef}', {diagnostics.Summarize()})";
                 return false;
             }
 

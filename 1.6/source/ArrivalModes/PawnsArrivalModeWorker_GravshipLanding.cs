@@ -37,21 +37,19 @@ namespace Gravship_Raids
         {
             if (!base.CanUseOnMap(map))
             {
+                Logger.Message($"PawnsArrivalModeWorker_GravshipLanding.CanUseOnMap: declining on map '{map}' - {DescribeBaseCanUseOnMapFailure(map)}.");
                 return false;
             }
 
             if (!ModsConfig.OdysseyActive)
             {
+                Logger.Message($"PawnsArrivalModeWorker_GravshipLanding.CanUseOnMap: declining on map '{map}' - Odyssey DLC is not active.");
                 return false;
             }
 
             if (!GravshipRaidsSettings.enabled)
             {
-                return false;
-            }
-
-            if (map.Tile.Valid && map.Tile.LayerDef != PlanetLayerDefOf.Surface)
-            {
+                Logger.Message($"PawnsArrivalModeWorker_GravshipLanding.CanUseOnMap: declining on map '{map}' - gravship raids are disabled in settings.");
                 return false;
             }
 
@@ -59,6 +57,7 @@ namespace Gravship_Raids
             int maxConcurrent = GravshipRaidsSettings.maxConcurrentShipsPerMap;
             if (component != null && component.ActiveInstanceCount >= maxConcurrent)
             {
+                Logger.Message($"PawnsArrivalModeWorker_GravshipLanding.CanUseOnMap: declining on map '{map}' - already has {component.ActiveInstanceCount} active gravship instance(s), at or above settings.maxConcurrentShipsPerMap {maxConcurrent}.");
                 return false;
             }
 
@@ -76,16 +75,19 @@ namespace Gravship_Raids
             currentCanUseWithParms = parms;
             if (!base.CanUseWith(parms))
             {
+                Logger.Message($"PawnsArrivalModeWorker_GravshipLanding.CanUseWith: declining for faction '{parms.faction?.def?.defName ?? "null"}' at {parms.points} points - {DescribeBaseCanUseWithFailure(parms)}.");
                 return false;
             }
 
             if (!(parms.target is Map map))
             {
+                Logger.Message("PawnsArrivalModeWorker_GravshipLanding.CanUseWith: declining - incident target is not a Map.");
                 return false;
             }
 
             if (parms.faction != null && (int)parms.faction.def.techLevel < (int)GravshipRaidsSettings.minEnemyFactionTechLevel)
             {
+                Logger.Message($"PawnsArrivalModeWorker_GravshipLanding.CanUseWith: declining for faction '{parms.faction.def.defName}' - techLevel {parms.faction.def.techLevel} is below settings.minEnemyFactionTechLevel {GravshipRaidsSettings.minEnemyFactionTechLevel}.");
                 return false;
             }
 
@@ -101,15 +103,88 @@ namespace Gravship_Raids
 
             if (!GravshipRaidTemplateUtility.HasEligibleTemplate(parms.faction?.def, parms.points, map))
             {
+                Logger.Message($"PawnsArrivalModeWorker_GravshipLanding.CanUseWith: declining for faction '{parms.faction?.def?.defName ?? "null"}' at {parms.points} points - no GravshipRaidTemplateDef is eligible on map '{map}'.");
                 return false;
             }
 
-            if (!GravshipLandingSiteFinder.HasViableLandingArea(map, parms.faction?.def, parms.points))
+            if (!GravshipLandingSiteFinder.HasViableLandingArea(map, parms.faction?.def, parms.points, out GravshipLandingSiteFinder.LandingSearchDiagnostics diagnostics))
             {
+                Logger.Message($"PawnsArrivalModeWorker_GravshipLanding.CanUseWith: declining for faction '{parms.faction?.def?.defName ?? "null"}' at {parms.points} points - GravshipLandingSiteFinder found no viable landing area on map '{map}' (layer '{map.Tile.LayerDef}', {diagnostics.Summarize()}).");
                 return false;
             }
 
             return true;
+        }
+
+        private static string DescribeBaseCanUseOnMapFailure(Map map)
+        {
+            BiomeDef biome = map.Biome;
+            if (!GravshipRaidsDefOf.GR_GravshipLanding.biomeWhitelist.NullOrEmpty() && !GravshipRaidsDefOf.GR_GravshipLanding.biomeWhitelist.Contains(biome))
+            {
+                return $"biome '{biome}' is not in this arrival mode's biomeWhitelist";
+            }
+            if (!GravshipRaidsDefOf.GR_GravshipLanding.biomeBlacklist.NullOrEmpty() && GravshipRaidsDefOf.GR_GravshipLanding.biomeBlacklist.Contains(biome))
+            {
+                return $"biome '{biome}' is in this arrival mode's biomeBlacklist";
+            }
+            if (biome.onlyAllowWhitelistedArrivalModes && (GravshipRaidsDefOf.GR_GravshipLanding.biomeWhitelist.NullOrEmpty() || !GravshipRaidsDefOf.GR_GravshipLanding.biomeWhitelist.Contains(biome)))
+            {
+                return $"biome '{biome}' only allows whitelisted arrival modes and this one isn't whitelisted";
+            }
+            if (map.Tile.Valid)
+            {
+                PlanetLayerDef layer = map.Tile.LayerDef;
+                if (!GravshipRaidsDefOf.GR_GravshipLanding.layerWhitelist.NullOrEmpty() && !GravshipRaidsDefOf.GR_GravshipLanding.layerWhitelist.Contains(layer))
+                {
+                    return $"planet layer '{layer}' is not in this arrival mode's layerWhitelist";
+                }
+                if (!GravshipRaidsDefOf.GR_GravshipLanding.layerBlacklist.NullOrEmpty() && GravshipRaidsDefOf.GR_GravshipLanding.layerBlacklist.Contains(layer))
+                {
+                    return $"planet layer '{layer}' is in this arrival mode's layerBlacklist";
+                }
+                if (layer.onlyAllowWhitelistedArrivalModes && (GravshipRaidsDefOf.GR_GravshipLanding.layerWhitelist.NullOrEmpty() || !GravshipRaidsDefOf.GR_GravshipLanding.layerWhitelist.Contains(layer)))
+                {
+                    return $"planet layer '{layer}' only allows whitelisted arrival modes and this one isn't whitelisted";
+                }
+            }
+            if (GravshipRaidsDefOf.GR_GravshipLanding.walkIn && !map.CanEverExit)
+            {
+                return "this arrival mode is walkIn but the map has no exit";
+            }
+            return "vanilla PawnsArrivalModeWorker.CanUseOnMap rejected it for an unlisted reason";
+        }
+
+        private static string DescribeBaseCanUseWithFailure(IncidentParms parms)
+        {
+            if (parms.faction != null)
+            {
+                FactionDef factionDef = parms.faction.def;
+                if (GravshipRaidsDefOf.GR_GravshipLanding.minTechLevel != TechLevel.Undefined && (int)factionDef.techLevel < (int)GravshipRaidsDefOf.GR_GravshipLanding.minTechLevel)
+                {
+                    return $"faction techLevel {factionDef.techLevel} is below this arrival mode's minTechLevel {GravshipRaidsDefOf.GR_GravshipLanding.minTechLevel}";
+                }
+                if (!factionDef.arrivalModeWhitelist.NullOrEmpty() && !factionDef.arrivalModeWhitelist.Contains(GravshipRaidsDefOf.GR_GravshipLanding))
+                {
+                    return $"faction '{factionDef.defName}' has an arrivalModeWhitelist that doesn't include GR_GravshipLanding";
+                }
+                if (!factionDef.arrivalModeBlacklist.NullOrEmpty() && factionDef.arrivalModeBlacklist.Contains(GravshipRaidsDefOf.GR_GravshipLanding))
+                {
+                    return $"faction '{factionDef.defName}' has an arrivalModeBlacklist that includes GR_GravshipLanding";
+                }
+            }
+            if (parms.raidArrivalModeForQuickMilitaryAid && !GravshipRaidsDefOf.GR_GravshipLanding.forQuickMilitaryAid)
+            {
+                return "parms.raidArrivalModeForQuickMilitaryAid is set but this arrival mode doesn't support quick military aid";
+            }
+            if (parms.raidStrategy != null && !parms.raidStrategy.arriveModes.Contains(GravshipRaidsDefOf.GR_GravshipLanding))
+            {
+                return $"raid strategy '{parms.raidStrategy.defName}' doesn't list GR_GravshipLanding in its arriveModes";
+            }
+            if (parms.target is Map map)
+            {
+                return DescribeBaseCanUseOnMapFailure(map);
+            }
+            return "vanilla PawnsArrivalModeWorker.CanUseWith rejected it for an unlisted reason";
         }
 
         public override bool TryResolveRaidSpawnCenter(IncidentParms parms)
@@ -152,9 +227,9 @@ namespace Gravship_Raids
 
             int seed = Gen.HashCombineInt(GravshipRaidTemplateUtility.MakeSelectionSeed(parms.faction?.def, parms.points, map), Find.TickManager.TicksGame);
 
-            if (!GravshipLandingSiteFinder.TryFindLandingSite(map, parms.faction?.def, parms.points, seed, out GravshipRaidTemplateDef template, out IntVec3 root, out Rot4 rotation))
+            if (!GravshipLandingSiteFinder.TryFindLandingSite(map, parms.faction?.def, parms.points, seed, out GravshipRaidTemplateDef template, out IntVec3 root, out Rot4 rotation, out GravshipLandingSiteFinder.LandingSearchDiagnostics diagnostics))
             {
-                Logger.Warning($"PawnsArrivalModeWorker_GravshipLanding.TryResolveRaidSpawnCenter: no viable landing site found on map '{map}' for faction '{parms.faction?.def?.defName ?? "null"}' at {parms.points} points; declining this arrival mode so the incident fails cleanly before any pawns are generated.");
+                Logger.Warning($"PawnsArrivalModeWorker_GravshipLanding.TryResolveRaidSpawnCenter: no viable landing site found on map '{map}' (layer '{map.Tile.LayerDef}') for faction '{parms.faction?.def?.defName ?? "null"}' at {parms.points} points ({diagnostics.Summarize()}); declining this arrival mode so the incident fails cleanly before any pawns are generated.");
                 return false;
             }
 

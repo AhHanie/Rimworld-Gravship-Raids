@@ -10,6 +10,12 @@ namespace Gravship_Raids
     {
         private static readonly Dictionary<GravshipRaidTemplateDef, IntVec3> CoreCellCache = new Dictionary<GravshipRaidTemplateDef, IntVec3>();
 
+        private static readonly Dictionary<GravshipRaidTemplateDef, List<IntVec3>> DoorCellsCache = new Dictionary<GravshipRaidTemplateDef, List<IntVec3>>();
+
+        private static readonly Dictionary<GravshipRaidTemplateDef, HashSet<IntVec3>> PrefabOccupiedCellsCache = new Dictionary<GravshipRaidTemplateDef, HashSet<IntVec3>>();
+
+        private static readonly Dictionary<GravshipRaidTemplateDef, HashSet<IntVec3>> PrefabWalkableCellsCache = new Dictionary<GravshipRaidTemplateDef, HashSet<IntVec3>>();
+
         internal static void PopulateCoreCellCache()
         {
             foreach (GravshipRaidTemplateDef template in DefDatabase<GravshipRaidTemplateDef>.AllDefsListForReading)
@@ -27,7 +33,116 @@ namespace Gravship_Raids
                     continue;
                 }
                 CoreCellCache[template] = coreThings[0].cell;
+
+                DoorCellsCache[template] = template.prefab.GetThings()
+                    .Where(t => t.data?.def != null && typeof(Building_Door).IsAssignableFrom(t.data.def.thingClass))
+                    .Select(t => t.cell)
+                    .ToList();
+
+                HashSet<IntVec3> occupiedCells = new HashSet<IntVec3>();
+                foreach (var (data, cell) in template.prefab.GetTerrain())
+                {
+                    if (data?.def != null)
+                    {
+                        occupiedCells.Add(cell);
+                    }
+                }
+                foreach (var (data, cell) in template.prefab.GetThings())
+                {
+                    if (data?.def != null)
+                    {
+                        occupiedCells.Add(cell);
+                    }
+                }
+                PrefabOccupiedCellsCache[template] = occupiedCells;
+
+                HashSet<IntVec3> blockedCells = new HashSet<IntVec3>();
+                foreach (var (data, cell) in template.prefab.GetThings())
+                {
+                    if (data?.def == null || typeof(Building_Door).IsAssignableFrom(data.def.thingClass))
+                    {
+                        continue;
+                    }
+                    if (data.def.passability == Traversability.Impassable)
+                    {
+                        blockedCells.Add(cell);
+                    }
+                }
+                HashSet<IntVec3> walkableCells = new HashSet<IntVec3>();
+                foreach (var (data, cell) in template.prefab.GetTerrain())
+                {
+                    if (data?.def != null && !blockedCells.Contains(cell))
+                    {
+                        walkableCells.Add(cell);
+                    }
+                }
+                PrefabWalkableCellsCache[template] = walkableCells;
             }
+        }
+
+        public static IEnumerable<IntVec3> GetDoorCells(GravshipRaidTemplateDef template, IntVec3 pos, Rot4 rot)
+        {
+            if (template == null || !DoorCellsCache.TryGetValue(template, out List<IntVec3> localCells))
+            {
+                yield break;
+            }
+            foreach (IntVec3 localCell in localCells)
+            {
+                yield return TransformCell(template, localCell, pos, rot);
+            }
+        }
+
+        public static List<IntVec3> GetDoorLocalCells(GravshipRaidTemplateDef template)
+        {
+            if (template == null || !DoorCellsCache.TryGetValue(template, out List<IntVec3> localCells))
+            {
+                return EmptyDoorCells;
+            }
+            return localCells;
+        }
+
+        private static readonly List<IntVec3> EmptyDoorCells = new List<IntVec3>();
+
+        private static readonly HashSet<IntVec3> EmptyOccupiedCells = new HashSet<IntVec3>();
+
+        public static HashSet<IntVec3> GetPrefabOccupiedLocalCells(GravshipRaidTemplateDef template)
+        {
+            if (template == null || !PrefabOccupiedCellsCache.TryGetValue(template, out HashSet<IntVec3> occupiedCells))
+            {
+                return EmptyOccupiedCells;
+            }
+            return occupiedCells;
+        }
+
+        public static HashSet<IntVec3> GetPrefabWalkableLocalCells(GravshipRaidTemplateDef template)
+        {
+            if (template == null || !PrefabWalkableCellsCache.TryGetValue(template, out HashSet<IntVec3> walkableCells))
+            {
+                return EmptyOccupiedCells;
+            }
+            return walkableCells;
+        }
+
+        public static IntVec3 GetLocalExteriorCell(GravshipRaidTemplateDef template, IntVec3 localDoor, IntVec3 localDir)
+        {
+            HashSet<IntVec3> walkableCells = GetPrefabWalkableLocalCells(template);
+            HashSet<IntVec3> occupiedCells = GetPrefabOccupiedLocalCells(template);
+            IntVec3 current = localDoor;
+            int maxSteps = template?.prefab != null ? template.prefab.size.x + template.prefab.size.z + 2 : 4;
+            for (int step = 0; step < maxSteps; step++)
+            {
+                current += localDir;
+                if (!walkableCells.Contains(current))
+                {
+                    return occupiedCells.Contains(current) ? IntVec3.Invalid : current;
+                }
+            }
+            return current;
+        }
+
+        public static IntVec3 GetLocalCellOffset(GravshipRaidTemplateDef template, IntVec3 localCell, Rot4 rot)
+        {
+            return TransformCell(template, localCell, IntVec3.Zero, rot);
         }
 
         public static bool IsValidTemplate(GravshipRaidTemplateDef template)

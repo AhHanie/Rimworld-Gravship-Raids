@@ -39,6 +39,12 @@ namespace Gravship_Raids
             GravshipRaidDebugApi.TestLandingSearch(Find.CurrentMap);
         }
 
+        [DebugAction("Gravship Raids", "Visualize orbital landing eligibility", false, false, false, false, false, 0, false, allowedGameStates = AllowedGameStates.PlayingOnMap)]
+        private static void VisualizeOrbitalLandingEligibility()
+        {
+            GravshipRaidDebugApi.VisualizeOrbitalLandingEligibility(Find.CurrentMap);
+        }
+
         [DebugAction("Gravship Raids", "Force gravship raid here", false, false, false, false, false, 0, false, allowedGameStates = AllowedGameStates.PlayingOnMap, actionType = DebugActionType.ToolMap)]
         private static void ForceGravshipRaid()
         {

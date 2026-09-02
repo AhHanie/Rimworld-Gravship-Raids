@@ -73,10 +73,41 @@ namespace Gravship_Raids
                 return;
             }
             float points = StorytellerUtility.DefaultThreatPointsNow(map);
-            bool found = GravshipLandingSiteFinder.TryFindLandingSite(map, null, points, Rand.Int, out GravshipRaidTemplateDef template, out IntVec3 root, out Rot4 rot);
+            bool found = GravshipLandingSiteFinder.TryFindLandingSite(map, null, points, Rand.Int, out GravshipRaidTemplateDef template, out IntVec3 root, out Rot4 rot, out GravshipLandingSiteFinder.LandingSearchDiagnostics diagnostics);
+            string layerName = map.Tile.Valid ? map.Tile.LayerDef.defName : "unknown";
             string message = found
-                ? $"[Gravship Raids] Landing search @ {points:F0} points: found '{template.defName}' at {root}, rotation {rot}."
-                : $"[Gravship Raids] Landing search @ {points:F0} points: no viable site found.";
+                ? $"[Gravship Raids] Landing search @ {points:F0} points (layer '{layerName}'): found '{template.defName}' at {root}, rotation {rot}."
+                : $"[Gravship Raids] Landing search @ {points:F0} points (layer '{layerName}'): no viable site found ({diagnostics.Summarize()}).";
+            Log.Message(message);
+            Messages.Message(message, MessageTypeDefOf.NeutralEvent, historical: false);
+        }
+
+        private const int OrbitDeckVisualizationDurationTicks = 900;
+
+        public static void VisualizeOrbitalLandingEligibility(Map map)
+        {
+            if (map == null)
+            {
+                return;
+            }
+
+            if (!map.Tile.Valid || map.Tile.LayerDef != PlanetLayerDefOf.Orbit)
+            {
+                string notOrbitMessage = "[Gravship Raids] Visualize orbital landing eligibility: this map's layer is not Orbit - nothing to visualize.";
+                Log.Message(notOrbitMessage);
+                Messages.Message(notOrbitMessage, MessageTypeDefOf.RejectInput, historical: false);
+                return;
+            }
+
+            HashSet<IntVec3> eligibleCells = GravshipLandingSiteFinder.GetOrbitDeckEligibleCells(map);
+            foreach (IntVec3 cell in eligibleCells)
+            {
+                map.debugDrawer.FlashCell(cell, 0.33f, null, OrbitDeckVisualizationDurationTicks);
+            }
+
+            float points = StorytellerUtility.DefaultThreatPointsNow(map);
+            GravshipLandingSiteFinder.HasViableLandingArea(map, null, points, out GravshipLandingSiteFinder.LandingSearchDiagnostics diagnostics);
+            string message = $"[Gravship Raids] Visualize orbital landing eligibility @ {points:F0} points: {diagnostics.Summarize()}. Flashed {eligibleCells.Count} eligible deck cell(s) in green for {OrbitDeckVisualizationDurationTicks} ticks.";
             Log.Message(message);
             Messages.Message(message, MessageTypeDefOf.NeutralEvent, historical: false);
         }

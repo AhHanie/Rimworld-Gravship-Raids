@@ -16,6 +16,7 @@
     <tale>Raid</tale>
     <layerWhitelist>
       <li>Surface</li>
+      <li MayRequire="Ludeon.RimWorld.Odyssey">Orbit</li>
     </layerWhitelist>
   </IncidentDef>
 
