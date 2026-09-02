@@ -81,6 +81,10 @@ namespace Gravship_Raids
                 "GravshipRaids.Settings.HardcoreEnemyDepartureDestroysUnguardedMaps".Translate(),
                 ref GravshipRaidsSettings.hardcoreEnemyDepartureDestroysUnguardedMaps,
                 "GravshipRaids.Settings.HardcoreEnemyDepartureDestroysUnguardedMapsDesc".Translate());
+            listing.CheckboxLabeled(
+                "GravshipRaids.Settings.AllowEmptyEnemyGravshipDeparture".Translate(),
+                ref GravshipRaidsSettings.allowEmptyEnemyGravshipDeparture,
+                "GravshipRaids.Settings.AllowEmptyEnemyGravshipDepartureDesc".Translate());
 
             listing.CheckboxLabeled(
                 "GravshipRaids.Settings.EnableGravshipGuards".Translate(),

@@ -135,9 +135,12 @@ namespace Gravship_Raids
 
             if (core != null && instance != null && instance.state == GravshipRaidState.Boarding && !AnyCrewStillTryingToBoard(core))
             {
-                if (EnemyGravshipRaidUtility.HasLivingCrewBoarded(instance, core))
+                bool hasLivingCrewBoarded = EnemyGravshipRaidUtility.HasLivingCrewBoarded(instance, core);
+                if (hasLivingCrewBoarded || GravshipRaidsSettings.allowEmptyEnemyGravshipDeparture)
                 {
-                    Logger.Message($"LordToil_BoardEnemyGravship.EnsureCorrectDuties: {instance} finished boarding with living crew aboard; beginning departure.");
+                    Logger.Message(hasLivingCrewBoarded
+                        ? $"LordToil_BoardEnemyGravship.EnsureCorrectDuties: {instance} finished boarding with living crew aboard; beginning departure."
+                        : $"LordToil_BoardEnemyGravship.EnsureCorrectDuties: {instance} finished boarding with no living crew aboard; beginning departure anyway (allowEmptyEnemyGravshipDeparture is enabled).");
                     EnemyGravshipRaidUtility.BeginDeparture(instance, lord.Map);
                 }
                 else

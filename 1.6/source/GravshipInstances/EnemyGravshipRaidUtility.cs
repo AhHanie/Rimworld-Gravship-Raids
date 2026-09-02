@@ -27,11 +27,16 @@ namespace Gravship_Raids
                 return false;
             }
 
-            if (!HasLivingCrewBoarded(instance, instance.core))
+            bool hasLivingCrewBoarded = HasLivingCrewBoarded(instance, instance.core);
+            if (!hasLivingCrewBoarded && !GravshipRaidsSettings.allowEmptyEnemyGravshipDeparture)
             {
                 Logger.Message($"EnemyGravshipRaidUtility.BeginDeparture: {instance} has no living crew aboard its core transporter; abandoning instead of departing.");
                 AbandonShip(instance, "no living crew boarded");
                 return false;
+            }
+            if (!hasLivingCrewBoarded)
+            {
+                Logger.Message($"EnemyGravshipRaidUtility.BeginDeparture: {instance} has no living crew aboard its core transporter, but allowEmptyEnemyGravshipDeparture is enabled; departing anyway.");
             }
 
             instance.state = GravshipRaidState.Launching;

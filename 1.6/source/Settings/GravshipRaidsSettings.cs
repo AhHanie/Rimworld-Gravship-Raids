@@ -31,6 +31,8 @@ namespace Gravship_Raids
 
         public static bool hardcoreEnemyDepartureDestroysUnguardedMaps = false;
 
+        public static bool allowEmptyEnemyGravshipDeparture = false;
+
         public static bool enableGravshipGuards = false;
 
         public static float gravshipGuardFraction = 0.1f;
@@ -94,6 +96,7 @@ namespace Gravship_Raids
                 ref hardcoreEnemyDepartureDestroysUnguardedMaps,
                 "hardcoreEnemyDepartureDestroysUnguardedMaps",
                 false);
+            Scribe_Values.Look(ref allowEmptyEnemyGravshipDeparture, "allowEmptyEnemyGravshipDeparture", false);
             Scribe_Values.Look(ref enableGravshipGuards, "enableGravshipGuards", false);
             Scribe_Values.Look(ref gravshipGuardFraction, "gravshipGuardFraction", 0.1f);
             Scribe_Values.Look(ref allowEnemyGravcoreDrops, "allowEnemyGravcoreDrops", false);

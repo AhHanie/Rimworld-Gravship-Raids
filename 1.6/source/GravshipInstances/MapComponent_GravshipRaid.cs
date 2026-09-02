@@ -249,7 +249,19 @@ namespace Gravship_Raids
 
                 if ((instance.state == GravshipRaidState.Landing || instance.state == GravshipRaidState.Landed || instance.state == GravshipRaidState.Boarding) && !AnyCrewStillLordOwned(instance))
                 {
-                    EnemyGravshipRaidUtility.AbandonShip(instance, "no crew left owned by any Lord (periodic sweep)");
+                    // A Lord is destroyed synchronously by Verse.AI.Group.Lord.Notify_PawnLost the instant its
+                    // last owned pawn is lost, before that call ever reaches curLordToil.Notify_PawnLost or
+                    // CheckTransitionOnSignal. LordToil_BoardEnemyGravship.EnsureCorrectDuties therefore never
+                    // gets a final tick to observe "boarding resolved, no living crew" once every crew pawn dies
+                    // or is downed - this sweep is the only place that reliably sees that outcome, so the
+                    // allowEmptyEnemyGravshipDeparture opt-in has to be applied here instead.
+                    bool departedEmpty = instance.state == GravshipRaidState.Boarding
+                        && GravshipRaidsSettings.allowEmptyEnemyGravshipDeparture
+                        && EnemyGravshipRaidUtility.BeginDeparture(instance, map);
+                    if (!departedEmpty)
+                    {
+                        EnemyGravshipRaidUtility.AbandonShip(instance, "no crew left owned by any Lord (periodic sweep)");
+                    }
                 }
 
                 if ((instance.state == GravshipRaidState.Departed || instance.state == GravshipRaidState.Destroyed) && !StillReferencedByLiveLord(instance))
