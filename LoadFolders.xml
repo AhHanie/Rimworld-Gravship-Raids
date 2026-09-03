@@ -4,6 +4,8 @@
     <li>1.6/Base</li>
     <li IfModActive="vanillaexpanded.gravship">1.6/VGE</li>
     <li IfModActive="Ludeon.RimWorld.Royalty">1.6/Royalty</li>
+    <li IfModActive="zwei2stein.pr.gazelle">1.6/Gazelle</li>
+    <li IfModActive="smallmine.HeavyShuttle">1.6/Orca</li>
     <li>/</li>
   </v1.6>
 </loadFolders>

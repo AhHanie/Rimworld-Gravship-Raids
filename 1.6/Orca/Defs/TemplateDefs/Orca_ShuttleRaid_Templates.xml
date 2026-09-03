@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<Defs>
+
+  <Gravship_Raids.ShuttleRaidTemplateDef>
+    <defName>GR_ShuttleTemplate_Orca</defName>
+    <label>Orca shuttle</label>
+    <shuttle>OrcaShuttle</shuttle>
+    <shipDef>Ship_OrcaShuttle</shipDef>
+    <minPoints>300</minPoints>
+  </Gravship_Raids.ShuttleRaidTemplateDef>
+
+</Defs>

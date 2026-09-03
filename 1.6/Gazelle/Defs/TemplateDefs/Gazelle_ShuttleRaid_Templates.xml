@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<Defs>
+
+  <Gravship_Raids.ShuttleRaidTemplateDef>
+    <defName>GR_ShuttleTemplate_Gazelle</defName>
+    <label>Gazelle flying saucer</label>
+    <shuttle>PR_Gazelle_Shuttle</shuttle>
+    <shipDef>Ship_Gazelle_Shuttle</shipDef>
+    <minPoints>300</minPoints>
+  </Gravship_Raids.ShuttleRaidTemplateDef>
+
+</Defs>
