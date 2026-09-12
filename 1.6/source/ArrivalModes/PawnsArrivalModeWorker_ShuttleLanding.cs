@@ -88,7 +88,7 @@ namespace Gravship_Raids
                 {
                     return false;
                 }
-                return RoyalTitlePermitWorker_CallShuttle.ShuttleCanLandHere(request.Root, map, request.SelectedTemplate.shuttle, request.Rotation).Accepted;
+                return ShuttleRaidTemplateUtility.CanShuttleLandAt(request.Root, map, request.SelectedTemplate.shuttle, request.Rotation);
             }
 
             if (!ShuttleRaidTemplateUtility.HasEligibleTemplate(parms.faction?.def, parms.points, map))
@@ -123,7 +123,7 @@ namespace Gravship_Raids
                     }
                 }
                 else if (!ShuttleRaidTemplateUtility.IsEligibleTemplate(template, parms.faction?.def, parms.points, map) ||
-                         !RoyalTitlePermitWorker_CallShuttle.ShuttleCanLandHere(request.Root, map, template.shuttle, request.Rotation).Accepted)
+                         !ShuttleRaidTemplateUtility.CanShuttleLandAt(request.Root, map, template.shuttle, request.Rotation))
                 {
                     Logger.Warning($"PawnsArrivalModeWorker_ShuttleLanding.TryResolveRaidSpawnCenter: selected template '{template.defName}' is not eligible/landable for faction '{parms.faction?.def?.defName ?? "null"}' at {parms.points} points at the debug-forced cell {request.Root} (rot {request.Rotation}); declining this arrival mode so the incident fails cleanly before any pawns are generated.");
                     return false;
@@ -136,18 +136,9 @@ namespace Gravship_Raids
                 return true;
             }
 
-            int seed = Gen.HashCombineInt(ShuttleRaidTemplateUtility.MakeSelectionSeed(parms.faction?.def, parms.points, map), Find.TickManager.TicksGame);
-
-            ShuttleRaidTemplateDef selected = ShuttleRaidTemplateUtility.SelectTemplate(parms.faction?.def, parms.points, map, seed);
-            if (selected == null)
+            if (!ShuttleRaidTemplateUtility.TryFindLandingSite(map, parms.faction?.def, parms.points, out ShuttleRaidTemplateDef selected, out IntVec3 root, out Rot4 rotation))
             {
-                Logger.Warning($"PawnsArrivalModeWorker_ShuttleLanding.TryResolveRaidSpawnCenter: no eligible ShuttleRaidTemplateDef for faction '{parms.faction?.def?.defName ?? "null"}' at {parms.points} points on map '{map}'; declining this arrival mode so the incident fails cleanly before any pawns are generated.");
-                return false;
-            }
-
-            if (!ShuttleRaidTemplateUtility.TryFindLandingSite(map, selected, seed, out IntVec3 root, out Rot4 rotation))
-            {
-                Logger.Warning($"PawnsArrivalModeWorker_ShuttleLanding.TryResolveRaidSpawnCenter: no viable landing site found on map '{map}' for template '{selected.defName}'; declining this arrival mode so the incident fails cleanly before any pawns are generated.");
+                Logger.Warning($"PawnsArrivalModeWorker_ShuttleLanding.TryResolveRaidSpawnCenter: no viable eligible shuttle template/site found within the bounded search on map '{map}' for faction '{parms.faction?.def?.defName ?? "null"}' at {parms.points} points; declining this arrival mode so the incident fails cleanly before any pawns are generated.");
                 return false;
             }
 
@@ -162,7 +153,7 @@ namespace Gravship_Raids
         {
             foreach (ShuttleRaidTemplateDef candidate in ShuttleRaidTemplateUtility.GetEligibleTemplates(factionDef, points, map))
             {
-                if (RoyalTitlePermitWorker_CallShuttle.ShuttleCanLandHere(root, map, candidate.shuttle, rotation).Accepted)
+                if (ShuttleRaidTemplateUtility.CanShuttleLandAt(root, map, candidate.shuttle, rotation))
                 {
                     template = candidate;
                     return true;

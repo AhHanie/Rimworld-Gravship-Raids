@@ -316,7 +316,7 @@ namespace Gravship_Raids
 
             if (selectedTemplate != null)
             {
-                AcceptanceReport report = RoyalTitlePermitWorker_CallShuttle.ShuttleCanLandHere(cell, map, selectedTemplate.shuttle, shuttleRotation);
+                AcceptanceReport report = ShuttleRaidTemplateUtility.CanShuttleLandAtReport(cell, map, selectedTemplate.shuttle, shuttleRotation);
                 if (!report.Accepted)
                 {
                     string rejectMessage = $"[Gravship Raids] Force shuttle raid with template '{selectedTemplate.defName}': cannot land at {cell} (rot {shuttleRotation}) - {report.Reason}.";
