@@ -344,11 +344,47 @@ namespace Gravship_Raids
             allContents.AddRange(boarded);
             allContents.AddRange(hullPieces);
 
-            GravshipDepartureSkyfaller leaving = (GravshipDepartureSkyfaller)SkyfallerMaker.MakeSkyfaller(skyfallerDef, allContents);
+            GravshipDepartureSkyfaller leaving = (GravshipDepartureSkyfaller)SkyfallerMaker.MakeSkyfaller(skyfallerDef);
             leaving.instance = instance;
+            foreach (Thing t in allContents)
+            {
+                AddToDepartureSkyfaller(leaving, t);
+            }
             GenSpawn.Spawn(leaving, cell, map, rot);
             instance.departingSkyfaller = leaving;
             return true;
+        }
+
+        // TryAddRangeOrTransfer refuses map-held things and destroys them via destroyLeftover - every item here
+        // must already have exactly one owner (or none) before it reaches the skyfaller's innerContainer.
+        private static void AddToDepartureSkyfaller(GravshipDepartureSkyfaller leaving, Thing item)
+        {
+            if (item == null || item.Destroyed)
+            {
+                return;
+            }
+
+            // A tracked piece can get involuntarily minified if a later prefab piece was placed on an
+            // overlapping cell during spawn (GenSpawn wipes the conflicting piece via GenSpawn.Refund, wrapping
+            // it in a MinifiedThing crate that instance.spawnedThings never learns about). Pulling the nested
+            // piece out via holdingOwner.Remove would empty that still-spawned crate and leave it orphaned with
+            // a null InnerThing, so move the crate itself instead - it carries the nested piece along intact.
+            if (!item.Spawned && item.holdingOwner?.Owner is Thing wrapper && wrapper != item && wrapper.Spawned)
+            {
+                item = wrapper;
+            }
+
+            if (item.Spawned)
+            {
+                item.DeSpawn(DestroyMode.Vanish);
+            }
+            item.holdingOwner?.Remove(item);
+
+            if (!leaving.innerContainer.TryAdd(item, canMergeWithExistingStacks: false))
+            {
+                Logger.Error($"EnemyGravshipRaidUtility.AddToDepartureSkyfaller: failed to add {item.ToStringSafe()} (owner={item.holdingOwner?.Owner.ToStringSafe() ?? "none"}) to the departure skyfaller; destroying it instead of leaving it ownerless.");
+                item.Destroy(DestroyMode.Vanish);
+            }
         }
 
         private static void RemoveSpawnedThings(EnemyGravshipInstance instance)

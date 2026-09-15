@@ -54,7 +54,7 @@ namespace Gravship_Raids
 
             using (HAROutfitStandCompatibility.BeginRaidPrefabSpawn())
             {
-                PrefabUtility.SpawnPrefab(template.prefab, map, cell, rotation);
+                PrefabStuffCompatibility.SpawnPrefab(template.prefab, map, cell, rotation);
             }
 
             GravshipRaidTemplateUtility.ApplyPrefabInteriorRoofs(template.prefab, map, cell, rotation);

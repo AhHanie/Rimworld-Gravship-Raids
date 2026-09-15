@@ -333,7 +333,7 @@ namespace Gravship_Raids
             List<Thing> spawned = new List<Thing>();
             using (HAROutfitStandCompatibility.BeginRaidPrefabSpawn())
             {
-                PrefabUtility.SpawnPrefab(template.prefab, map, root, rotation, faction, spawned);
+                PrefabStuffCompatibility.SpawnPrefab(template.prefab, map, root, rotation, faction, spawned);
             }
 
             List<GravshipRaidTemplateUtility.RoofCellSnapshot> roofSnapshot = GravshipRaidTemplateUtility.ApplyPrefabInteriorRoofs(template.prefab, map, root, rotation);

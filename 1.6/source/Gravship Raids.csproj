@@ -90,6 +90,7 @@
     <Compile Include="Debug\DebugActionsGravshipRaidPrefabCapture.cs" />
     <Compile Include="Debug\GravshipRaidDebugApi.cs" />
     <Compile Include="Compatibility\HAROutfitStandCompatibility.cs" />
+    <Compile Include="Compatibility\PrefabStuffCompatibility.cs" />
     <Compile Include="Compatibility\VGEAstrofuelTankCompatibility.cs" />
     <Compile Include="Compatibility\GravshipRaidEligibility.cs" />
     <Compile Include="Compatibility\WinstonWavesCompatibility.cs" />
