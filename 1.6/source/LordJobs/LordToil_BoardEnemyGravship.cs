@@ -189,7 +189,7 @@ namespace Gravship_Raids
                 return;
             }
 
-            if (instance.state == GravshipRaidState.Departed || instance.state == GravshipRaidState.Destroyed)
+            if (instance.state == GravshipRaidState.Launching || instance.state == GravshipRaidState.Departed || instance.state == GravshipRaidState.Destroyed)
             {
                 return;
             }

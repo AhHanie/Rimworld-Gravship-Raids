@@ -18,12 +18,12 @@ namespace Gravship_Raids
             GravshipRaidDebugApi.StartPrefabCaptureWithTerrain();
         }
 
-        internal static string BuildPrefabXml(CellRect rect, List<(PrefabThingData data, IntVec3 cell)> things, List<(PrefabTerrainData data, IntVec3 cell)> terrain)
+        internal static string BuildPrefabXml(CellRect rect, List<(PrefabThingData data, IntVec3 cell)> things, List<(PrefabTerrainData data, IntVec3 cell)> terrain, List<(PrefabRoofData data, IntVec3 cell)> roofs)
         {
             CellRect localRect = new CellRect(0, 0, rect.Size.x, rect.Size.z);
             StringBuilder sb = new StringBuilder();
             const string indent = "  ";
-            sb.AppendLine("<PrefabDef>");
+            sb.AppendLine("<Gravship_Raids.GravshipRaidPrefabDef>");
             sb.AppendLine(indent + "<defName>NewPrefab</defName> <!-- rename before use -->");
             sb.AppendLine($"{indent}<size>({rect.Size.x},{rect.Size.z})</size>");
             List<(ThingGroupKey key, List<IntVec3> cells)> thingGroups = GroupThings(things);
@@ -49,7 +49,17 @@ namespace Gravship_Raids
                 }
                 sb.AppendLine(indent + "</terrain>");
             }
-            sb.AppendLine("</PrefabDef>");
+            List<(RoofGroupKey key, List<IntVec3> cells)> roofGroups = GroupRoofs(roofs);
+            if (roofGroups.Count > 0)
+            {
+                sb.AppendLine(indent + "<roofs>");
+                foreach ((RoofGroupKey key, List<IntVec3> cells) in roofGroups)
+                {
+                    AppendRoofGroup(sb, indent, localRect, key, cells);
+                }
+                sb.AppendLine(indent + "</roofs>");
+            }
+            sb.AppendLine("</Gravship_Raids.GravshipRaidPrefabDef>");
             return sb.ToString();
         }
 
@@ -92,6 +102,38 @@ namespace Gravship_Raids
                 groups[index].cells.Add(cell);
             }
             return groups;
+        }
+
+        private static List<(RoofGroupKey key, List<IntVec3> cells)> GroupRoofs(List<(PrefabRoofData data, IntVec3 cell)> roofs)
+        {
+            List<(RoofGroupKey key, List<IntVec3> cells)> groups = new List<(RoofGroupKey, List<IntVec3>)>();
+            Dictionary<RoofGroupKey, int> indexByKey = new Dictionary<RoofGroupKey, int>();
+            foreach ((PrefabRoofData data, IntVec3 cell) in roofs)
+            {
+                RoofGroupKey key = new RoofGroupKey(data);
+                if (!indexByKey.TryGetValue(key, out int index))
+                {
+                    index = groups.Count;
+                    indexByKey.Add(key, index);
+                    groups.Add((key, new List<IntVec3>()));
+                }
+                groups[index].cells.Add(cell);
+            }
+            return groups;
+        }
+
+        private static void AppendRoofGroup(StringBuilder sb, string indent, CellRect localRect, RoofGroupKey key, List<IntVec3> cells)
+        {
+            string tag = key.def.defName;
+            sb.AppendLine(indent + indent + "<" + tag + ">");
+            HashSet<IntVec3> cellSet = cells.ToHashSet();
+            sb.AppendLine(indent + indent + indent + "<rects>");
+            foreach (CellRect subRect in localRect.EnumerateRectanglesCovering((IntVec3 c) => cellSet.Contains(c)))
+            {
+                sb.AppendLine($"{indent}{indent}{indent}{indent}<li>{subRect}</li>");
+            }
+            sb.AppendLine(indent + indent + indent + "</rects>");
+            sb.AppendLine(indent + indent + "</" + tag + ">");
         }
 
         private static void AppendThingGroup(StringBuilder sb, string indent, CellRect localRect, ThingGroupKey key, List<IntVec3> cells)
@@ -219,6 +261,31 @@ namespace Gravship_Raids
                 hash = hash * 31 + stackCountRange.GetHashCode();
                 hash = hash * 31 + (int)relativeRotation;
                 return hash;
+            }
+        }
+
+        private readonly struct RoofGroupKey : IEquatable<RoofGroupKey>
+        {
+            public readonly RoofDef def;
+
+            public RoofGroupKey(PrefabRoofData data)
+            {
+                def = data.def;
+            }
+
+            public bool Equals(RoofGroupKey other)
+            {
+                return def == other.def;
+            }
+
+            public override bool Equals(object obj)
+            {
+                return obj is RoofGroupKey other && Equals(other);
+            }
+
+            public override int GetHashCode()
+            {
+                return def?.GetHashCode() ?? 0;
             }
         }
 

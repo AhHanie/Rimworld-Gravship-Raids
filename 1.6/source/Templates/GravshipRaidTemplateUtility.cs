@@ -555,87 +555,32 @@ namespace Gravship_Raids
             }
         }
 
-        // Finds prefab-interior cells sealed off by a continuous perimeter of holdsRoof things: flood-fills
-        // outward from a one-cell-expanded ring around the footprint, through non-barrier cells, so any cell
-        // the fill can't reach (and that isn't itself a hull/wall/thruster cell) is enclosed. A breach in the
-        // hull simply gives the fill a path in, correctly leaving that compartment unroofed.
-        private static List<IntVec3> GetEnclosedInteriorCells(PrefabDef prefab, Map map, IntVec3 pos, Rot4 rot)
+        // Roofs are captured data, not computed: GravshipRaidPrefabDef.roofs records whatever the source ship
+        // had roofed at capture time (see DebugActionsGravshipRaidPrefabCapture), and that's replayed verbatim
+        // here - no enclosure/flood-fill inference. A plain PrefabDef (not yet recaptured with roof data) simply
+        // gets no roofs.
+        public static List<RoofCellSnapshot> ApplyPrefabInteriorRoofs(PrefabDef prefab, Map map, IntVec3 pos, Rot4 rot)
         {
-            List<IntVec3> result = new List<IntVec3>();
-            if (prefab == null || map == null)
+            List<RoofCellSnapshot> result = new List<RoofCellSnapshot>();
+            if (!(prefab is GravshipRaidPrefabDef roofedPrefab) || map == null)
             {
                 return result;
             }
 
             Rot4 validatedRot = PrefabUtility.ValidateRotation(prefab, rot);
-            CellRect bounds = GetRotatedBounds(prefab, pos, validatedRot);
+            IntVec3 root = PrefabUtility.GetRoot(prefab, pos, validatedRot);
 
-            HashSet<IntVec3> barrierCells = new HashSet<IntVec3>();
-            foreach (var (data, cell, itemRot) in PrefabUtility.GetThings(prefab, pos, validatedRot))
-            {
-                if (data?.def == null || !data.def.holdsRoof)
-                {
-                    continue;
-                }
-                foreach (IntVec3 occupied in GenAdj.OccupiedRect(cell, itemRot, data.def.Size))
-                {
-                    barrierCells.Add(occupied);
-                }
-            }
-
-            CellRect searchBounds = bounds.ExpandedBy(1);
-            HashSet<IntVec3> visited = new HashSet<IntVec3>();
-            Queue<IntVec3> queue = new Queue<IntVec3>();
-
-            foreach (IntVec3 cell in searchBounds.Cells)
-            {
-                bool onEdge = cell.x == searchBounds.minX || cell.x == searchBounds.maxX || cell.z == searchBounds.minZ || cell.z == searchBounds.maxZ;
-                if (!onEdge || !cell.InBounds(map) || barrierCells.Contains(cell) || !visited.Add(cell))
-                {
-                    continue;
-                }
-                queue.Enqueue(cell);
-            }
-
-            while (queue.Count > 0)
-            {
-                IntVec3 current = queue.Dequeue();
-                for (int i = 0; i < GenAdj.CardinalDirections.Length; i++)
-                {
-                    IntVec3 next = current + GenAdj.CardinalDirections[i];
-                    if (!searchBounds.Contains(next) || !next.InBounds(map) || barrierCells.Contains(next) || !visited.Add(next))
-                    {
-                        continue;
-                    }
-                    queue.Enqueue(next);
-                }
-            }
-
-            foreach (IntVec3 cell in bounds.Cells)
-            {
-                if (barrierCells.Contains(cell) || visited.Contains(cell))
-                {
-                    continue;
-                }
-                result.Add(cell);
-            }
-
-            return result;
-        }
-
-        public static List<RoofCellSnapshot> ApplyPrefabInteriorRoofs(PrefabDef prefab, Map map, IntVec3 pos, Rot4 rot)
-        {
-            List<RoofCellSnapshot> result = new List<RoofCellSnapshot>();
-            if (prefab == null || map == null)
-            {
-                return result;
-            }
-
-            List<IntVec3> candidates = GetEnclosedInteriorCells(prefab, map, pos, rot);
+            List<(PrefabRoofData data, IntVec3 cell)> candidates = roofedPrefab.GetRoofs().ToList();
             int skippedCount = 0;
-            foreach (IntVec3 cell in candidates)
+            foreach (var (data, localCell) in candidates)
             {
-                if (map.roofGrid.RoofAt(cell) != null || map.areaManager.NoRoof[cell])
+                IntVec3 cell = root + PrefabUtility.GetAdjustedLocalPosition(localCell, validatedRot);
+                if (!cell.InBounds(map))
+                {
+                    skippedCount++;
+                    continue;
+                }
+                if (map.roofGrid.RoofAt(cell) != null)
                 {
                     skippedCount++;
                     continue;
@@ -645,11 +590,11 @@ namespace Gravship_Raids
                     skippedCount++;
                     continue;
                 }
-                map.roofGrid.SetRoof(cell, RoofDefOf.RoofConstructed);
-                result.Add(new RoofCellSnapshot(cell, null, RoofDefOf.RoofConstructed));
+                map.roofGrid.SetRoof(cell, data.def);
+                result.Add(new RoofCellSnapshot(cell, null, data.def));
             }
 
-            Logger.Message($"GravshipRaidTemplateUtility.ApplyPrefabInteriorRoofs: prefab '{prefab.defName}' at {pos} (rot {rot}) - {candidates.Count} candidate(s), {result.Count} applied, {skippedCount} skipped.");
+            Logger.Message($"GravshipRaidTemplateUtility.ApplyPrefabInteriorRoofs: prefab '{prefab.defName}' at {pos} (rot {rot}) - {candidates.Count} captured roof cell(s), {result.Count} applied, {skippedCount} skipped.");
             return result;
         }
 

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <Defs>
 
-  <PrefabDef>
+  <Gravship_Raids.GravshipRaidPrefabDef>
     <defName>GR_Prefab_VGE_SmallGravship</defName>
     <size>(14,11)</size>
     <things>
@@ -52,9 +52,6 @@
         <stuff>Steel</stuff>
         <quality>Normal</quality>
       </Table1x2c>
-      <VGE_SealantPopper>
-        <position>(4, 0, 2)</position>
-      </VGE_SealantPopper>
       <Turret_MiniTurret>
         <rects>
           <li>(8,6,8,6)</li>
@@ -180,9 +177,21 @@
         </rects>
       </Substructure>
     </terrain>
-  </PrefabDef>
+    <roofs>
+      <RoofConstructed>
+        <rects>
+          <li>(4,1,9,9)</li>
+          <li>(3,2,3,8)</li>
+          <li>(10,2,10,8)</li>
+          <li>(11,3,12,7)</li>
+          <li>(0,4,2,6)</li>
+          <li>(13,4,13,6)</li>
+        </rects>
+      </RoofConstructed>
+    </roofs>
+  </Gravship_Raids.GravshipRaidPrefabDef>
 
-  <PrefabDef>
+  <Gravship_Raids.GravshipRaidPrefabDef>
     <defName>GR_Prefab_VGE_MediumGravship</defName>
     <size>(21,13)</size>
     <things>
@@ -514,9 +523,23 @@
         </rects>
       </Substructure>
     </terrain>
-  </PrefabDef>
+    <roofs>
+      <RoofConstructed>
+        <rects>
+          <li>(6,2,7,10)</li>
+          <li>(10,2,10,10)</li>
+          <li>(13,2,14,10)</li>
+          <li>(1,3,5,9)</li>
+          <li>(8,3,9,9)</li>
+          <li>(11,3,12,9)</li>
+          <li>(15,3,18,9)</li>
+          <li>(19,6,19,6)</li>
+        </rects>
+      </RoofConstructed>
+    </roofs>
+  </Gravship_Raids.GravshipRaidPrefabDef>
 
-  <PrefabDef>
+  <Gravship_Raids.GravshipRaidPrefabDef>
     <defName>GR_Prefab_VGE_SmallGravship1</defName>
     <size>(13,15)</size>
     <things>
@@ -688,9 +711,22 @@
         </rects>
       </Substructure>
     </terrain>
-  </PrefabDef>
+    <roofs>
+      <RoofConstructed>
+        <rects>
+          <li>(4,3,8,12)</li>
+          <li>(3,6,3,6)</li>
+          <li>(9,6,9,6)</li>
+          <li>(2,9,3,10)</li>
+          <li>(9,9,10,10)</li>
+          <li>(3,11,3,12)</li>
+          <li>(9,11,9,12)</li>
+        </rects>
+      </RoofConstructed>
+    </roofs>
+  </Gravship_Raids.GravshipRaidPrefabDef>
 
-  <PrefabDef>
+  <Gravship_Raids.GravshipRaidPrefabDef>
     <defName>GR_Prefab_VGE_LargeGravship</defName>
     <size>(24,11)</size>
     <things>
@@ -978,9 +1014,33 @@
         </rects>
       </Substructure>
     </terrain>
-  </PrefabDef>
+    <roofs>
+      <RoofConstructed>
+        <rects>
+          <li>(2,1,2,3)</li>
+          <li>(12,1,19,2)</li>
+          <li>(8,2,9,8)</li>
+          <li>(1,3,1,3)</li>
+          <li>(3,3,7,7)</li>
+          <li>(10,3,10,7)</li>
+          <li>(14,3,14,9)</li>
+          <li>(17,3,17,9)</li>
+          <li>(11,4,12,6)</li>
+          <li>(15,4,16,6)</li>
+          <li>(19,4,21,6)</li>
+          <li>(13,5,13,5)</li>
+          <li>(18,5,18,5)</li>
+          <li>(1,7,2,7)</li>
+          <li>(2,8,2,9)</li>
+          <li>(12,8,13,9)</li>
+          <li>(15,8,16,9)</li>
+          <li>(18,8,19,9)</li>
+        </rects>
+      </RoofConstructed>
+    </roofs>
+  </Gravship_Raids.GravshipRaidPrefabDef>
 
-  <PrefabDef>
+  <Gravship_Raids.GravshipRaidPrefabDef>
     <defName>GR_Prefab_VGE_SmallGravship2</defName>
     <size>(15,9)</size>
     <things>
@@ -1126,6 +1186,17 @@
         </rects>
       </VGE_GravshipSubscaffold>
     </terrain>
-  </PrefabDef>
+    <roofs>
+      <RoofConstructed>
+        <rects>
+          <li>(5,2,8,6)</li>
+          <li>(9,3,10,6)</li>
+          <li>(11,4,12,4)</li>
+          <li>(4,5,4,5)</li>
+          <li>(11,5,11,6)</li>
+        </rects>
+      </RoofConstructed>
+    </roofs>
+  </Gravship_Raids.GravshipRaidPrefabDef>
 
 </Defs>

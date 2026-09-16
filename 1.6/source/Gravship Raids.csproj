@@ -73,6 +73,7 @@
     <Compile Include="ArrivalModes\GravshipLandingSiteFinder.cs" />
     <Compile Include="ArrivalModes\MapSuitabilityUtility.cs" />
     <Compile Include="Templates\GravshipRaidTemplateDef.cs" />
+    <Compile Include="Templates\GravshipRaidPrefabDef.cs" />
     <Compile Include="Templates\GravshipRaidTemplateUtility.cs" />
     <Compile Include="Comps\CompEnemyGravshipCore.cs" />
     <Compile Include="GravshipInstances\EnemyGravshipEffects.cs" />
@@ -92,6 +93,7 @@
     <Compile Include="Compatibility\HAROutfitStandCompatibility.cs" />
     <Compile Include="Compatibility\PrefabStuffCompatibility.cs" />
     <Compile Include="Compatibility\VGEAstrofuelTankCompatibility.cs" />
+    <Compile Include="Compatibility\VGE2AstrorigCompatibility.cs" />
     <Compile Include="Compatibility\GravshipRaidEligibility.cs" />
     <Compile Include="Compatibility\WinstonWavesCompatibility.cs" />
     <Compile Include="Scenarios\ScenPart_CrashlandedGravshipStart.cs" />
@@ -109,6 +111,7 @@
     <Compile Include="Patches\CompShuttleHostileCrewPatch.cs" />
     <Compile Include="Patches\FlightCriticalBuildingDestroyedPatch.cs" />
     <Compile Include="Patches\EnemyGravshipRainShortCircuitPatch.cs" />
+    <Compile Include="Patches\EnemyGravshipInvalidRepairPatch.cs" />
     <Compile Include="LordJobs\LordJob_ShuttleRaid.cs" />
     <Compile Include="LordJobs\LordToil_ShuttleAssault.cs" />
     <Compile Include="LordJobs\LordToil_BoardEnemyShuttle.cs" />

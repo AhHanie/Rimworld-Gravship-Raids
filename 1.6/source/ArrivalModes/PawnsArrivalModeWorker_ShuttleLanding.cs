@@ -167,6 +167,8 @@ namespace Gravship_Raids
         {
             Map map = (Map)parms.target;
 
+            VGE2AstrorigCompatibility.EquipAstrorigsForSpaceRaidPawns(pawns, map);
+
             if (!TryTakeLandingPlan(parms, out LandingPlan plan))
             {
                 Logger.Error("PawnsArrivalModeWorker_ShuttleLanding.Arrive: no landing plan was stashed for this IncidentParms by TryResolveRaidSpawnCenter; falling back to a plain drop near spawnCenter so pawns are not lost.");

@@ -79,6 +79,8 @@ namespace Gravship_Raids
 
         public static float winstonWavesGravshipChance = 0.20f;
 
+        public static bool enableAstrorigsForSpaceRaids = true;
+
         public override void ExposeData()
         {
             base.ExposeData();
@@ -126,6 +128,7 @@ namespace Gravship_Raids
 
             Scribe_Values.Look(ref enableWinstonWavesCompatibility, "enableWinstonWavesCompatibility", true);
             Scribe_Values.Look(ref winstonWavesGravshipChance, "winstonWavesGravshipChance", 0.20f);
+            Scribe_Values.Look(ref enableAstrorigsForSpaceRaids, "enableAstrorigsForSpaceRaids", true);
         }
 
         public static float ClampedGravshipGuardFraction()

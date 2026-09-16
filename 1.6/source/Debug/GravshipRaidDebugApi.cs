@@ -410,11 +410,12 @@ namespace Gravship_Raids
                     List<(PrefabTerrainData data, IntVec3 cell)> foundation = CaptureFoundationTerrain(Find.CurrentMap, rect);
                     HashSet<IntVec3> substructureCells = foundation.Select((t) => t.cell).ToHashSet();
                     List<(PrefabThingData data, IntVec3 cell)> things = prefab.GetThings().Where((t) => substructureCells.Contains(t.cell)).ToList();
+                    List<(PrefabRoofData data, IntVec3 cell)> roofs = CaptureRoofs(Find.CurrentMap, rect);
 
-                    string xml = DebugActionsGravshipRaidPrefabCapture.BuildPrefabXml(rect, things, foundation);
+                    string xml = DebugActionsGravshipRaidPrefabCapture.BuildPrefabXml(rect, things, foundation, roofs);
                     GUIUtility.systemCopyBuffer = xml;
 
-                    string message = $"[Gravship Raids] Captured prefab {rect.Size.x}x{rect.Size.z} ({things.Count} thing cell(s), {foundation.Count} foundation terrain cell(s)). Copied to clipboard - rename NewPrefab before pasting into a defs file.";
+                    string message = $"[Gravship Raids] Captured prefab {rect.Size.x}x{rect.Size.z} ({things.Count} thing cell(s), {foundation.Count} foundation terrain cell(s), {roofs.Count} roof cell(s)). Copied to clipboard - rename NewPrefab before pasting into a defs file.";
                     Log.Message(message);
                     Messages.Message(message, MessageTypeDefOf.NeutralEvent, historical: false);
                 }
@@ -445,6 +446,28 @@ namespace Gravship_Raids
                 {
                     def = foundationDef,
                     color = terrainGrid.ColorAt(cell),
+                    rects = new List<CellRect> { new CellRect(localCell.x, localCell.z, 1, 1) }
+                };
+                result.Add((data, localCell));
+            }
+            return result;
+        }
+
+        private static List<(PrefabRoofData data, IntVec3 cell)> CaptureRoofs(Map map, CellRect rect)
+        {
+            List<(PrefabRoofData data, IntVec3 cell)> result = new List<(PrefabRoofData, IntVec3)>();
+            RoofGrid roofGrid = map.roofGrid;
+            foreach (IntVec3 cell in rect.Cells)
+            {
+                RoofDef roof = roofGrid.RoofAt(cell);
+                if (roof == null)
+                {
+                    continue;
+                }
+                IntVec3 localCell = cell - rect.Min;
+                PrefabRoofData data = new PrefabRoofData
+                {
+                    def = roof,
                     rects = new List<CellRect> { new CellRect(localCell.x, localCell.z, 1, 1) }
                 };
                 result.Add((data, localCell));

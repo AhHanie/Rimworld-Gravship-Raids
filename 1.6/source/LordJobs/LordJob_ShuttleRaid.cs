@@ -51,32 +51,35 @@ namespace Gravship_Raids
 
             if (assaulterFaction != null && assaulterFaction.def.humanlikeFaction)
             {
+                // canSendMessage is evaluated lazily when the transition actually fires, not when the graph is
+                // built - suppresses the "falling back to their shuttle" framing once the shuttle is already
+                // lost, so it doesn't contradict LordToil_BoardEnemyShuttle's stranded message.
                 if (canTimeoutOrFlee)
                 {
                     Transition timeoutTransition = new Transition(assaultToil, boardToil);
                     Trigger_TicksPassed ticksTrigger = new Trigger_TicksPassed(AssaultTimeBeforeGiveUp.RandomInRange);
                     ticksTrigger.WithFilter(new TriggerFilter_MapExitable());
                     timeoutTransition.AddTrigger(ticksTrigger);
-                    timeoutTransition.AddPreAction(new TransitionAction_Message("GravshipRaids.MessageShuttleRaidersGivenUpRetreating".Translate(assaulterFaction.def.pawnsPlural.CapitalizeFirst(), assaulterFaction.Name)));
+                    timeoutTransition.AddPreAction(new TransitionAction_Message("GravshipRaids.MessageShuttleRaidersGivenUpRetreating".Translate(assaulterFaction.def.pawnsPlural.CapitalizeFirst(), assaulterFaction.Name), MessageTypeDefOf.NeutralEvent, canSendMessage: () => !instance.shuttleLost));
                     stateGraph.AddTransition(timeoutTransition);
 
                     Transition damageTransition = new Transition(assaultToil, boardToil);
                     Trigger_FractionColonyDamageTaken damageTrigger = new Trigger_FractionColonyDamageTaken(new FloatRange(0.25f, 0.35f).RandomInRange, 900f);
                     damageTrigger.WithFilter(new TriggerFilter_MapExitable());
                     damageTransition.AddTrigger(damageTrigger);
-                    damageTransition.AddPreAction(new TransitionAction_Message("GravshipRaids.MessageShuttleRaidersSatisfiedRetreating".Translate(assaulterFaction.def.pawnsPlural.CapitalizeFirst(), assaulterFaction.Name)));
+                    damageTransition.AddPreAction(new TransitionAction_Message("GravshipRaids.MessageShuttleRaidersSatisfiedRetreating".Translate(assaulterFaction.def.pawnsPlural.CapitalizeFirst(), assaulterFaction.Name), MessageTypeDefOf.NeutralEvent, canSendMessage: () => !instance.shuttleLost));
                     stateGraph.AddTransition(damageTransition);
                 }
 
                 Transition casualtyTransition = new Transition(assaultToil, boardToil);
                 float casualtyThreshold = Mathf.Clamp(GravshipRaidsSettings.shuttleCasualtyRetreatThreshold, 0.05f, 1f);
                 casualtyTransition.AddTrigger(new Trigger_FractionPawnsLostWithMinimum(casualtyThreshold, MinimumCasualtiesForFractionRetreat));
-                casualtyTransition.AddPreAction(new TransitionAction_Message("GravshipRaids.MessageShuttleRaidersRetreatingCasualties".Translate(assaulterFaction.def.pawnsPlural.CapitalizeFirst(), assaulterFaction.Name)));
+                casualtyTransition.AddPreAction(new TransitionAction_Message("GravshipRaids.MessageShuttleRaidersRetreatingCasualties".Translate(assaulterFaction.def.pawnsPlural.CapitalizeFirst(), assaulterFaction.Name), MessageTypeDefOf.NeutralEvent, canSendMessage: () => !instance.shuttleLost));
                 stateGraph.AddTransition(casualtyTransition);
 
                 Transition nonHostileTransition = new Transition(assaultToil, boardToil);
                 nonHostileTransition.AddTrigger(new Trigger_BecameNonHostileToPlayer());
-                nonHostileTransition.AddPreAction(new TransitionAction_Message("GravshipRaids.MessageShuttleRaidersRetreatingNonHostile".Translate(assaulterFaction.def.pawnsPlural.CapitalizeFirst(), assaulterFaction.Name)));
+                nonHostileTransition.AddPreAction(new TransitionAction_Message("GravshipRaids.MessageShuttleRaidersRetreatingNonHostile".Translate(assaulterFaction.def.pawnsPlural.CapitalizeFirst(), assaulterFaction.Name), MessageTypeDefOf.NeutralEvent, canSendMessage: () => !instance.shuttleLost));
                 stateGraph.AddTransition(nonHostileTransition);
 
                 Logger.Message($"LordJob_ShuttleRaid.CreateGraph: {instance} - wired retreat transitions for faction '{assaulterFaction.def.defName}' (canTimeoutOrFlee={canTimeoutOrFlee}, casualtyThreshold={Mathf.Clamp(GravshipRaidsSettings.shuttleCasualtyRetreatThreshold, 0.05f, 1f)}, minimumCasualties={MinimumCasualtiesForFractionRetreat}).");

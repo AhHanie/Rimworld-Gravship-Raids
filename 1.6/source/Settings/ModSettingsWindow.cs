@@ -85,6 +85,10 @@ namespace Gravship_Raids
                 "GravshipRaids.Settings.AllowEmptyEnemyGravshipDeparture".Translate(),
                 ref GravshipRaidsSettings.allowEmptyEnemyGravshipDeparture,
                 "GravshipRaids.Settings.AllowEmptyEnemyGravshipDepartureDesc".Translate());
+            listing.CheckboxLabeled(
+                "GravshipRaids.Settings.EnableAstrorigsForSpaceRaids".Translate(),
+                ref GravshipRaidsSettings.enableAstrorigsForSpaceRaids,
+                "GravshipRaids.Settings.EnableAstrorigsForSpaceRaidsDesc".Translate());
 
             listing.CheckboxLabeled(
                 "GravshipRaids.Settings.EnableGravshipGuards".Translate(),

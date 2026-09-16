@@ -258,6 +258,8 @@ namespace Gravship_Raids
         {
             Map map = (Map)parms.target;
 
+            VGE2AstrorigCompatibility.EquipAstrorigsForSpaceRaidPawns(pawns, map);
+
             if (!TryTakeLandingPlan(parms, out LandingPlan plan))
             {
                 // Should never happen on the normal incident call path (see TryResolveRaidSpawnCenter above),
