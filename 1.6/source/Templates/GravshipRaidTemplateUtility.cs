@@ -344,22 +344,52 @@ namespace Gravship_Raids
             }
             Rot4 validatedRot = PrefabUtility.ValidateRotation(prefab, rot);
             IntVec3 root = PrefabUtility.GetRoot(prefab, pos, validatedRot);
-            List<PaintedCell> painted = new List<PaintedCell>();
-            try
+
+            List<(TerrainDef def, IntVec3 cell)> terrainCells = new List<(TerrainDef, IntVec3)>();
+            foreach (var (data, cell) in prefab.GetTerrain())
             {
-                foreach (var (data, cell) in prefab.GetTerrain())
+                if (data?.def == null)
                 {
-                    if (data?.def == null)
-                    {
-                        continue;
-                    }
-                    IntVec3 absolute = root + PrefabUtility.GetAdjustedLocalPosition(cell, validatedRot);
-                    if (!absolute.InBounds(map))
+                    continue;
+                }
+                IntVec3 absolute = root + PrefabUtility.GetAdjustedLocalPosition(cell, validatedRot);
+                if (!absolute.InBounds(map))
+                {
+                    return false;
+                }
+                terrainCells.Add((data.def, absolute));
+            }
+
+            // Mirrors TerrainGrid.SetTerrain's underGrid handling to preflight foundation cells before any
+            // painting happens - SetFoundation logs and no-ops if underGrid is already populated there.
+            Dictionary<IntVec3, bool> simulatedUnderTerrain = new Dictionary<IntVec3, bool>();
+            foreach (var (def, cell) in terrainCells)
+            {
+                if (!simulatedUnderTerrain.TryGetValue(cell, out bool hasUnderTerrain))
+                {
+                    hasUnderTerrain = map.terrainGrid.UnderTerrainAt(cell) != null;
+                }
+                if (def.isFoundation)
+                {
+                    if (hasUnderTerrain)
                     {
                         return false;
                     }
-                    painted.Add(new PaintedCell(absolute, map.terrainGrid.FoundationAt(absolute), map.terrainGrid.TopTerrainAt(absolute)));
-                    map.terrainGrid.SetTerrain(absolute, data.def);
+                }
+                else
+                {
+                    hasUnderTerrain = def.layerable;
+                }
+                simulatedUnderTerrain[cell] = hasUnderTerrain;
+            }
+
+            List<PaintedCell> painted = new List<PaintedCell>();
+            try
+            {
+                foreach (var (def, cell) in terrainCells)
+                {
+                    painted.Add(new PaintedCell(cell, map.terrainGrid.FoundationAt(cell), map.terrainGrid.TopTerrainAt(cell)));
+                    map.terrainGrid.SetTerrain(cell, def);
                 }
                 return PrefabUtility.CanSpawnPrefab(prefab, map, pos, validatedRot, canWipeEdifices);
             }
