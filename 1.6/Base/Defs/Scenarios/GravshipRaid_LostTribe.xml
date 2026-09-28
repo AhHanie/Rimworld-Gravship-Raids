@@ -12,7 +12,7 @@
     <label>Lost Tribe (Gravship Raids)</label>
     <description>Your tribe was destroyed in a night raid by a hostile faction with weapons and machines beyond anything your people had ever faced. Five of you escaped aboard a gravship stolen in the chaos - but its gravlite core failed over this rimworld, and the hull came apart on the way down. Now, it's time to build up a new home.\n\nNote: Since you'll start poor and lack technology, this is a difficult scenario.</description>
     <scenario>
-      <summary>Five lost tribespeople emerge from a wrecked gravship and attempt to rebuild. Difficult.</summary>
+      <summary>Five tribespeople in a wrecked gravship. Difficult.</summary>
       <playerFaction>
         <factionDef>PlayerTribe</factionDef>
       </playerFaction>

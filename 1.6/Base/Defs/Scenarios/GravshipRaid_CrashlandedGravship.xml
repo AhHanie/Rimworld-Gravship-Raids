@@ -12,7 +12,7 @@
     <label>Crashlanded Gravship</label>
     <description>The three of you wake in your cryptosleep caskets to shredded alarms and tearing metal. Your gravship crashed hard - there is no engine left to salvage and no way it will ever fly again. Whatever is left of it is your new home.</description>
     <scenario>
-      <summary>Three survivors wake from cryptosleep inside their gravship's wreckage - the classic RimWorld start, with a crashed ship instead of drop pods.</summary>
+      <summary>Three survivors in a wrecked gravship. The classic start.</summary>
       <parts>
 
         <!-- Config pages -->
