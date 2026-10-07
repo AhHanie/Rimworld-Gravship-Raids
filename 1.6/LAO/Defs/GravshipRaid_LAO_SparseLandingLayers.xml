@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<Defs>
+
+  <Gravship_Raids.SparseLandingLayerDef>
+    <defName>GR_SparseLandingLayers_LAO</defName>
+    <layers>
+      <li>LAO_Troposphere</li>
+      <li>LAO_Stratosphere</li>
+      <li>LAO_Mesosphere</li>
+      <li>LAO_HighOrbit</li>
+    </layers>
+  </Gravship_Raids.SparseLandingLayerDef>
+
+</Defs>

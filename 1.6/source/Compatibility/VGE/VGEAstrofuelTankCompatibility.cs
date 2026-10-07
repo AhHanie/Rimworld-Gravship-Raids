@@ -16,7 +16,7 @@ namespace Gravship_Raids
     // There's no compile-time reference to VEF's PipeSystem assembly in this project, so the storage
     // comp, its capacity field, and its AddResource(float) method are all resolved by reflection, gated
     // on the type actually being loaded.
-    internal static class VGEAstrofuelTankCompatibility
+    internal sealed class VGEAstrofuelTankCompatibility : RaidCompatibilityModule
     {
         private static readonly Type ResourceStorageType = AccessTools.TypeByName("PipeSystem.CompResourceStorage");
 
@@ -30,7 +30,9 @@ namespace Gravship_Raids
 
         private static bool Available => ResourceStorageType != null && AddResourceMethod != null && StorageCapacityField != null;
 
-        internal static bool TryRandomizeFuelLevel(Thing thing)
+        public override bool IsActive => Available;
+
+        public override bool TryRandomizeFuelLevel(Thing thing)
         {
             if (!Available || !(thing is ThingWithComps thingWithComps))
             {

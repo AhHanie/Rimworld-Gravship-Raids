@@ -75,12 +75,6 @@ namespace Gravship_Raids
 
         public static string shuttleMinColonistCountBuffer;
 
-        public static bool enableWinstonWavesCompatibility = true;
-
-        public static float winstonWavesGravshipChance = 0.20f;
-
-        public static bool enableAstrorigsForSpaceRaids = true;
-
         public override void ExposeData()
         {
             base.ExposeData();
@@ -126,19 +120,13 @@ namespace Gravship_Raids
                 shuttleDisallowedFactionDefNames = new List<string>();
             }
 
-            Scribe_Values.Look(ref enableWinstonWavesCompatibility, "enableWinstonWavesCompatibility", true);
-            Scribe_Values.Look(ref winstonWavesGravshipChance, "winstonWavesGravshipChance", 0.20f);
-            Scribe_Values.Look(ref enableAstrorigsForSpaceRaids, "enableAstrorigsForSpaceRaids", true);
+
+            RaidCompatibility.ExposeSettings();
         }
 
         public static float ClampedGravshipGuardFraction()
         {
             return Mathf.Clamp(gravshipGuardFraction, 0f, MaxGravshipGuardFraction);
-        }
-
-        public static float ClampedWinstonWavesGravshipChance()
-        {
-            return Mathf.Clamp01(winstonWavesGravshipChance);
         }
 
         public static void PruneInvalidGlobalFactionEntries()

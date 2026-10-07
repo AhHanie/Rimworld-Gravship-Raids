@@ -3,6 +3,7 @@ using System.Linq;
 using RimWorld;
 using UnityEngine;
 using Verse;
+using Verse.AI;
 
 namespace Gravship_Raids
 {
@@ -16,9 +17,9 @@ namespace Gravship_Raids
 
         private const int MaxCandidateAttemptsCheap = 25;
 
-        private const int MaxCandidateAttemptsFullOrbit = 480;
+        private const int MaxCandidateAttemptsFullSparse = 480;
 
-        private const int MaxCandidateAttemptsCheapOrbit = 400;
+        private const int MaxCandidateAttemptsCheapSparse = 400;
 
         private const int MaxExpensiveProbesPerTemplate = 8;
 
@@ -30,13 +31,13 @@ namespace Gravship_Raids
             Reachability,
             NoReachableDoor,
             PrefabPlacement,
-            OrbitRoofed,
-            OrbitExistingFoundation,
-            OrbitBuilding,
-            OrbitBlueprintOrFrame,
-            OrbitPlant,
-            OrbitQuestTag,
-            OrbitClearanceBuilding
+            DeckRoofed,
+            DeckExistingFoundation,
+            DeckBuilding,
+            DeckBlueprintOrFrame,
+            DeckPlant,
+            DeckQuestTag,
+            DeckClearanceBuilding
         }
 
         internal sealed class LandingSearchDiagnostics
@@ -45,7 +46,7 @@ namespace Gravship_Raids
 
             internal readonly Dictionary<LandingSiteRejectionReason, int> RejectionCounts = new Dictionary<LandingSiteRejectionReason, int>();
 
-            internal bool HasOrbitDeckStats;
+            internal bool HasOpenDeckStats;
 
             internal IntVec3 LargestInscribedRectanglePosition;
 
@@ -80,7 +81,7 @@ namespace Gravship_Raids
                 }
                 string suffix = parts.Count > 0 ? ", " + string.Join(", ", parts) : string.Empty;
                 string deckSuffix = string.Empty;
-                if (HasOrbitDeckStats)
+                if (HasOpenDeckStats)
                 {
                     string smallestTemplatePart = SmallestTemplateDefName != null
                         ? $"; smallest eligible template '{SmallestTemplateDefName}' needs {SmallestTemplateFootprintSize.x}x{SmallestTemplateFootprintSize.z} ({SmallestTemplateFootprintSize.x * SmallestTemplateFootprintSize.z} cells) contiguous deck, +{SmallestTemplateClearance} clearance around it"
@@ -112,20 +113,20 @@ namespace Gravship_Raids
                         return "no ship door has a walkable path to the colony";
                     case LandingSiteRejectionReason.PrefabPlacement:
                         return "prefab placement rejected";
-                    case LandingSiteRejectionReason.OrbitRoofed:
-                        return "orbit: footprint cell roofed";
-                    case LandingSiteRejectionReason.OrbitExistingFoundation:
-                        return "orbit: footprint cell has an existing foundation (likely overlaps a player-built pad)";
-                    case LandingSiteRejectionReason.OrbitBuilding:
-                        return "orbit: footprint cell has a building on it";
-                    case LandingSiteRejectionReason.OrbitBlueprintOrFrame:
-                        return "orbit: footprint cell has a blueprint/frame on it";
-                    case LandingSiteRejectionReason.OrbitPlant:
-                        return "orbit: footprint cell has a sown plant on it";
-                    case LandingSiteRejectionReason.OrbitQuestTag:
-                        return "orbit: footprint cell has quest-tagged content on it";
-                    case LandingSiteRejectionReason.OrbitClearanceBuilding:
-                        return "orbit: clearance ring around footprint has a building on it";
+                    case LandingSiteRejectionReason.DeckRoofed:
+                        return "open deck: footprint cell roofed";
+                    case LandingSiteRejectionReason.DeckExistingFoundation:
+                        return "open deck: footprint cell has an existing foundation (likely overlaps a player-built pad)";
+                    case LandingSiteRejectionReason.DeckBuilding:
+                        return "open deck: footprint cell has a building on it";
+                    case LandingSiteRejectionReason.DeckBlueprintOrFrame:
+                        return "open deck: footprint cell has a blueprint/frame on it";
+                    case LandingSiteRejectionReason.DeckPlant:
+                        return "open deck: footprint cell has a sown plant on it";
+                    case LandingSiteRejectionReason.DeckQuestTag:
+                        return "open deck: footprint cell has quest-tagged content on it";
+                    case LandingSiteRejectionReason.DeckClearanceBuilding:
+                        return "open deck: clearance ring around footprint has a building on it";
                     default:
                         return reason.ToString();
                 }
@@ -171,14 +172,14 @@ namespace Gravship_Raids
                 return false;
             }
 
-            bool isOrbit = IsOrbitMap(map);
-            HashSet<IntVec3> orbitDeckEligibleCells = isOrbit ? GetOrbitDeckEligibleCells(map) : null;
-            List<IntVec3> orbitGroundAnchors = isOrbit ? GetGroundAnchorCells(map) : null;
+            bool isSparse = UsesSparseLandingSearch(map);
+            HashSet<IntVec3> deckEligibleCells = isSparse ? GetOpenDeckEligibleCells(map) : null;
+            List<IntVec3> sparseGroundAnchors = isSparse ? GetGroundAnchorCells(map) : null;
 
-            if (isOrbit && diagnostics != null)
+            if (isSparse && diagnostics != null)
             {
-                PopulateOrbitDeckDiagnostics(pool, orbitDeckEligibleCells, diagnostics);
-                diagnostics.GroundAnchorCount = orbitGroundAnchors.Count;
+                PopulateOpenDeckDiagnostics(pool, deckEligibleCells, diagnostics);
+                diagnostics.GroundAnchorCount = sparseGroundAnchors.Count;
             }
 
             bool found = false;
@@ -200,7 +201,7 @@ namespace Gravship_Raids
                         diagnostics.TemplatesConsidered++;
                     }
 
-                    if (TryFindPlacementForTemplate(candidate, map, validateFully, diagnostics, isOrbit, orbitGroundAnchors, orbitDeckEligibleCells, out IntVec3 foundRoot, out Rot4 foundRot))
+                    if (TryFindPlacementForTemplate(candidate, map, validateFully, diagnostics, isSparse, sparseGroundAnchors, deckEligibleCells, out IntVec3 foundRoot, out Rot4 foundRot))
                     {
                         template = candidate;
                         root = foundRoot;
@@ -218,7 +219,7 @@ namespace Gravship_Raids
             return found;
         }
 
-        private static bool TryFindPlacementForTemplate(GravshipRaidTemplateDef template, Map map, bool validateFully, LandingSearchDiagnostics diagnostics, bool isOrbit, List<IntVec3> orbitGroundAnchors, HashSet<IntVec3> orbitDeckEligibleCells, out IntVec3 root, out Rot4 rotation)
+        private static bool TryFindPlacementForTemplate(GravshipRaidTemplateDef template, Map map, bool validateFully, LandingSearchDiagnostics diagnostics, bool isSparse, List<IntVec3> sparseGroundAnchors, HashSet<IntVec3> deckEligibleCells, out IntVec3 root, out Rot4 rotation)
         {
             root = IntVec3.Invalid;
             rotation = Rot4.North;
@@ -227,9 +228,9 @@ namespace Gravship_Raids
                 return false;
             }
 
-            if (isOrbit)
+            if (isSparse)
             {
-                return TryFindOrbitPlacementForTemplate(template, map, validateFully, diagnostics, orbitGroundAnchors, orbitDeckEligibleCells, out root, out rotation);
+                return TryFindSparsePlacementForTemplate(template, map, validateFully, diagnostics, sparseGroundAnchors, deckEligibleCells, out root, out rotation);
             }
 
             List<Rot4> allowedRotations = GetAllowedRotations(template.prefab);
@@ -246,7 +247,7 @@ namespace Gravship_Raids
                 }
                 Rot4 rot = allowedRotations[Rand.Range(0, allowedRotations.Count)];
 
-                if (!CheapPreScreen(template, map, candidate, rot, clearance, isOrbit: false, diagnostics, null))
+                if (!CheapPreScreen(template, map, candidate, rot, clearance, isSparse: false, diagnostics, null))
                 {
                     continue;
                 }
@@ -284,7 +285,7 @@ namespace Gravship_Raids
             return false;
         }
 
-        private static bool TryFindOrbitPlacementForTemplate(GravshipRaidTemplateDef template, Map map, bool validateFully, LandingSearchDiagnostics diagnostics, List<IntVec3> groundAnchors, HashSet<IntVec3> deckEligibleCells, out IntVec3 root, out Rot4 rotation)
+        private static bool TryFindSparsePlacementForTemplate(GravshipRaidTemplateDef template, Map map, bool validateFully, LandingSearchDiagnostics diagnostics, List<IntVec3> groundAnchors, HashSet<IntVec3> deckEligibleCells, out IntVec3 root, out Rot4 rotation)
         {
             root = IntVec3.Invalid;
             rotation = Rot4.North;
@@ -296,7 +297,7 @@ namespace Gravship_Raids
             List<Rot4> allowedRotations = GetAllowedRotations(template.prefab);
             int clearance = Mathf.CeilToInt(template.landingClearance);
             List<IntVec3> doorLocalCells = GravshipRaidTemplateUtility.GetDoorLocalCells(template);
-            int maxCandidateAttempts = validateFully ? MaxCandidateAttemptsFullOrbit : MaxCandidateAttemptsCheapOrbit;
+            int maxCandidateAttempts = validateFully ? MaxCandidateAttemptsFullSparse : MaxCandidateAttemptsCheapSparse;
             int expensiveProbesRemaining = validateFully ? MaxExpensiveProbesPerTemplate : 0;
 
             for (int attempt = 0; attempt < maxCandidateAttempts; attempt++)
@@ -328,7 +329,7 @@ namespace Gravship_Raids
 
                 CellRect footprint = GravshipRaidTemplateUtility.GetRotatedBounds(template, candidate, rot);
 
-                if (!CheapPreScreen(template, map, candidate, rot, clearance, isOrbit: true, diagnostics, deckEligibleCells))
+                if (!CheapPreScreen(template, map, candidate, rot, clearance, isSparse: true, diagnostics, deckEligibleCells))
                 {
                     continue;
                 }
@@ -374,7 +375,7 @@ namespace Gravship_Raids
             return false;
         }
 
-        internal static HashSet<IntVec3> GetOrbitDeckEligibleCells(Map map)
+        internal static HashSet<IntVec3> GetOpenDeckEligibleCells(Map map)
         {
             HashSet<IntVec3> result = new HashSet<IntVec3>();
             foreach (IntVec3 cell in map.AllCells)
@@ -400,9 +401,9 @@ namespace Gravship_Raids
             return result;
         }
 
-        private static void PopulateOrbitDeckDiagnostics(List<GravshipRaidTemplateDef> pool, HashSet<IntVec3> eligibleCells, LandingSearchDiagnostics diagnostics)
+        private static void PopulateOpenDeckDiagnostics(List<GravshipRaidTemplateDef> pool, HashSet<IntVec3> eligibleCells, LandingSearchDiagnostics diagnostics)
         {
-            diagnostics.HasOrbitDeckStats = true;
+            diagnostics.HasOpenDeckStats = true;
             diagnostics.EligibleDeckCellCount = eligibleCells.Count;
 
             var (largestCount, largestBounds) = FindLargestConnectedRegion(eligibleCells);
@@ -515,11 +516,11 @@ namespace Gravship_Raids
             return (bestSize, bestPos);
         }
 
-        private static bool CheapPreScreen(GravshipRaidTemplateDef template, Map map, IntVec3 pos, Rot4 rot, int clearance, bool isOrbit, LandingSearchDiagnostics diagnostics, HashSet<IntVec3> deckEligibleCells)
+        private static bool CheapPreScreen(GravshipRaidTemplateDef template, Map map, IntVec3 pos, Rot4 rot, int clearance, bool isSparse, LandingSearchDiagnostics diagnostics, HashSet<IntVec3> deckEligibleCells)
         {
             CellRect footprint = GravshipRaidTemplateUtility.GetRotatedBounds(template, pos, rot);
 
-            if (isOrbit)
+            if (isSparse)
             {
                 if (!IsWithinMapEdgeMargin(footprint, map, 0))
                 {
@@ -533,7 +534,7 @@ namespace Gravship_Raids
                 return false;
             }
 
-            if (isOrbit)
+            if (isSparse)
             {
                 foreach (IntVec3 localCell in GravshipRaidTemplateUtility.GetPrefabOccupiedLocalCells(template))
                 {
@@ -567,7 +568,7 @@ namespace Gravship_Raids
             if (clearance > 0)
             {
                 CellRect clearRect = footprint.ExpandedBy(clearance);
-                if (isOrbit)
+                if (isSparse)
                 {
                     clearRect = clearRect.ClipInsideMap(map);
                 }
@@ -577,14 +578,14 @@ namespace Gravship_Raids
                     {
                         continue;
                     }
-                    if (!isOrbit && map.areaManager.Home[cell])
+                    if (!isSparse && map.areaManager.Home[cell])
                     {
                         diagnostics?.Record(LandingSiteRejectionReason.HomeArea);
                         return false;
                     }
                     if (cell.GetFirstBuilding(map) != null)
                     {
-                        diagnostics?.Record(isOrbit ? LandingSiteRejectionReason.OrbitClearanceBuilding : LandingSiteRejectionReason.Structural);
+                        diagnostics?.Record(isSparse ? LandingSiteRejectionReason.DeckClearanceBuilding : LandingSiteRejectionReason.Structural);
                         return false;
                     }
                 }
@@ -606,15 +607,15 @@ namespace Gravship_Raids
             }
             if (cell.Roofed(map))
             {
-                return LandingSiteRejectionReason.OrbitRoofed;
+                return LandingSiteRejectionReason.DeckRoofed;
             }
             if (map.terrainGrid.FoundationAt(cell) != null)
             {
-                return LandingSiteRejectionReason.OrbitExistingFoundation;
+                return LandingSiteRejectionReason.DeckExistingFoundation;
             }
             if (cell.GetFirstBuilding(map) != null)
             {
-                return LandingSiteRejectionReason.OrbitBuilding;
+                return LandingSiteRejectionReason.DeckBuilding;
             }
             List<Thing> things = cell.GetThingList(map);
             for (int i = 0; i < things.Count; i++)
@@ -622,23 +623,40 @@ namespace Gravship_Raids
                 Thing thing = things[i];
                 if (thing is Blueprint || thing is Frame)
                 {
-                    return LandingSiteRejectionReason.OrbitBlueprintOrFrame;
+                    return LandingSiteRejectionReason.DeckBlueprintOrFrame;
                 }
                 if (thing is Plant plant && plant.sown)
                 {
-                    return LandingSiteRejectionReason.OrbitPlant;
+                    return LandingSiteRejectionReason.DeckPlant;
                 }
                 if (!thing.questTags.NullOrEmpty())
                 {
-                    return LandingSiteRejectionReason.OrbitQuestTag;
+                    return LandingSiteRejectionReason.DeckQuestTag;
                 }
             }
             return null;
         }
 
-        internal static bool IsOrbitMap(Map map)
+        internal static bool UsesSparseLandingSearch(Map map)
         {
-            return map.Tile.Valid && map.Tile.LayerDef == PlanetLayerDefOf.Orbit;
+            return map.Tile.Valid && SparseLandingLayerDef.Contains(map.Tile.LayerDef);
+        }
+
+        private static bool CanReachColonistDirectly(IntVec3 cell, Map map)
+        {
+            if (!cell.InBounds(map) || !cell.Walkable(map))
+            {
+                return false;
+            }
+            List<Pawn> colonists = map.mapPawns.FreeColonistsSpawned;
+            for (int i = 0; i < colonists.Count; i++)
+            {
+                if (colonists[i].CanReach(cell, PathEndMode.OnCell, Danger.Deadly))
+                {
+                    return true;
+                }
+            }
+            return false;
         }
 
         private static bool HasReachableDoor(GravshipRaidTemplateDef template, List<IntVec3> doorLocalCells, IntVec3 pos, Rot4 rot, Map map)
@@ -659,7 +677,7 @@ namespace Gravship_Raids
                         continue;
                     }
                     IntVec3 exteriorCell = GravshipRaidTemplateUtility.TransformCell(template, localExteriorCell, pos, rot);
-                    if (exteriorCell.InBounds(map) && exteriorCell.Walkable(map))
+                    if (CanReachColonistDirectly(exteriorCell, map))
                     {
                         return true;
                     }
@@ -673,7 +691,7 @@ namespace Gravship_Raids
         {
             foreach (IntVec3 cell in footprint.Cells)
             {
-                if (cell.Walkable(map))
+                if (CanReachColonistDirectly(cell, map))
                 {
                     return true;
                 }

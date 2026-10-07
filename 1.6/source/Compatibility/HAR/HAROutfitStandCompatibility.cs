@@ -33,7 +33,7 @@ namespace Gravship_Raids
     // No compile-time reference to AlienRace.dll: the target method is resolved dynamically via
     // TargetMethod, and Prepare gates the whole patch on HAR actually being active.
     [HarmonyPatch]
-    internal static class HAROutfitStandCompatibility
+    internal sealed class HAROutfitStandCompatibility : RaidCompatibilityModule
     {
         private const string HarPackageId = "erdelf.HumanoidAlienRaces";
 
@@ -44,6 +44,8 @@ namespace Gravship_Raids
         private static readonly HashSet<FactionDef> LoggedFallbackFactions = new HashSet<FactionDef>();
 
         private static bool IsSpawningRaidPrefab => raidPrefabSpawnDepth > 0;
+
+        public override bool IsActive => ModsConfig.IsActive(HarPackageId);
 
         [HarmonyPrepare]
         private static bool Prepare()
@@ -110,7 +112,7 @@ namespace Gravship_Raids
             return false;
         }
 
-        public static IDisposable BeginRaidPrefabSpawn()
+        public override IDisposable BeginRaidPrefabSpawn()
         {
             return new RaidPrefabSpawnScope();
         }

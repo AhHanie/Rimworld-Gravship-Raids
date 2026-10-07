@@ -52,9 +52,9 @@ namespace Gravship_Raids
             bool canSpawn = GravshipRaidTemplateUtility.CanSpawnPrefab(template, map, cell, rotation);
             Log.Message($"[Gravship Raids] Spawning template '{template.defName}' at {cell}, rotation {rotation}. Bounds: {bounds}. CanSpawnPrefab: {canSpawn}.");
 
-            using (HAROutfitStandCompatibility.BeginRaidPrefabSpawn())
+            using (RaidCompatibility.BeginRaidPrefabSpawn())
             {
-                PrefabStuffCompatibility.SpawnPrefab(template.prefab, map, cell, rotation);
+                PrefabSpawnUtility.SpawnPrefab(template.prefab, map, cell, rotation);
             }
 
             GravshipRaidTemplateUtility.ApplyPrefabInteriorRoofs(template.prefab, map, cell, rotation);
@@ -82,7 +82,7 @@ namespace Gravship_Raids
             Messages.Message(message, MessageTypeDefOf.NeutralEvent, historical: false);
         }
 
-        private const int OrbitDeckVisualizationDurationTicks = 900;
+        private const int DeckVisualizationDurationTicks = 900;
 
         public static void VisualizeOrbitalLandingEligibility(Map map)
         {
@@ -91,23 +91,23 @@ namespace Gravship_Raids
                 return;
             }
 
-            if (!map.Tile.Valid || map.Tile.LayerDef != PlanetLayerDefOf.Orbit)
+            if (!GravshipLandingSiteFinder.UsesSparseLandingSearch(map))
             {
-                string notOrbitMessage = "[Gravship Raids] Visualize orbital landing eligibility: this map's layer is not Orbit - nothing to visualize.";
-                Log.Message(notOrbitMessage);
-                Messages.Message(notOrbitMessage, MessageTypeDefOf.RejectInput, historical: false);
+                string notSparseMessage = $"[Gravship Raids] Visualize orbital landing eligibility: this map's layer ({(map.Tile.Valid ? map.Tile.LayerDef.defName : "unknown")}) uses surface-style landing, not the open-deck search - nothing to visualize.";
+                Log.Message(notSparseMessage);
+                Messages.Message(notSparseMessage, MessageTypeDefOf.RejectInput, historical: false);
                 return;
             }
 
-            HashSet<IntVec3> eligibleCells = GravshipLandingSiteFinder.GetOrbitDeckEligibleCells(map);
+            HashSet<IntVec3> eligibleCells = GravshipLandingSiteFinder.GetOpenDeckEligibleCells(map);
             foreach (IntVec3 cell in eligibleCells)
             {
-                map.debugDrawer.FlashCell(cell, 0.33f, null, OrbitDeckVisualizationDurationTicks);
+                map.debugDrawer.FlashCell(cell, 0.33f, null, DeckVisualizationDurationTicks);
             }
 
             float points = StorytellerUtility.DefaultThreatPointsNow(map);
             GravshipLandingSiteFinder.HasViableLandingArea(map, null, points, out GravshipLandingSiteFinder.LandingSearchDiagnostics diagnostics);
-            string message = $"[Gravship Raids] Visualize orbital landing eligibility @ {points:F0} points: {diagnostics.Summarize()}. Flashed {eligibleCells.Count} eligible deck cell(s) in green for {OrbitDeckVisualizationDurationTicks} ticks.";
+            string message = $"[Gravship Raids] Visualize open-deck landing eligibility (layer '{map.Tile.LayerDef.defName}') @ {points:F0} points: {diagnostics.Summarize()}. Flashed {eligibleCells.Count} eligible deck cell(s) in green for {DeckVisualizationDurationTicks} ticks.";
             Log.Message(message);
             Messages.Message(message, MessageTypeDefOf.NeutralEvent, historical: false);
         }

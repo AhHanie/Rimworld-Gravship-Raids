@@ -258,7 +258,7 @@ namespace Gravship_Raids
         {
             Map map = (Map)parms.target;
 
-            VGE2AstrorigCompatibility.EquipAstrorigsForSpaceRaidPawns(pawns, map);
+            RaidCompatibility.OnRaidPawnsArriving(pawns, map);
 
             if (!TryTakeLandingPlan(parms, out LandingPlan plan))
             {
@@ -333,9 +333,9 @@ namespace Gravship_Raids
             List<GravshipRaidTemplateUtility.TerrainCellSnapshot> terrainSnapshot = GravshipRaidTemplateUtility.SnapshotTerrain(template, map, root, rotation);
 
             List<Thing> spawned = new List<Thing>();
-            using (HAROutfitStandCompatibility.BeginRaidPrefabSpawn())
+            using (RaidCompatibility.BeginRaidPrefabSpawn())
             {
-                PrefabStuffCompatibility.SpawnPrefab(template.prefab, map, root, rotation, faction, spawned);
+                PrefabSpawnUtility.SpawnPrefab(template.prefab, map, root, rotation, faction, spawned);
             }
 
             List<GravshipRaidTemplateUtility.RoofCellSnapshot> roofSnapshot = GravshipRaidTemplateUtility.ApplyPrefabInteriorRoofs(template.prefab, map, root, rotation);
@@ -404,7 +404,7 @@ namespace Gravship_Raids
                     fuelComp.Refuel(Rand.Range(0.2f, 1f) * fuelComp.Props.fuelCapacity);
                     continue;
                 }
-                VGEAstrofuelTankCompatibility.TryRandomizeFuelLevel(thing);
+                RaidCompatibility.TryRandomizeFuelLevel(thing);
             }
         }
 

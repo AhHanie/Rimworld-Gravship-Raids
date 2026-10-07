@@ -167,7 +167,7 @@ namespace Gravship_Raids
         {
             Map map = (Map)parms.target;
 
-            VGE2AstrorigCompatibility.EquipAstrorigsForSpaceRaidPawns(pawns, map);
+            RaidCompatibility.OnRaidPawnsArriving(pawns, map);
 
             if (!TryTakeLandingPlan(parms, out LandingPlan plan))
             {

@@ -26,10 +26,7 @@ namespace Gravship_Raids
             GravshipRaidsSettings.PruneInvalidGlobalFactionEntries();
             GravshipRaidsSettings.PruneInvalidShuttleFactionEntries();
 
-            if (ModsConfig.IsActive("VanillaStorytellersExpanded.WinstonWave"))
-            {
-                WinstonWavesCompatibility.TryInstall(harmony);
-            }
+            RaidCompatibility.Initialize(harmony);
 
             if (!ModsConfig.OdysseyActive)
             {

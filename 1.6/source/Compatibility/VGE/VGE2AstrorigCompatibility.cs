@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using RimWorld;
+using UnityEngine;
 using Verse;
 
 namespace Gravship_Raids
@@ -12,20 +13,34 @@ namespace Gravship_Raids
     // (PostPostMake), so this helper only has to create and wear it. Equipping it here, before VGE2's own global
     // GenSpawn.Spawn patch runs, makes that patch see the conflicting oxygen-provider apparel already worn and
     // skip giving a random astrorig/oxygen pack of its own.
-    internal static class VGE2AstrorigCompatibility
+    internal sealed class VGE2AstrorigCompatibility : RaidCompatibilityModule
     {
         private const string VGE2PackageId = "vanillaexpanded.gravship2";
 
         private const string AstrorigDefName = "VGE_Apparel_Astrorig";
 
-        internal static void EquipAstrorigsForSpaceRaidPawns(IEnumerable<Pawn> pawns, Map map)
-        {
-            if (map == null || map.Disposed || !map.Biome.inVacuum || pawns == null || !GravshipRaidsSettings.enableAstrorigsForSpaceRaids)
-            {
-                return;
-            }
+        private static bool enableAstrorigsForSpaceRaids = true;
 
-            if (!ModsConfig.IsActive(VGE2PackageId))
+        public override bool IsActive => ModsConfig.IsActive(VGE2PackageId);
+
+        public override bool HasSettings => true;
+
+        public override void ExposeSettings()
+        {
+            Scribe_Values.Look(ref enableAstrorigsForSpaceRaids, "enableAstrorigsForSpaceRaids", true);
+        }
+
+        public override void DrawSettings(Listing_Standard listing)
+        {
+            listing.CheckboxLabeled(
+                "GravshipRaids.Settings.EnableAstrorigsForSpaceRaids".Translate(),
+                ref enableAstrorigsForSpaceRaids,
+                "GravshipRaids.Settings.EnableAstrorigsForSpaceRaidsDesc".Translate());
+        }
+
+        public override void OnRaidPawnsArriving(IEnumerable<Pawn> pawns, Map map)
+        {
+            if (map == null || map.Disposed || !map.Biome.inVacuum || pawns == null || !enableAstrorigsForSpaceRaids)
             {
                 return;
             }
@@ -33,7 +48,7 @@ namespace Gravship_Raids
             ThingDef astrorigDef = DefDatabase<ThingDef>.GetNamedSilentFail(AstrorigDefName);
             if (astrorigDef == null || !astrorigDef.IsApparel)
             {
-                Logger.Message($"VGE2AstrorigCompatibility.EquipAstrorigsForSpaceRaidPawns: ThingDef '{AstrorigDefName}' is missing or not apparel; skipping astrorig equip.");
+                Logger.Message($"VGE2AstrorigCompatibility.OnRaidPawnsArriving: ThingDef '{AstrorigDefName}' is missing or not apparel; skipping astrorig equip.");
                 return;
             }
 
@@ -73,7 +88,7 @@ namespace Gravship_Raids
                 equipped++;
             }
 
-            Logger.Message($"VGE2AstrorigCompatibility.EquipAstrorigsForSpaceRaidPawns: equipped {equipped} astrorig(s), skipped {skipped} pawn(s) on map '{map}'.");
+            Logger.Message($"VGE2AstrorigCompatibility.OnRaidPawnsArriving: equipped {equipped} astrorig(s), skipped {skipped} pawn(s) on map '{map}'.");
         }
     }
 }

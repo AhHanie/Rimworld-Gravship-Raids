@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Reflection;
 using HarmonyLib;
 using RimWorld;
+using UnityEngine;
 using Verse;
 
 namespace Gravship_Raids
@@ -19,14 +20,45 @@ namespace Gravship_Raids
     // Both private VSEWW.NextRaidInfo members below are resolved by reflection and only patched if found, so
     // a missing/incompatible Winston Waves version simply leaves this compatibility inactive instead of
     // throwing during mod load.
-    internal static class WinstonWavesCompatibility
+    internal sealed class WinstonWavesCompatibility : RaidCompatibilityModule
     {
+        private const string WinstonPackageId = "VanillaStorytellersExpanded.WinstonWave";
+
         private const string WinstonStorytellerDefName = "VSE_WinstonWave";
 
         private static FieldInfo parmsField;
         private static FieldInfo raidPawnsField;
 
-        internal static void TryInstall(Harmony harmony)
+        private static bool enableWinstonWavesCompatibility = true;
+
+        private static float winstonWavesGravshipChance = 0.20f;
+
+        public override bool IsActive => ModsConfig.IsActive(WinstonPackageId);
+
+        public override bool HasSettings => true;
+
+        public override void ExposeSettings()
+        {
+            Scribe_Values.Look(ref enableWinstonWavesCompatibility, "enableWinstonWavesCompatibility", true);
+            Scribe_Values.Look(ref winstonWavesGravshipChance, "winstonWavesGravshipChance", 0.20f);
+        }
+
+        public override void DrawSettings(Listing_Standard listing)
+        {
+            listing.Label("GravshipRaids.Settings.WinstonSectionHeader".Translate());
+            listing.CheckboxLabeled(
+                "GravshipRaids.Settings.EnableWinstonWavesCompatibility".Translate(),
+                ref enableWinstonWavesCompatibility,
+                "GravshipRaids.Settings.EnableWinstonWavesCompatibilityDesc".Translate());
+
+            if (enableWinstonWavesCompatibility)
+            {
+                listing.Label("GravshipRaids.Settings.WinstonWavesGravshipChance".Translate(winstonWavesGravshipChance.ToStringPercent()));
+                winstonWavesGravshipChance = Mathf.Clamp01(listing.Slider(winstonWavesGravshipChance, 0f, 1f));
+            }
+        }
+
+        public override void Install(Harmony harmony)
         {
             Type nextRaidInfoType = AccessTools.TypeByName("VSEWW.NextRaidInfo");
             if (nextRaidInfoType == null)
@@ -95,7 +127,7 @@ namespace Gravship_Raids
                 return false;
             }
 
-            if (!GravshipRaidsSettings.enableWinstonWavesCompatibility)
+            if (!enableWinstonWavesCompatibility)
             {
                 return false;
             }
@@ -113,7 +145,7 @@ namespace Gravship_Raids
                 return false;
             }
 
-            if (!Rand.Chance(GravshipRaidsSettings.ClampedWinstonWavesGravshipChance()))
+            if (!Rand.Chance(Mathf.Clamp01(winstonWavesGravshipChance)))
             {
                 return false;
             }

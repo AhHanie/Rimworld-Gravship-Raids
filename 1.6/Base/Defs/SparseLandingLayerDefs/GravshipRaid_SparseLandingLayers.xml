@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<Defs>
+
+  <Gravship_Raids.SparseLandingLayerDef>
+    <defName>GR_SparseLandingLayers_Vanilla</defName>
+    <layers>
+      <li MayRequire="Ludeon.RimWorld.Odyssey">Orbit</li>
+    </layers>
+  </Gravship_Raids.SparseLandingLayerDef>
+
+</Defs>

@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<Patch>
+
+  <Operation Class="PatchOperationAdd">
+    <xpath>Defs/IncidentDef[defName="GR_GravshipRaid"]/layerWhitelist</xpath>
+    <value>
+      <li>LAO_Troposphere</li>
+      <li>LAO_Stratosphere</li>
+      <li>LAO_Mesosphere</li>
+      <li>LAO_HighOrbit</li>
+      <li>LAO_Surface_Luna</li>
+    </value>
+  </Operation>
+
+  <Operation Class="PatchOperationAdd">
+    <xpath>Defs/PawnsArrivalModeDef[defName="GR_GravshipLanding"]/layerWhitelist</xpath>
+    <value>
+      <li>LAO_Troposphere</li>
+      <li>LAO_Stratosphere</li>
+      <li>LAO_Mesosphere</li>
+      <li>LAO_HighOrbit</li>
+      <li>LAO_Surface_Luna</li>
+    </value>
+  </Operation>
+
+</Patch>

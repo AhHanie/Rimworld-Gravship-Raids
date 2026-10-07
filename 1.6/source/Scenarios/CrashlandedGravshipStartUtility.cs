@@ -118,7 +118,7 @@ namespace Gravship_Raids
             }
 
             List<Thing> spawned = new List<Thing>();
-            PrefabStuffCompatibility.SpawnPrefab(prefab, map, root, rotation, Faction.OfPlayer, spawned);
+            PrefabSpawnUtility.SpawnPrefab(prefab, map, root, rotation, Faction.OfPlayer, spawned);
 
             GravshipRaidTemplateUtility.ApplyPrefabInteriorRoofs(prefab, map, root, rotation);
 

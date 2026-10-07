@@ -10,7 +10,7 @@ namespace Gravship_Raids
     // lamps option adding stuffCategories to WallLamp. Without this, ThingMaker.MakeThing logs a
     // "madeFromStuff but stuff=null" error before falling back to GenStuff.DefaultStuffFor itself; resolving
     // the material here up front gets the same material with no error.
-    internal static class PrefabStuffCompatibility
+    internal static class PrefabSpawnUtility
     {
         public static void SpawnPrefab(PrefabDef prefab, Map map, IntVec3 pos, Rot4 rot, Faction faction = null, List<Thing> spawned = null)
         {

@@ -86,11 +86,6 @@ namespace Gravship_Raids
                 ref GravshipRaidsSettings.allowEmptyEnemyGravshipDeparture,
                 "GravshipRaids.Settings.AllowEmptyEnemyGravshipDepartureDesc".Translate());
             listing.CheckboxLabeled(
-                "GravshipRaids.Settings.EnableAstrorigsForSpaceRaids".Translate(),
-                ref GravshipRaidsSettings.enableAstrorigsForSpaceRaids,
-                "GravshipRaids.Settings.EnableAstrorigsForSpaceRaidsDesc".Translate());
-
-            listing.CheckboxLabeled(
                 "GravshipRaids.Settings.EnableGravshipGuards".Translate(),
                 ref GravshipRaidsSettings.enableGravshipGuards,
                 "GravshipRaids.Settings.EnableGravshipGuardsDesc".Translate());
@@ -133,8 +128,7 @@ namespace Gravship_Raids
             listing.GapLine();
             listing.CheckboxLabeled("GravshipRaids.Settings.DebugLogging".Translate(), ref GravshipRaidsSettings.debugLogging, "GravshipRaids.Settings.DebugLoggingDesc".Translate());
 
-            listing.GapLine();
-            DrawWinstonWavesCompatibilitySection(listing);
+            RaidCompatibility.DrawSettings(listing);
 
             listing.GapLine();
             DrawShuttleRaidSection(listing);
@@ -145,26 +139,6 @@ namespace Gravship_Raids
             }
             listing.End();
             Widgets.EndScrollView();
-        }
-
-        private static void DrawWinstonWavesCompatibilitySection(Listing_Standard listing)
-        {
-            if (!ModsConfig.IsActive("VanillaStorytellersExpanded.WinstonWave"))
-            {
-                return;
-            }
-
-            listing.Label("GravshipRaids.Settings.WinstonSectionHeader".Translate());
-            listing.CheckboxLabeled(
-                "GravshipRaids.Settings.EnableWinstonWavesCompatibility".Translate(),
-                ref GravshipRaidsSettings.enableWinstonWavesCompatibility,
-                "GravshipRaids.Settings.EnableWinstonWavesCompatibilityDesc".Translate());
-
-            if (GravshipRaidsSettings.enableWinstonWavesCompatibility)
-            {
-                listing.Label("GravshipRaids.Settings.WinstonWavesGravshipChance".Translate(GravshipRaidsSettings.winstonWavesGravshipChance.ToStringPercent()));
-                GravshipRaidsSettings.winstonWavesGravshipChance = Mathf.Clamp01(listing.Slider(GravshipRaidsSettings.winstonWavesGravshipChance, 0f, 1f));
-            }
         }
 
         private static void DrawShuttleRaidSection(Listing_Standard listing)
