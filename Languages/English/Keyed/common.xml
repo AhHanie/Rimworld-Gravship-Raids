@@ -30,7 +30,7 @@
     <GravshipRaids.Settings.EnableMinPlayerTechLevelDesc>If enabled, gravship raids will not occur until your faction's tech level is at least the level chosen below. Useful to keep gravships away from low-tech starts (e.g. tribal) until your colony has caught up.</GravshipRaids.Settings.EnableMinPlayerTechLevelDesc>
     <GravshipRaids.Settings.MinPlayerTechLevel>Minimum colony tech level required</GravshipRaids.Settings.MinPlayerTechLevel>
     <GravshipRaids.Settings.DebugLogging>Enable debug logging</GravshipRaids.Settings.DebugLogging>
-    <GravshipRaids.Settings.DebugLoggingDesc>Logs extra diagnostic messages about gravship raid selection, landing, and lord behavior to the console.</GravshipRaids.Settings.DebugLoggingDesc>
+    <GravshipRaids.Settings.DebugLoggingDesc>Logs extra diagnostic messages about gravship and shuttle raid selection, landing, and lord behavior to the console. Applies to both raid types.</GravshipRaids.Settings.DebugLoggingDesc>
     <GravshipRaids.Settings.EnableGlobalFactionFilter>Enable global faction filter</GravshipRaids.Settings.EnableGlobalFactionFilter>
     <GravshipRaids.Settings.EnableGlobalFactionFilterDesc>If enabled, factions excluded below can never be a gravship raid source, regardless of what any individual raid template's own allowed/disallowed faction lists say. Disabled by default.</GravshipRaids.Settings.EnableGlobalFactionFilterDesc>
     <GravshipRaids.Settings.AddExcludedFaction>Add faction to exclude...</GravshipRaids.Settings.AddExcludedFaction>
@@ -62,6 +62,8 @@
     <GravshipRaids.Settings.WinstonWavesGravshipChance>Chance per eligible wave: {0}</GravshipRaids.Settings.WinstonWavesGravshipChance>
 
     <!-- Shuttle raids settings -->
+    <GravshipRaids.Settings.GravshipTab>Gravship raids</GravshipRaids.Settings.GravshipTab>
+    <GravshipRaids.Settings.SharedSectionHeader>Shared settings (both raid types)</GravshipRaids.Settings.SharedSectionHeader>
     <GravshipRaids.Settings.ShuttleSectionHeader>Shuttle raids</GravshipRaids.Settings.ShuttleSectionHeader>
     <GravshipRaids.Settings.EnableShuttleRaids>Enable shuttle raids</GravshipRaids.Settings.EnableShuttleRaids>
     <GravshipRaids.Settings.EnableShuttleRaidsDesc>If disabled, the shuttle raid incident will never fire and will not be offered as a raid option. Requires the Royalty DLC; stays inactive without it regardless of this setting.</GravshipRaids.Settings.EnableShuttleRaidsDesc>

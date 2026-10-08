@@ -25,6 +25,8 @@ namespace Gravship_Raids
 
         public override bool HasSettings => true;
 
+        public override RaidSettingsScope SettingsScope => RaidSettingsScope.Both;
+
         public override void ExposeSettings()
         {
             Scribe_Values.Look(ref enableAstrorigsForSpaceRaids, "enableAstrorigsForSpaceRaids", true);

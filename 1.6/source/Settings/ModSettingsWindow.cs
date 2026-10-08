@@ -12,14 +12,49 @@ namespace Gravship_Raids
 
         private static Vector2 shuttleFactionScrollPosition = Vector2.zero;
 
-        private static Vector2 settingsScrollPosition = Vector2.zero;
+        private static Vector2 gravshipScrollPosition = Vector2.zero;
 
-        private static float settingsViewHeight = 1000f;
+        private static float gravshipViewHeight = 1000f;
+
+        private static Vector2 shuttleScrollPosition = Vector2.zero;
+
+        private static float shuttleViewHeight = 1000f;
+
+        private static SettingsTab selectedTab = SettingsTab.Gravship;
+
+        private enum SettingsTab
+        {
+            Gravship,
+            Shuttle
+        }
 
         public static void Draw(Rect inRect)
         {
-            Rect viewRect = new Rect(0f, 0f, inRect.width - 16f, settingsViewHeight);
-            Widgets.BeginScrollView(inRect, ref settingsScrollPosition, viewRect);
+            Rect frame = new Rect(inRect.x, inRect.y + TabDrawer.TabHeight, inRect.width, inRect.height - TabDrawer.TabHeight);
+            Widgets.DrawMenuSection(frame);
+
+            List<TabRecord> tabs = new List<TabRecord>
+            {
+                new TabRecord("GravshipRaids.Settings.GravshipTab".Translate(), () => selectedTab = SettingsTab.Gravship, () => selectedTab == SettingsTab.Gravship),
+                new TabRecord("GravshipRaids.Settings.ShuttleSectionHeader".Translate(), () => selectedTab = SettingsTab.Shuttle, () => selectedTab == SettingsTab.Shuttle)
+            };
+            TabDrawer.DrawTabs(frame, tabs);
+
+            Rect viewport = frame.ContractedBy(8f);
+            if (selectedTab == SettingsTab.Gravship)
+            {
+                DrawPage(viewport, ref gravshipScrollPosition, ref gravshipViewHeight, DrawGravshipRaidSettings);
+            }
+            else
+            {
+                DrawPage(viewport, ref shuttleScrollPosition, ref shuttleViewHeight, DrawShuttleRaidSettings);
+            }
+        }
+
+        private static void DrawPage(Rect viewport, ref Vector2 scrollPosition, ref float viewHeight, Action<Listing_Standard> drawContents)
+        {
+            Rect viewRect = new Rect(0f, 0f, viewport.width - 16f, viewHeight);
+            Widgets.BeginScrollView(viewport, ref scrollPosition, viewRect);
 
             Listing_Standard listing = new Listing_Standard();
             listing.Begin(viewRect);
@@ -30,6 +65,28 @@ namespace Gravship_Raids
             // makes the extra height reachable.
             listing.maxOneColumn = true;
 
+            drawContents(listing);
+            DrawSharedSettings(listing);
+
+            if (Event.current.type == EventType.Layout)
+            {
+                viewHeight = listing.CurHeight + 30f;
+                scrollPosition.y = Mathf.Clamp(scrollPosition.y, 0f, Mathf.Max(0f, viewHeight - viewport.height));
+            }
+            listing.End();
+            Widgets.EndScrollView();
+        }
+
+        private static void DrawSharedSettings(Listing_Standard listing)
+        {
+            listing.GapLine();
+            listing.Label("GravshipRaids.Settings.SharedSectionHeader".Translate());
+            listing.CheckboxLabeled("GravshipRaids.Settings.DebugLogging".Translate(), ref GravshipRaidsSettings.debugLogging, "GravshipRaids.Settings.DebugLoggingDesc".Translate());
+            RaidCompatibility.DrawSettings(listing, RaidSettingsScope.Both);
+        }
+
+        private static void DrawGravshipRaidSettings(Listing_Standard listing)
+        {
             listing.CheckboxLabeled("GravshipRaids.Settings.Enable".Translate(), ref GravshipRaidsSettings.enabled, "GravshipRaids.Settings.EnableDesc".Translate());
 
             if (!ModsConfig.OdysseyActive)
@@ -125,26 +182,11 @@ namespace Gravship_Raids
                 DrawGlobalFactionFilter(listing);
             }
 
-            listing.GapLine();
-            listing.CheckboxLabeled("GravshipRaids.Settings.DebugLogging".Translate(), ref GravshipRaidsSettings.debugLogging, "GravshipRaids.Settings.DebugLoggingDesc".Translate());
-
-            RaidCompatibility.DrawSettings(listing);
-
-            listing.GapLine();
-            DrawShuttleRaidSection(listing);
-
-            if (Event.current.type == EventType.Layout)
-            {
-                settingsViewHeight = listing.CurHeight + 30f;
-            }
-            listing.End();
-            Widgets.EndScrollView();
+            RaidCompatibility.DrawSettings(listing, RaidSettingsScope.GravshipOnly);
         }
 
-        private static void DrawShuttleRaidSection(Listing_Standard listing)
+        private static void DrawShuttleRaidSettings(Listing_Standard listing)
         {
-            listing.Label("GravshipRaids.Settings.ShuttleSectionHeader".Translate());
-
             if (!ModsConfig.RoyaltyActive)
             {
                 GUI.color = Color.red;
@@ -214,6 +256,8 @@ namespace Gravship_Raids
             {
                 DrawShuttleFactionFilter(listing);
             }
+
+            RaidCompatibility.DrawSettings(listing, RaidSettingsScope.ShuttleOnly);
         }
 
         private static void DrawShuttleFactionFilter(Listing_Standard listing)

@@ -48,11 +48,11 @@ namespace Gravship_Raids
             }
         }
 
-        internal static void DrawSettings(Listing_Standard listing)
+        internal static void DrawSettings(Listing_Standard listing, RaidSettingsScope scope)
         {
             foreach (RaidCompatibilityModule module in ActiveModules)
             {
-                if (!module.HasSettings)
+                if (!module.HasSettings || module.SettingsScope != scope)
                 {
                     continue;
                 }

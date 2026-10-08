@@ -7,11 +7,20 @@ using Verse;
 
 namespace Gravship_Raids
 {
+    internal enum RaidSettingsScope
+    {
+        GravshipOnly,
+        ShuttleOnly,
+        Both
+    }
+
     internal abstract class RaidCompatibilityModule
     {
         public abstract bool IsActive { get; }
 
         public virtual bool HasSettings => false;
+
+        public virtual RaidSettingsScope SettingsScope => RaidSettingsScope.GravshipOnly;
 
         public virtual void Install(Harmony harmony)
         {
