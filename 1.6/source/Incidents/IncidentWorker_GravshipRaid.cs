@@ -1,3 +1,4 @@
+using System.Linq;
 using RimWorld;
 using Verse;
 
@@ -7,13 +8,41 @@ namespace Gravship_Raids
     {
         protected override bool CanFireNowSub(IncidentParms parms)
         {
-            if (!GravshipRaidEligibility.CanUseGravshipRaidOnMap(parms.target as Map, out string reason, parms))
+            if (!CanRunAsShipRaid(parms, out string reason))
             {
                 Logger.Message($"IncidentWorker_GravshipRaid.CanFireNowSub: declining - {reason}.");
                 return false;
             }
 
-            return base.CanFireNowSub(parms);
+            return true;
+        }
+
+        internal bool CanRunAsShipRaid(IncidentParms parms, out string reason)
+        {
+            if (!(parms.target is Map map))
+            {
+                reason = "incident target is not a Map";
+                return false;
+            }
+
+            if (!GravshipRaidEligibility.CanUseGravshipRaidOnMap(map, out reason, parms))
+            {
+                return false;
+            }
+
+            if (parms.faction != null)
+            {
+                return GravshipRaidEligibility.CanUseGravshipRaidForFaction(parms.faction, map, parms.points, out reason);
+            }
+
+            IncidentParms probe = parms.ShallowCopy();
+            if (!Find.FactionManager.AllFactions.Any(f => FactionCanBeGroupSource(f, probe)))
+            {
+                reason = $"no hostile faction can send a gravship raid at {parms.points} points";
+                return false;
+            }
+
+            return true;
         }
 
         public override float ChanceFactorNow(IIncidentTarget target)
@@ -40,7 +69,7 @@ namespace Gravship_Raids
             Map map = parms.target as Map;
             if (!GravshipRaidEligibility.CanUseGravshipRaidForFaction(f, map, parms.points, out string reason))
             {
-                Logger.Message($"IncidentWorker_GravshipRaid.FactionCanBeGroupSource: excluding faction '{f.def.defName}' - {reason}.");
+                Logger.Message($"IncidentWorker_GravshipRaid.FactionCanBeGroupSource: probe found faction '{f.def.defName}' ineligible - {reason}.");
                 return false;
             }
 

@@ -83,7 +83,8 @@ namespace Gravship_Raids
 
         public static bool HasViableLandingArea(Map map, FactionDef factionDef, float points)
         {
-            return TryFindLandingSiteInternal(map, factionDef, points, Rand.Int, validateFully: false, out _, out _, out _);
+            int seed = Gen.HashCombineInt(MakeSelectionSeed(factionDef, points, map), Find.TickManager.TicksGame / GenDate.TicksPerHour);
+            return TryFindLandingSiteInternal(map, factionDef, points, seed, validateFully: false, out _, out _, out _);
         }
 
         public static bool TryFindLandingSite(Map map, FactionDef factionDef, float points, out ShuttleRaidTemplateDef template, out IntVec3 root, out Rot4 rotation)

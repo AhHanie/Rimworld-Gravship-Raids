@@ -62,6 +62,13 @@ namespace Gravship_Raids
             return true;
         }
 
+        internal static bool HasViableCombatPawnGroup(FactionDef factionDef, float points)
+        {
+            return factionDef.pawnGroupMakers != null
+                && factionDef.pawnGroupMakers.Any(p => p.kindDef == PawnGroupKindDefOf.Combat && points <= p.maxTotalPoints)
+                && points > factionDef.MinPointsToGeneratePawnGroup(PawnGroupKindDefOf.Combat);
+        }
+
         internal static bool CanUseGravshipRaidForFaction(Faction faction, Map map, float points, out string reason)
         {
             reason = null;
@@ -102,9 +109,7 @@ namespace Gravship_Raids
                 return false;
             }
 
-            if (faction.def.pawnGroupMakers == null
-                || !faction.def.pawnGroupMakers.Any(p => p.kindDef == PawnGroupKindDefOf.Combat && points <= p.maxTotalPoints)
-                || points <= faction.def.MinPointsToGeneratePawnGroup(PawnGroupKindDefOf.Combat))
+            if (!HasViableCombatPawnGroup(faction.def, points))
             {
                 reason = $"faction '{faction.def.defName}' has no viable Combat pawn group at {points} points";
                 return false;
