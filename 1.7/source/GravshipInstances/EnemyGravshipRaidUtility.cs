@@ -1,0 +1,459 @@
+using System;
+using System.Collections.Generic;
+using RimWorld;
+using RimWorld.Planet;
+using UnityEngine;
+using Verse;
+using Verse.Sound;
+
+namespace Gravship_Raids
+{
+    public static class EnemyGravshipRaidUtility
+    {
+        private const float TerminalFadeToBlackSeconds = 2f;
+
+        public static bool BeginDeparture(EnemyGravshipInstance instance, Map map)
+        {
+            if (instance == null || map == null)
+            {
+                return false;
+            }
+            if (instance.state != GravshipRaidState.Boarding)
+            {
+                return false;
+            }
+            if (instance.core == null || !instance.core.Spawned || instance.flightDisabled)
+            {
+                return false;
+            }
+
+            bool hasLivingCrewBoarded = HasLivingCrewBoarded(instance, instance.core);
+            if (!hasLivingCrewBoarded && !GravshipRaidsSettings.allowEmptyEnemyGravshipDeparture)
+            {
+                Logger.Message($"EnemyGravshipRaidUtility.BeginDeparture: {instance} has no living crew aboard its core transporter; abandoning instead of departing.");
+                AbandonShip(instance, "no living crew boarded");
+                return false;
+            }
+            if (!hasLivingCrewBoarded)
+            {
+                Logger.Message($"EnemyGravshipRaidUtility.BeginDeparture: {instance} has no living crew aboard its core transporter, but allowEmptyEnemyGravshipDeparture is enabled; departing anyway.");
+            }
+
+            instance.state = GravshipRaidState.Launching;
+            Logger.Message($"EnemyGravshipRaidUtility.BeginDeparture: {instance} beginning departure sequence.");
+            CompleteDeparture(instance, map);
+            return true;
+        }
+
+        public static bool HasLivingCrewBoarded(EnemyGravshipInstance instance, Thing core)
+        {
+            if (instance?.crew == null || core == null)
+            {
+                return false;
+            }
+            CompTransporter transporter = core.TryGetComp<CompTransporter>();
+            if (transporter?.innerContainer == null)
+            {
+                return false;
+            }
+            foreach (Thing t in transporter.innerContainer)
+            {
+                if (t is Pawn pawn && !pawn.Dead && instance.crew.Contains(pawn))
+                {
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        public static void AbandonShip(EnemyGravshipInstance instance, string reason)
+        {
+            if (instance == null || instance.state == GravshipRaidState.Destroyed || instance.state == GravshipRaidState.Departed)
+            {
+                return;
+            }
+
+            Thing core = instance.core;
+            CompTransporter transporter = (core != null && !core.Destroyed && core.Spawned) ? core.TryGetComp<CompTransporter>() : null;
+            bool cancelledLoad = transporter != null && transporter.CancelLoad();
+
+            instance.state = GravshipRaidState.Destroyed;
+            instance.departureTick = -1;
+            Logger.Message($"EnemyGravshipRaidUtility.AbandonShip: {instance} abandoned ({reason}); core and hull remain on the map as a wreck ({(cancelledLoad ? "cancelled active loading" : "no active loading")}).");
+        }
+
+        public static void CompleteDeparture(EnemyGravshipInstance instance, Map map)
+        {
+            try
+            {
+                Thing core = (instance.core != null && !instance.core.Destroyed) ? instance.core : null;
+                bool coreLive = core != null && core.Spawned;
+                IntVec3 launchCell = coreLive ? core.Position : instance.root;
+                Rot4 launchRot = coreLive ? core.Rotation : instance.rotation;
+
+                List<Thing> boarded = new List<Thing>();
+                if (coreLive)
+                {
+                    CompTransporter transporter = core.TryGetComp<CompTransporter>();
+                    if (transporter?.innerContainer != null && transporter.innerContainer.Any)
+                    {
+                        boarded.AddRange(transporter.innerContainer);
+                        transporter.groupID = -1;
+                    }
+                }
+
+                PlayLaunchEffect(map, launchCell);
+
+                GravshipRaidTemplateUtility.RestoreRoofs(instance.roofSnapshot, map);
+                instance.roofSnapshot?.Clear();
+
+                GravshipRaidTemplateUtility.RestoreTerrain(instance.terrainSnapshot, map);
+                instance.terrainSnapshot?.Clear();
+
+                List<Thing> hullPieces;
+                if (GravshipRaidsSettings.enableRaidshipEffects)
+                {
+                    hullPieces = CollectAndDespawnHullPieces(instance);
+                }
+                else
+                {
+                    RemoveSpawnedThings(instance);
+                    hullPieces = new List<Thing>();
+                }
+
+                bool risingAway = TransferDepartingShipToLeavingEffect(boarded, hullPieces, instance, map, launchCell, launchRot);
+                if (!risingAway)
+                {
+                    FinalizeDeparture(instance, map);
+                }
+            }
+            catch (Exception ex)
+            {
+                Logger.Error($"EnemyGravshipRaidUtility.CompleteDeparture: exception while completing departure for {instance}: {ex}");
+                FinalizeDeparture(instance, map);
+            }
+        }
+
+        public static void FinalizeDeparture(EnemyGravshipInstance instance, Map map)
+        {
+            if (instance == null || instance.state == GravshipRaidState.Departed)
+            {
+                return;
+            }
+
+            instance.core = null;
+            instance.state = GravshipRaidState.Departed;
+            instance.departingSkyfaller = null;
+            Logger.Message($"EnemyGravshipRaidUtility.FinalizeDeparture: {instance} finished its departure; ship fully departed.");
+
+            ApplyHardcoreDepartureConsequence(map);
+        }
+
+        private static void ApplyHardcoreDepartureConsequence(Map map)
+        {
+            if (!GravshipRaidsSettings.hardcoreEnemyDepartureDestroysUnguardedMaps)
+            {
+                return;
+            }
+            if (map == null || map.Disposed || map.Parent == null)
+            {
+                return;
+            }
+            if (map.listerThings.AnyThingWithDef(ThingDefOf.GravAnchor))
+            {
+                return;
+            }
+
+            Logger.Message($"EnemyGravshipRaidUtility.ApplyHardcoreDepartureConsequence: map {map} has no grav anchor; abandoning it after a successful enemy gravship departure.");
+            GravshipUtility.AbandonMap(map);
+
+            if (PlayerHasSurvivingColonistsElsewhere())
+            {
+                return;
+            }
+
+            Logger.Message("EnemyGravshipRaidUtility.ApplyHardcoreDepartureConsequence: no surviving player colonists remain anywhere; fading to black before starting the terminal credits sequence.");
+            ScreenFader.StartFade(Color.black, TerminalFadeToBlackSeconds);
+            Delay.AfterNSeconds(TerminalFadeToBlackSeconds, delegate
+            {
+                GameVictoryUtility.ShowCredits(
+                    "GravshipRaids.Ending.UnguardedMapDestroyedIntro".Translate() + "\n\n" +
+                    "GravshipRaids.Ending.UnguardedMapDestroyedEnding".Translate(),
+                    SongDefOf.OdysseyCreditsSong,
+                    exitToMainMenu: true,
+                    songStartDelay: 0f);
+            });
+        }
+
+        private static bool PlayerHasSurvivingColonistsElsewhere()
+        {
+            List<Map> maps = Find.Maps;
+            for (int i = 0; i < maps.Count; i++)
+            {
+                if (maps[i].mapPawns.FreeColonistsSpawnedOrInPlayerEjectablePodsCount >= 1)
+                {
+                    return true;
+                }
+            }
+
+            for (int i = 0; i < maps.Count; i++)
+            {
+                IReadOnlyList<Pawn> allPawnsSpawned = maps[i].mapPawns.AllPawnsSpawned;
+                for (int j = 0; j < allPawnsSpawned.Count; j++)
+                {
+                    Pawn carried = allPawnsSpawned[j].carryTracker?.CarriedThing as Pawn;
+                    if (carried != null && carried.IsFreeColonist)
+                    {
+                        return true;
+                    }
+                }
+            }
+
+            List<Caravan> caravans = Find.WorldObjects.Caravans;
+            for (int i = 0; i < caravans.Count; i++)
+            {
+                if (CaravanHasFreeColonist(caravans[i]))
+                {
+                    return true;
+                }
+            }
+
+            List<TravellingTransporters> travellingTransporters = Find.WorldObjects.TravellingTransporters;
+            for (int i = 0; i < travellingTransporters.Count; i++)
+            {
+                if (travellingTransporters[i].PodsHaveAnyFreeColonist)
+                {
+                    return true;
+                }
+            }
+
+            if (Find.CurrentGravship != null)
+            {
+                foreach (Pawn pawn in Find.CurrentGravship.Pawns)
+                {
+                    if (pawn.IsFreeColonist)
+                    {
+                        return true;
+                    }
+                }
+            }
+
+            if (QuestUtility.TotalBorrowedColonistCount() > 0)
+            {
+                return true;
+            }
+
+            if (ModsConfig.AnomalyActive)
+            {
+                if (DeathRefusalUtility.PlayerHasCorpseWithDeathRefusal())
+                {
+                    return true;
+                }
+                for (int i = 0; i < maps.Count; i++)
+                {
+                    List<Pawn> allPawnsUnspawned = maps[i].mapPawns.AllPawnsUnspawned;
+                    for (int j = 0; j < allPawnsUnspawned.Count; j++)
+                    {
+                        Pawn pawn = allPawnsUnspawned[j];
+                        if (pawn.IsColonist && pawn.HostFaction == null && pawn.ParentHolder is CompDevourer)
+                        {
+                            return true;
+                        }
+                    }
+                }
+            }
+
+            return false;
+        }
+
+        private static bool CaravanHasFreeColonist(Caravan caravan)
+        {
+            if (!caravan.IsPlayerControlled)
+            {
+                return false;
+            }
+            List<Pawn> pawnsListForReading = caravan.PawnsListForReading;
+            for (int i = 0; i < pawnsListForReading.Count; i++)
+            {
+                Pawn pawn = pawnsListForReading[i];
+                if (pawn.IsColonist && pawn.HostFaction == null)
+                {
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        private static List<Thing> CollectAndDespawnHullPieces(EnemyGravshipInstance instance)
+        {
+            List<Thing> hullPieces = new List<Thing>();
+            if (instance.spawnedThings == null)
+            {
+                return hullPieces;
+            }
+            foreach (Thing t in instance.spawnedThings)
+            {
+                if (t == null || t.Destroyed)
+                {
+                    continue;
+                }
+                if (t.Spawned)
+                {
+                    t.DeSpawn(DestroyMode.Vanish);
+                }
+                hullPieces.Add(t);
+            }
+            instance.spawnedThings.Clear();
+            return hullPieces;
+        }
+
+        private static bool TransferDepartingShipToLeavingEffect(List<Thing> boarded, List<Thing> hullPieces, EnemyGravshipInstance instance, Map map, IntVec3 cell, Rot4 rot)
+        {
+            if (boarded.Count == 0 && hullPieces.Count == 0)
+            {
+                return false;
+            }
+            ThingDef skyfallerDef = GravshipRaidsDefOf.GR_GravshipDepartureSkyfaller;
+            if (skyfallerDef == null)
+            {
+                // Should never happen (DefOf-checked at startup) - never spill boarded pawns or leave hull
+                // pieces dangling even if the leaving-effect def is somehow missing.
+                Logger.Error("EnemyGravshipRaidUtility.TransferDepartingShipToLeavingEffect: GR_GravshipDepartureSkyfaller is null; falling back to direct pawn removal/hull destruction with no leaving effect.");
+                foreach (Thing t in boarded)
+                {
+                    if (t is Pawn pawn && !pawn.Destroyed && !pawn.IsWorldPawn())
+                    {
+                        pawn.ExitMap(allowedToJoinOrCreateCaravan: false, Rot4.Invalid);
+                    }
+                    else if (!(t is Pawn))
+                    {
+                        t.DestroyOrPassToWorld(DestroyMode.Vanish);
+                    }
+                }
+                foreach (Thing t in hullPieces)
+                {
+                    if (t != null && !t.Destroyed)
+                    {
+                        t.Destroy(DestroyMode.Vanish);
+                    }
+                }
+                return false;
+            }
+
+            List<Thing> allContents = new List<Thing>(boarded.Count + hullPieces.Count);
+            allContents.AddRange(boarded);
+            allContents.AddRange(hullPieces);
+
+            GravshipDepartureSkyfaller leaving = (GravshipDepartureSkyfaller)SkyfallerMaker.MakeSkyfaller(skyfallerDef);
+            leaving.instance = instance;
+            foreach (Thing t in allContents)
+            {
+                AddToDepartureSkyfaller(leaving, t);
+            }
+            GenSpawn.Spawn(leaving, cell, map, rot);
+            instance.departingSkyfaller = leaving;
+            return true;
+        }
+
+        // TryAddRangeOrTransfer refuses map-held things and destroys them via destroyLeftover - every item here
+        // must already have exactly one owner (or none) before it reaches the skyfaller's innerContainer.
+        private static void AddToDepartureSkyfaller(GravshipDepartureSkyfaller leaving, Thing item)
+        {
+            if (item == null || item.Destroyed)
+            {
+                return;
+            }
+
+            // A tracked piece can get involuntarily minified if a later prefab piece was placed on an
+            // overlapping cell during spawn (GenSpawn wipes the conflicting piece via GenSpawn.Refund, wrapping
+            // it in a MinifiedThing crate that instance.spawnedThings never learns about). Pulling the nested
+            // piece out via holdingOwner.Remove would empty that still-spawned crate and leave it orphaned with
+            // a null InnerThing, so move the crate itself instead - it carries the nested piece along intact.
+            if (!item.Spawned && item.holdingOwner?.Owner is Thing wrapper && wrapper != item && wrapper.Spawned)
+            {
+                item = wrapper;
+            }
+
+            if (item.Spawned)
+            {
+                item.DeSpawn(DestroyMode.Vanish);
+            }
+            item.holdingOwner?.Remove(item);
+
+            if (!leaving.innerContainer.TryAdd(item, canMergeWithExistingStacks: false))
+            {
+                Logger.Error($"EnemyGravshipRaidUtility.AddToDepartureSkyfaller: failed to add {item.ToStringSafe()} (owner={item.holdingOwner?.Owner.ToStringSafe() ?? "none"}) to the departure skyfaller; destroying it instead of leaving it ownerless.");
+                item.Destroy(DestroyMode.Vanish);
+            }
+        }
+
+        private static void RemoveSpawnedThings(EnemyGravshipInstance instance)
+        {
+            if (instance.spawnedThings == null)
+            {
+                return;
+            }
+            List<Thing> things = new List<Thing>(instance.spawnedThings);
+            foreach (Thing t in things)
+            {
+                if (t == null || t.Destroyed)
+                {
+                    continue;
+                }
+                t.Destroy(DestroyMode.Vanish);
+            }
+            instance.spawnedThings.Clear();
+        }
+
+        private static void PlayLaunchEffect(Map map, IntVec3 cell)
+        {
+            if (map == null || !cell.InBounds(map))
+            {
+                return;
+            }
+            TargetInfo target = new TargetInfo(cell, map);
+            SoundDefOf.Gravship_Engine_Start?.PlayOneShot(SoundInfo.InMap(target));
+            SoundDefOf.Gravship_Launch?.PlayOneShot(SoundInfo.InMap(target));
+            FleckMaker.ThrowDustPuff(cell, map, Rand.Range(2f, 3f));
+            FleckMaker.ThrowHeatGlow(cell, map, 4f);
+        }
+
+        public static void HandleFlightCriticalBuildingDestroyed(EnemyGravshipInstance instance, Thing destroyedBuilding)
+        {
+            if (instance == null)
+            {
+                return;
+            }
+            if (instance.state != GravshipRaidState.Landed && instance.state != GravshipRaidState.Boarding)
+            {
+                // Already mid/post departure (Launching/Departed) or already abandoned (Destroyed) - this is our
+                // own departure cleanup destroying hull/core pieces, or a duplicate notification, not real
+                // combat loss.
+                return;
+            }
+
+            bool wasAlreadyDisabled = instance.flightDisabled;
+            instance.flightDisabled = true;
+            if (instance.core != null && instance.core == destroyedBuilding)
+            {
+                instance.core = null;
+            }
+
+            if (wasAlreadyDisabled)
+            {
+                return;
+            }
+
+            if (instance.faction?.def != null)
+            {
+                Messages.Message("GravshipRaids.MessageGravshipCoreDestroyed".Translate(instance.faction.def.pawnsPlural.CapitalizeFirst(), instance.faction.Name), MessageTypeDefOf.PositiveEvent);
+            }
+            Logger.Message($"EnemyGravshipRaidUtility.HandleFlightCriticalBuildingDestroyed: {instance}'s flight-critical building '{destroyedBuilding?.def?.defName ?? "null"}' was destroyed; the ship can no longer fly, but the raid continues normally until it otherwise retreats, at which point it will fall back on foot.");
+        }
+
+        public static void HandleCoreDestroyed(EnemyGravshipInstance instance)
+        {
+            HandleFlightCriticalBuildingDestroyed(instance, instance?.core);
+        }
+    }
+}

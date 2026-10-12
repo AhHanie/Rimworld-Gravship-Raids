@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<Defs>
+
+  <ThingDef Name="GR_GravshipArrivalSkyfallerBase" ParentName="ShuttleSkyfallerBase" Abstract="True">
+    <thingClass>Gravship_Raids.GravshipArrivalSkyfaller</thingClass>
+    <rotatable>false</rotatable>
+    <graphicData>
+      <texPath>Things/Building/Misc/Shuttle</texPath>
+      <graphicClass>Graphic_Single</graphicClass>
+      <shaderType>CutoutFlying</shaderType>
+    </graphicData>
+    <skyfaller>
+      <anticipationSound>Gravship_LandingServos</anticipationSound>
+      <anticipationSoundTicks>140</anticipationSoundTicks>
+      <impactSound>Gravship_Touchdown</impactSound>
+      <ticksToImpactRange>210~260</ticksToImpactRange>
+      <cameraShake>2.5</cameraShake>
+      <minimalRoofDestruction>true</minimalRoofDestruction>
+    </skyfaller>
+  </ThingDef>
+
+  <!-- Matches GR_Template_SmallLander's 7x7 prefab (GravshipRaid_Prefabs.xml). -->
+  <ThingDef ParentName="GR_GravshipArrivalSkyfallerBase">
+    <defName>GR_GravshipArrivalSkyfaller_Small</defName>
+    <label>gravship (incoming)</label>
+    <size>(4,4)</size>
+    <graphicData>
+      <drawSize>(4.5,4.5)</drawSize>
+    </graphicData>
+    <skyfaller>
+      <shadowSize>(4,4)</shadowSize>
+    </skyfaller>
+  </ThingDef>
+
+  <!-- Matches GR_Template_MediumAssault's 11x9 prefab (GravshipRaid_Prefabs.xml). -->
+  <ThingDef ParentName="GR_GravshipArrivalSkyfallerBase">
+    <defName>GR_GravshipArrivalSkyfaller_Medium</defName>
+    <label>gravship (incoming)</label>
+    <size>(6,5)</size>
+    <graphicData>
+      <drawSize>(6.5,5.5)</drawSize>
+    </graphicData>
+    <skyfaller>
+      <shadowSize>(6,5)</shadowSize>
+      <ticksToImpactRange>230~280</ticksToImpactRange>
+    </skyfaller>
+  </ThingDef>
+
+  <!-- Matches GR_Template_LargeCraft's 15x13 prefab (GravshipRaid_Prefabs.xml). -->
+  <ThingDef ParentName="GR_GravshipArrivalSkyfallerBase">
+    <defName>GR_GravshipArrivalSkyfaller_Large</defName>
+    <label>gravship (incoming)</label>
+    <size>(9,7)</size>
+    <graphicData>
+      <drawSize>(9.5,7.5)</drawSize>
+    </graphicData>
+    <skyfaller>
+      <shadowSize>(9,7)</shadowSize>
+      <ticksToImpactRange>250~300</ticksToImpactRange>
+      <cameraShake>3.5</cameraShake>
+    </skyfaller>
+  </ThingDef>
+
+</Defs>

@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<Defs>
+
+  <PawnsArrivalModeDef>
+    <defName>GR_ShuttleLanding</defName>
+    <workerClass>Gravship_Raids.PawnsArrivalModeWorker_ShuttleLanding</workerClass>
+    <selectionWeightCurve>
+      <points>
+        <li>(0, 1)</li>
+      </points>
+    </selectionWeightCurve>
+    <textEnemy>A hostile shuttle carrying {0} from {1} is landing nearby.</textEnemy>
+    <textFriendly>A shuttle carrying friendly {0} from {1} is landing nearby.</textFriendly>
+    <textWillArrive>{0_pawnsPluralDef} will arrive aboard a landing shuttle.</textWillArrive>
+    <layerWhitelist>
+      <li>Surface</li>
+    </layerWhitelist>
+  </PawnsArrivalModeDef>
+
+</Defs>

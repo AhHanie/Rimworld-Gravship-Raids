@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<Defs>
+
+    <Gravship_Raids.GravshipRaidTemplateDef>
+        <defName>GR_Template_VGE_SmallGravship</defName>
+        <label>small VGE gravship</label>
+        <prefab>GR_Prefab_VGE_SmallGravship</prefab>
+        <author>Dmitrij2811by</author>
+        <flightCriticalBuildings>
+            <li>LargeThruster</li>
+            <li>VGE_PilotCockpit</li>
+            <li>VGE_GiantAstrofuelTank</li>
+            <li>VGE_GiantThruster</li>
+            <li>SmallThruster</li>
+            <li>ChemfuelTank</li>
+            <li>LargeChemfuelTank</li>
+        </flightCriticalBuildings>
+    </Gravship_Raids.GravshipRaidTemplateDef>
+
+    <Gravship_Raids.GravshipRaidTemplateDef>
+        <defName>GR_Template_VGE_SmallGravship1</defName>
+        <label>small VGE gravship</label>
+        <prefab>GR_Prefab_VGE_SmallGravship1</prefab>
+        <author>Dmitrij2811by</author>
+        <flightCriticalBuildings>
+            <li>LargeThruster</li>
+            <li>VGE_PilotCockpit</li>
+            <li>VGE_GiantAstrofuelTank</li>
+            <li>VGE_GiantThruster</li>
+            <li>SmallThruster</li>
+            <li>ChemfuelTank</li>
+            <li>LargeChemfuelTank</li>
+        </flightCriticalBuildings>
+    </Gravship_Raids.GravshipRaidTemplateDef>
+
+    <Gravship_Raids.GravshipRaidTemplateDef>
+        <defName>GR_Template_VGE_SmallGravship2</defName>
+        <label>small VGE gravship</label>
+        <prefab>GR_Prefab_VGE_SmallGravship2</prefab>
+        <author>Dmitrij2811by</author>
+        <flightCriticalBuildings>
+            <li>LargeThruster</li>
+            <li>VGE_PilotCockpit</li>
+            <li>VGE_GiantAstrofuelTank</li>
+            <li>VGE_GiantThruster</li>
+            <li>SmallThruster</li>
+            <li>ChemfuelTank</li>
+            <li>LargeChemfuelTank</li>
+        </flightCriticalBuildings>
+    </Gravship_Raids.GravshipRaidTemplateDef>
+
+    <Gravship_Raids.GravshipRaidTemplateDef>
+        <defName>GR_Template_VGE_MediumGravship</defName>
+        <label>medium VGE gravship</label>
+        <prefab>GR_Prefab_VGE_MediumGravship</prefab>
+        <author>Dmitrij2811by</author>
+        <flightCriticalBuildings>
+            <li>LargeThruster</li>
+            <li>VGE_PilotCockpit</li>
+            <li>VGE_GiantAstrofuelTank</li>
+            <li>VGE_GiantThruster</li>
+            <li>SmallThruster</li>
+            <li>ChemfuelTank</li>
+            <li>LargeChemfuelTank</li>
+        </flightCriticalBuildings>
+    </Gravship_Raids.GravshipRaidTemplateDef>
+
+    <Gravship_Raids.GravshipRaidTemplateDef>
+        <defName>GR_Template_VGE_LargeGravship</defName>
+        <label>large VGE gravship</label>
+        <prefab>GR_Prefab_VGE_LargeGravship</prefab>
+        <author>Dmitrij2811by</author>
+        <flightCriticalBuildings>
+            <li>LargeThruster</li>
+            <li>VGE_PilotCockpit</li>
+            <li>VGE_GiantAstrofuelTank</li>
+            <li>VGE_GiantThruster</li>
+            <li>SmallThruster</li>
+            <li>ChemfuelTank</li>
+            <li>LargeChemfuelTank</li>
+        </flightCriticalBuildings>
+    </Gravship_Raids.GravshipRaidTemplateDef>
+
+</Defs>

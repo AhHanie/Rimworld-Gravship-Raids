@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<Defs>
+
+  <Gravship_Raids.GravshipRaidTemplateDef>
+    <defName>GR_Template_SmallLander</defName>
+    <label>small raider lander</label>
+    <prefab>GR_Prefab_SmallLander</prefab>
+    <author>Hrušker</author>
+    <flightCriticalBuildings>
+      <li>SmallThruster</li>
+      <li>PilotConsole</li>
+      <li>ChemfuelTank</li>
+    </flightCriticalBuildings>
+  </Gravship_Raids.GravshipRaidTemplateDef>
+
+  <Gravship_Raids.GravshipRaidTemplateDef>
+    <defName>GR_Template_LargeCraft1</defName>
+    <label>large late-game craft</label>
+    <prefab>GR_Prefab_LargeCraft1</prefab>
+    <author>Taylor MH</author>
+    <flightCriticalBuildings>
+      <li>SmallThruster</li>
+      <li>PilotConsole</li>
+      <li>ChemfuelTank</li>
+    </flightCriticalBuildings>
+  </Gravship_Raids.GravshipRaidTemplateDef>
+
+  <Gravship_Raids.GravshipRaidTemplateDef>
+    <defName>GR_Template_LargeCraft2</defName>
+    <label>large late-game craft</label>
+    <prefab>GR_Prefab_LargeCraft2</prefab>
+    <author>Taylor MH</author>
+    <flightCriticalBuildings>
+      <li>SmallThruster</li>
+      <li>PilotConsole</li>
+      <li>ChemfuelTank</li>
+    </flightCriticalBuildings>
+  </Gravship_Raids.GravshipRaidTemplateDef>
+
+  <Gravship_Raids.GravshipRaidTemplateDef>
+    <defName>GR_Template_LargeCraft3</defName>
+    <label>large late-game craft</label>
+    <prefab>GR_Prefab_LargeCraft3</prefab>
+    <author>Taylor MH</author>
+    <flightCriticalBuildings>
+      <li>SmallThruster</li>
+      <li>PilotConsole</li>
+      <li>ChemfuelTank</li>
+    </flightCriticalBuildings>
+  </Gravship_Raids.GravshipRaidTemplateDef>
+
+  <Gravship_Raids.GravshipRaidTemplateDef>
+    <defName>GR_Template_LargeCraft4</defName>
+    <label>large late-game craft</label>
+    <prefab>GR_Prefab_LargeCraft4</prefab>
+    <author>Taylor MH</author>
+    <flightCriticalBuildings>
+      <li>SmallThruster</li>
+      <li>PilotConsole</li>
+      <li>ChemfuelTank</li>
+    </flightCriticalBuildings>
+  </Gravship_Raids.GravshipRaidTemplateDef>
+
+  <Gravship_Raids.GravshipRaidTemplateDef>
+    <defName>GR_Template_LargeCraft5</defName>
+    <label>large late-game craft</label>
+    <prefab>GR_Prefab_LargeCraft5</prefab>
+    <author>Taylor MH</author>
+    <flightCriticalBuildings>
+      <li>SmallThruster</li>
+      <li>PilotConsole</li>
+      <li>ChemfuelTank</li>
+    </flightCriticalBuildings>
+  </Gravship_Raids.GravshipRaidTemplateDef>
+
+</Defs>

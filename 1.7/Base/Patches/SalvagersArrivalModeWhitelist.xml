@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<Patch>
+
+  <Operation Class="PatchOperationAdd" MayRequire="Ludeon.RimWorld.Odyssey">
+    <xpath>Defs/FactionDef[defName="Salvagers"]/arrivalModeWhitelist</xpath>
+    <value>
+      <li>GR_GravshipLanding</li>
+    </value>
+  </Operation>
+
+</Patch>
