@@ -38,6 +38,12 @@
       <ComponentIndustrial>4</ComponentIndustrial>
       <ShuttleEngine MayRequire="Ludeon.RimWorld.Odyssey">1</ShuttleEngine>
     </killedLeavings>
+    <costList>
+      <Steel>150</Steel>
+      <ComponentIndustrial>2</ComponentIndustrial>
+    </costList>
+    <resourcesFractionWhenDeconstructed>1</resourcesFractionWhenDeconstructed>
+    <leaveResourcesWhenKilled>false</leaveResourcesWhenKilled>
     <rotatable>false</rotatable>
     <bringAlongOnGravship>false</bringAlongOnGravship>
     <hasInteractionCell>true</hasInteractionCell>
