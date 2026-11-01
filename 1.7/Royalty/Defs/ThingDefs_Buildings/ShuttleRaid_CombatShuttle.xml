@@ -32,7 +32,7 @@
     <tickerType>Normal</tickerType>
     <canOverlapZones>true</canOverlapZones>
     <killedLeavings>
-      <Plasteel>50</Plasteel>
+      <Plasteel>60</Plasteel>
       <Uranium>50</Uranium>
       <ChunkSlagSteel>4</ChunkSlagSteel>
       <ComponentIndustrial>4</ComponentIndustrial>
@@ -40,7 +40,10 @@
     </killedLeavings>
     <costList>
       <Steel>150</Steel>
-      <ComponentIndustrial>2</ComponentIndustrial>
+      <Plasteel>75</Plasteel>
+      <Uranium>50</Uranium>
+      <ComponentIndustrial>5</ComponentIndustrial>
+      <ShuttleEngine MayRequire="Ludeon.RimWorld.Odyssey">1</ShuttleEngine>
     </costList>
     <resourcesFractionWhenDeconstructed>1</resourcesFractionWhenDeconstructed>
     <leaveResourcesWhenKilled>false</leaveResourcesWhenKilled>
