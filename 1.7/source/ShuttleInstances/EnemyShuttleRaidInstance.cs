@@ -32,6 +32,10 @@ namespace Gravship_Raids
 
         public int departureTick = -1;
 
+        public int landingStartedTick = -1;
+
+        public IntVec3 landingCell = IntVec3.Invalid;
+
         public EnemyShuttleRaidInstance()
         {
         }
@@ -61,6 +65,8 @@ namespace Gravship_Raids
             Scribe_Values.Look(ref state, "state", ShuttleRaidState.Landing);
             Scribe_Values.Look(ref shuttleLost, "shuttleLost", false);
             Scribe_Values.Look(ref departureTick, "departureTick", -1);
+            Scribe_Values.Look(ref landingStartedTick, "landingStartedTick", -1);
+            Scribe_Values.Look(ref landingCell, "landingCell", IntVec3.Invalid);
 
             if (Scribe.mode == LoadSaveMode.PostLoadInit)
             {

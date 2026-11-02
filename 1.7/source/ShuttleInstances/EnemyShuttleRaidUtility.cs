@@ -1,3 +1,4 @@
+using System.Linq;
 using RimWorld;
 using Verse;
 
@@ -51,6 +52,95 @@ namespace Gravship_Raids
             instance.state = ShuttleRaidState.Lost;
             instance.departureTick = -1;
             Logger.Message($"EnemyShuttleRaidUtility.AbandonInstance: {instance} abandoned ({reason}); shuttle cleanup: {cleanupOutcome}; wreck: {wreckOutcome}.");
+        }
+
+        public static bool IsShuttleIncoming(Thing shuttle)
+        {
+            if (shuttle == null || shuttle.Destroyed)
+            {
+                return false;
+            }
+            return shuttle.Spawned || (shuttle.ParentHolder is Skyfaller skyfaller && skyfaller.Spawned);
+        }
+
+        public static void RecoverUnlandedShuttle(EnemyShuttleRaidInstance instance, Map map, IntVec3 near, string reason)
+        {
+            if (instance == null || instance.state == ShuttleRaidState.Departed || instance.state == ShuttleRaidState.Lost)
+            {
+                return;
+            }
+
+            Thing shuttle = instance.shuttle;
+            int pawnsSpawned = 0;
+            int pawnsKept = 0;
+            int itemsPlaced = 0;
+            CompTransporter transporter = shuttle?.TryGetComp<CompTransporter>();
+            if (transporter?.innerContainer != null && map != null)
+            {
+                foreach (Thing thing in transporter.innerContainer.ToList())
+                {
+                    if (thing is Pawn pawn)
+                    {
+                        if (ShuttleRaidSpawnUtility.TrySpawnOnSafeLand(pawn, map, near, Rot4.Random))
+                        {
+                            pawnsSpawned++;
+                        }
+                        else
+                        {
+                            pawnsKept++;
+                        }
+                    }
+                    else
+                    {
+                        transporter.innerContainer.Remove(thing);
+                        if (GenPlace.TryPlaceThing(thing, near, map, ThingPlaceMode.Near))
+                        {
+                            itemsPlaced++;
+                        }
+                        else
+                        {
+                            thing.Destroy();
+                        }
+                    }
+                }
+            }
+
+            TransportShip ship = shuttle?.TryGetComp<CompShuttle>()?.shipParent;
+            if (ship != null)
+            {
+                Find.TransportShipManager.DeregisterShipObject(ship);
+            }
+            if (shuttle != null && !shuttle.Spawned && !shuttle.Destroyed && !(shuttle.ParentHolder is Skyfaller))
+            {
+                shuttle.Destroy(DestroyMode.QuestLogic);
+            }
+
+            Logger.Warning($"EnemyShuttleRaidUtility.RecoverUnlandedShuttle: {instance} failed to land ({reason}). Planned site {instance.landingCell} (terrain {(instance.landingCell.IsValid && map != null ? ShuttleRaidTemplateUtility.DescribeTerrain(instance.landingCell, map) : "unknown")}); {pawnsSpawned} crew spawned on safe land, {pawnsKept} kept as world pawns, {itemsPlaced} other item(s) placed.");
+
+            instance.shuttleLost = true;
+            instance.shuttle = null;
+            instance.state = ShuttleRaidState.Lost;
+            instance.departureTick = -1;
+        }
+
+        public static void AbortIncomingShip(TransportShip ship, Thing shuttle)
+        {
+            if (ship != null)
+            {
+                Find.TransportShipManager.DeregisterShipObject(ship);
+            }
+            if (shuttle == null || shuttle.Destroyed || shuttle.Spawned)
+            {
+                return;
+            }
+            if (shuttle.ParentHolder is Skyfaller skyfaller)
+            {
+                skyfaller.Destroy();
+            }
+            else
+            {
+                shuttle.Destroy(DestroyMode.QuestLogic);
+            }
         }
 
         public static bool TryDepart(EnemyShuttleRaidInstance instance)

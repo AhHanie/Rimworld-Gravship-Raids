@@ -10,6 +10,8 @@ namespace Gravship_Raids
     {
         private const int SweepIntervalTicks = 251;
 
+        private const int LandingTimeoutGraceTicks = 600;
+
         private List<EnemyShuttleRaidInstance> instances = new List<EnemyShuttleRaidInstance>();
 
         public MapComponent_ShuttleRaid(Map map)
@@ -126,6 +128,14 @@ namespace Gravship_Raids
                         instance.state = ShuttleRaidState.Landed;
                         Logger.Message($"MapComponent_ShuttleRaid.SweepInstances: {instance} finished landing.");
                     }
+                    else if (instance.landingStartedTick < 0)
+                    {
+                        instance.landingStartedTick = Find.TickManager.TicksGame;
+                    }
+                    else if (!EnemyShuttleRaidUtility.IsShuttleIncoming(instance.shuttle) && Find.TickManager.TicksGame - instance.landingStartedTick > LandingTimeoutTicks(instance))
+                    {
+                        EnemyShuttleRaidUtility.RecoverUnlandedShuttle(instance, map, instance.landingCell, "landing timed out with no shuttle or incoming skyfaller");
+                    }
                 }
                 else if (!instance.ShuttleAvailable && !instance.shuttleLost)
                 {
@@ -146,6 +156,12 @@ namespace Gravship_Raids
                     DeregisterInstance(instance);
                 }
             }
+        }
+
+        private static int LandingTimeoutTicks(EnemyShuttleRaidInstance instance)
+        {
+            int flightTicks = instance.template?.shipDef?.arrivingSkyfaller?.skyfaller?.ticksToImpactRange.max ?? 400;
+            return flightTicks + LandingTimeoutGraceTicks;
         }
 
         private static bool AnyCrewStillLordOwned(EnemyShuttleRaidInstance instance)

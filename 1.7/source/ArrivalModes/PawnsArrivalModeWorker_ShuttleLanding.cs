@@ -88,7 +88,7 @@ namespace Gravship_Raids
                 {
                     return false;
                 }
-                return ShuttleRaidTemplateUtility.CanShuttleLandAt(request.Root, map, request.SelectedTemplate.shuttle, request.Rotation);
+                return ShuttleRaidTemplateUtility.CanShuttleLandAt(request.SelectedTemplate, request.Root, map, request.Rotation);
             }
 
             if (!ShuttleRaidTemplateUtility.HasEligibleTemplate(parms.faction?.def, parms.points, map))
@@ -123,9 +123,9 @@ namespace Gravship_Raids
                     }
                 }
                 else if (!ShuttleRaidTemplateUtility.IsEligibleTemplate(template, parms.faction?.def, parms.points, map) ||
-                         !ShuttleRaidTemplateUtility.CanShuttleLandAt(request.Root, map, template.shuttle, request.Rotation))
+                         !ShuttleRaidTemplateUtility.CanShuttleLandAt(template, request.Root, map, request.Rotation))
                 {
-                    Logger.Warning($"PawnsArrivalModeWorker_ShuttleLanding.TryResolveRaidSpawnCenter: selected template '{template.defName}' is not eligible/landable for faction '{parms.faction?.def?.defName ?? "null"}' at {parms.points} points at the debug-forced cell {request.Root} (rot {request.Rotation}); declining this arrival mode so the incident fails cleanly before any pawns are generated.");
+                    Logger.Warning($"PawnsArrivalModeWorker_ShuttleLanding.TryResolveRaidSpawnCenter: selected template '{template.defName}' is not eligible/landable for faction '{parms.faction?.def?.defName ?? "null"}' at {parms.points} points at the debug-forced cell {request.Root} (rot {request.Rotation}) ({ShuttleRaidTemplateUtility.CanShuttleLandAtReport(template, request.Root, map, request.Rotation).Reason}); declining this arrival mode so the incident fails cleanly before any pawns are generated.");
                     return false;
                 }
 
@@ -153,7 +153,7 @@ namespace Gravship_Raids
         {
             foreach (ShuttleRaidTemplateDef candidate in ShuttleRaidTemplateUtility.GetEligibleTemplates(factionDef, points, map))
             {
-                if (ShuttleRaidTemplateUtility.CanShuttleLandAt(root, map, candidate.shuttle, rotation))
+                if (ShuttleRaidTemplateUtility.CanShuttleLandAt(candidate, root, map, rotation))
                 {
                     template = candidate;
                     return true;
@@ -176,20 +176,42 @@ namespace Gravship_Raids
                 return;
             }
 
+            AcceptanceReport planReport = ShuttleRaidTemplateUtility.CanShuttleLandAtReport(plan.Template, plan.Root, map, plan.Rotation);
+            if (!planReport.Accepted)
+            {
+                Logger.Warning($"PawnsArrivalModeWorker_ShuttleLanding.Arrive: stashed plan for template '{plan.Template?.defName ?? "null"}' at {plan.Root} (rot {plan.Rotation}) is no longer valid ({planReport.Reason}); searching for a fresh site.");
+                if (!ShuttleRaidTemplateUtility.TryFindLandingSite(map, parms.faction?.def, parms.points, out ShuttleRaidTemplateDef freshTemplate, out IntVec3 freshRoot, out Rot4 freshRotation))
+                {
+                    Logger.Warning("PawnsArrivalModeWorker_ShuttleLanding.Arrive: no fresh landing site found; dropping the raiders on safe land instead of by shuttle.");
+                    FallbackArrive(pawns, map, plan.Root, plan.Rotation);
+                    return;
+                }
+                plan = new LandingPlan(freshTemplate, freshRoot, freshRotation);
+            }
+
             EnemyShuttleRaidInstance instance = null;
+            TransportShip transportShip = null;
+            Thing shuttleThing = null;
             try
             {
-                Thing shuttleThing = ThingMaker.MakeThing(plan.Template.shuttle);
+                shuttleThing = ThingMaker.MakeThing(plan.Template.shuttle);
                 shuttleThing.SetFaction(parms.faction);
                 shuttleThing.Rotation = plan.Rotation;
 
                 instance = new EnemyShuttleRaidInstance(plan.Template, parms.faction, shuttleThing);
                 instance.state = ShuttleRaidState.Landing;
+                instance.landingStartedTick = Find.TickManager.TicksGame;
+                instance.landingCell = plan.Root;
                 instance.crew.AddRange(pawns);
                 MapComponent_ShuttleRaid.GetFor(map).RegisterInstance(instance);
 
-                TransportShip transportShip = TransportShipMaker.MakeTransportShip(plan.Template.shipDef, pawns, shuttleThing);
+                transportShip = TransportShipMaker.MakeTransportShip(plan.Template.shipDef, pawns, shuttleThing);
                 transportShip.ArriveAt(plan.Root, map.Parent);
+
+                if (!EnemyShuttleRaidUtility.IsShuttleIncoming(shuttleThing))
+                {
+                    throw new InvalidOperationException("the arriving skyfaller was not spawned for the shuttle");
+                }
 
                 ShipJob_WaitForever waitJob = (ShipJob_WaitForever)ShipJobMaker.MakeShipJob(ShipJobDefOf.WaitForever);
                 waitJob.showGizmos = false;
@@ -206,6 +228,7 @@ namespace Gravship_Raids
                     MapComponent_ShuttleRaid.GetFor(map)?.DeregisterInstance(instance);
                 }
                 FallbackArrive(pawns, map, plan.Root, plan.Rotation);
+                EnemyShuttleRaidUtility.AbortIncomingShip(transportShip, shuttleThing);
             }
         }
 
@@ -221,11 +244,7 @@ namespace Gravship_Raids
 
         private static void FallbackArrive(List<Pawn> pawns, Map map, IntVec3 spawnCenter, Rot4 spawnRotation)
         {
-            for (int i = 0; i < pawns.Count; i++)
-            {
-                IntVec3 loc = CellFinder.RandomClosewalkCellNear(spawnCenter, map, 8);
-                GenSpawn.Spawn(pawns[i], loc, map, spawnRotation);
-            }
+            ShuttleRaidSpawnUtility.TrySpawnAllOnSafeLand(pawns, map, spawnCenter, spawnRotation);
         }
 
         private sealed class LandingPlan
