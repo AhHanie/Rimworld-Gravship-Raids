@@ -42,7 +42,10 @@ namespace Gravship_Raids
 
         private Thing LiveShuttle => (instance != null && instance.ShuttleAvailable) ? instance.shuttle : null;
 
-        private bool BoardingWindowOpen => instance == null || instance.departureTick < 0 || Find.TickManager.TicksGame < instance.departureTick;
+        private bool BoardingWindowOpen => instance != null
+            && instance.state == ShuttleRaidState.Boarding
+            && instance.departureTick >= 0
+            && Find.TickManager.TicksGame < instance.departureTick;
 
         public override void Init()
         {
@@ -208,8 +211,12 @@ namespace Gravship_Raids
             {
                 return;
             }
+            if (instance.state == ShuttleRaidState.Departing || instance.state == ShuttleRaidState.Departed)
+            {
+                return;
+            }
             LordToilData_BoardEnemyShuttle data = Data;
-            if (shuttle != null)
+            if (shuttle != null && instance.state == ShuttleRaidState.Boarding)
             {
                 if (!data.sentBoardingMessage)
                 {
@@ -219,10 +226,6 @@ namespace Gravship_Raids
                 return;
             }
 
-            if (instance.state == ShuttleRaidState.Departed)
-            {
-                return;
-            }
             if (!data.sentStrandedMessage)
             {
                 data.sentStrandedMessage = true;
